@@ -1,0 +1,51 @@
+import jwt from "jsonwebtoken" 
+import User from "../models/User";
+import type { Request, Response, NextFunction } from "express";
+import { Document } from "mongoose";
+
+interface JwtPayload {
+    id: string;
+    iat?: number; // issued at timestamp
+    exp?: number; // expiration timestamp
+  }  
+
+
+
+  interface IUser extends Document {
+      name: string;
+      email: string;
+      profilePic?: string | null;
+      bio?: string;
+      role: 'admin' | 'member';
+      createdAt: Date;
+      updatedAt: Date;
+  }
+  
+const protect = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        let token = req.headers.authorization;
+
+        if (token && token.startsWith('Bearer ')){
+            token = token.split(" ")[1];
+
+            if (!token) {
+                return res.status(401).json({ message: "Not authorized, invalid token format" });
+            }
+            
+            const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+            // req.user = ...: The entire result of the database query—the user document (without the password)—is assigned to a new property on the request object called user.
+            // This makes the user's information accessible in all subsequent middleware and route handlers in the request-response cycle.
+            req.user = await User.findById(decoded.id).select("-password") as IUser;
+            console.log(req.user)
+            next();
+        }
+        else{
+            res.status(401).json({message: "Not authorized --> No token !!"})
+        }
+        
+    } catch (error) {
+        res.status(401).json({message: "Token failed. Error: ", error});
+    }
+}
+
+export default protect;
