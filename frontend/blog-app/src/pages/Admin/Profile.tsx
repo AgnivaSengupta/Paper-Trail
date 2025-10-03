@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Check, Pencil } from 'lucide-react'
 import React, { useState } from 'react'
+import Test from './Test'
 
 type editType = {
   name: boolean;
@@ -27,8 +28,8 @@ const Profile = () => {
   }
 
   return (
-    <DashboardLayout>
-        <DashboardNavbar page='Profile'/>
+    <Test>
+        
         <div className='p-5 flex flex-col gap-5 px-10 w-[60%]'>
             <div>
                 <h1 className='text-3xl font-medium'>My Profile</h1>
@@ -115,7 +116,7 @@ const Profile = () => {
               </div>
             </div>
         </div>
-    </DashboardLayout>
+    </Test>
   )
 }
 

@@ -36,114 +36,62 @@ const BlogLandingPage = () => {
   };
 
   return (
-    // <BlogLayout>
-    //   <section className="h-screen p-5">
-    //     <div className="flex flex-col justify-center items-center gap-10 p-2 w-auto h-full font-playfair">
-    //       <div className="flex flex-col justify-center items-center text-center gap-20 p-5 ">
-    //         <h1 className="text-8xl">A journal of ideas, Open to all..</h1>
-    //         <p className="text-3xl text-center italic text-gray-400">A minimal space where I share my thoughts, projects, and daily learnings — and where you can share yours too.</p>
-    //       </div>
-
-    //       <div className=" flex justify-center items-center gap-10 w-full p-5">
-    //         <Button size="lg" className="border-1 border-[#F9F4EC] cursor-pointer">
-    //           Start writting
-    //         </Button>
-
-    //         <Button size="lg" variant="secondary" className="cursor-pointer" onClick={handleScrollToBlogs}>
-    //           Read blog
-    //           <CircleArrowRight className="ml-1 size-6" />
-    //         </Button>
-    //       </div>
-    //     </div>
-    //   </section>
-
-    //   <section
-    //     ref={blogSectionRef}
-    //     className="min-h-[calc(100vh-80px)] w-full p-5 bg-amber-100"
-    //   >
-    //     <div className="w-full h-[500px] border-red-500 border-2 border-dashed">
-    //       <div className="grid grid-cols-[1fr_2fr_1fr] gap-4">
-    //       <div className="col-span-full row-start-1 min-[800px]:col-start-1 bg-blue-300">
-    //         <article>1</article>  
-    //       </div>
-    //       <div className="col-start-2 row-start-1 bg-purple-200">
-    //         <article>2</article>
-    //       </div>
-
-    //       <div className="col-span-full row-start-1 min-[800px]:col-start-3 bg-pink-300">
-    //         <article>3</article>
-    //       </div>
-    //       </div>
-    //     </div>
-    //   </section>
-
-    // </BlogLayout>
-
-    <div className="min-h-screen bg-[#212121]">
-          {/* Header */}
-          <header className="bg-[#212121] backdrop-blur-sm sticky top-0 z-50 text-sm">
-          <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
+    
+    <div className="min-h-screen bg-background">
+        {/* Header */}
+        <div className="flex justify-center items-end w-full backdrop-blur-sm sticky top-0 z-50 h-20">
+          <header className="bg-[#212121] text-sm min-w-[400px] sm:min-w-[500px] md:min-w-[700px] lg:min-w-[900px] xl:min-w-[1200px] rounded-lg">
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 ">
+              <div className="flex items-center justify-between h-16">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <h1 className="text-2xl text-white font-playfair">Papertrail</h1>
                 </div>
-                <h1 className="text-2xl text-white font-playfair">Papertrail</h1>
-              </div>
 
-              <div className="flex items-center space-x-4">
-                <Button variant='tab' size="sm">Sign In</Button>
-                <Button size="sm" variant='preview' className="text-white">
-                  <PenTool className="w-4 h-4 mr-2" />
-                  Write
-                </Button>
+                <div className="flex items-center space-x-4">
+                  <Button variant='tab' size="sm">Sign In</Button>
+                  <Button size="sm" variant='preview' className="text-white">
+                    <PenTool className="w-4 h-4 mr-2" />
+                    Write
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
+        </div>
 
 
       
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
             <Users className="w-4 h-4 mr-2" />
             Join {mockStats.totalAuthors}+ writers in our community
           </div>
-          <h1 className="text-5xl md:text-7xl font-playfair text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-playfair text-foreground mb-6 leading-tight">
             A journal of ideas, Open to all
           </h1>
-          <p className="text-xl font-playfair italic text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl font-playfair italic text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
           A minimal space where I share my thoughts, projects, and daily learnings — and where you can share yours too.
           </p>
           
-          {/* Stats */}
-          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{mockStats.totalPosts}</div>
-              <div className="text-sm text-gray-600">Published Posts</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{mockStats.totalAuthors}+</div>
-              <div className="text-sm text-gray-600">Active Writers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{mockStats.totalViews}</div>
-              <div className="text-sm text-gray-600">Total Views</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{mockStats.monthlyReaders}</div>
-              <div className="text-sm text-gray-600">Monthly Readers</div>
-            </div>
-          </div> */}
-
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 px-8 text-base h-12">
+            <Button size="lg" 
+              className="bg-primary hover:bg-primary/90  text-secondary-foreground focus-visible:ring-ring cursor-pointer px-8 text-base h-12"
+              onClick={() => {
+                const element = document.getElementById("PostsSection");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+            >
               <BookOpen className="w-5 h-5 mr-2" />
               Start Reading
             </Button>
-            <Button size="lg" variant="outline" className="px-8 h-12 text-base">
+            <Button size="lg" className="px-8 h-12 text-base bg-secondary hover:bg-secondary/80 focus-visible:ring-ring text-secondary-foreground cursor-pointer">
               <PenTool className="w-5 h-5 mr-2" />
               Write Your Story
             </Button>
@@ -152,10 +100,10 @@ const BlogLandingPage = () => {
       </section>
 
 
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id='PostsSection' className="py-25 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-5xl font-semibold text-white font-playfair">Latest Posts</h2>
+            <h2 className="text-3xl font-semibold text-foreground font-playfair">Latest Posts</h2>
             <div className="relative w-full lg:w-96">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
@@ -163,13 +111,13 @@ const BlogLandingPage = () => {
                 placeholder="Search posts, authors, or topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-3 w-full"
+                className="pl-10 pr-4 py-3 w-full border-input focus-visible:ring-ring text-muted-foreground"
               />
             </div>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => (
-              <Card key={post.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-md bg-white/10 p-0">
+              <Card key={post.id} className="group hover:shadow-xl transition-all duration-300 shadow-md bg-card border-border border-1 p-0 cursor-pointer">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <img
                     src={post.image}
@@ -187,10 +135,10 @@ const BlogLandingPage = () => {
                       {post.readTime}
                     </div>
                   </div>
-                  <h3 className="text-xl font-medium text-white mb-3 group-hover:text-white/80 cursor-pointer transition-colors line-clamp-2">
+                  <h3 className="text-xl font-medium text-foreground mb-3 group-hover:text-white/80 cursor-pointer transition-colors line-clamp-2">
                     {post.title}
                   </h3>
-                  <p className="text-white font-extralight text-sm mb-4 line-clamp-3">
+                  <p className="text-muted-foreground font-extralight text-sm mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
                   <div className="flex items-center justify-between">
@@ -200,8 +148,8 @@ const BlogLandingPage = () => {
                         <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium text-white">{post.author.name}</p>
-                        <p className="text-xs text-gray-400">{formatDate(post.publishedAt)}</p>
+                        <p className="text-sm font-medium text-foreground">{post.author.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(post.publishedAt)}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4 text-sm text-gray-400">
@@ -219,6 +167,10 @@ const BlogLandingPage = () => {
               </Card>
             ))}
           </div>
+        </div>
+
+        <div className="w-full flex justify-center mt-15">
+          <Button className="bg-secondary hover:bg-secondary/80 text-base cursor-pointer">Load more</Button>
         </div>
       </section>
 

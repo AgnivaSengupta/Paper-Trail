@@ -9,12 +9,10 @@ type Props = {
 const BlogLayout = ({children} : Props) => {
   return (
     
-      <div className="bg-[#212121] flex flex-col min-h-screen text-white">
-          <div className="fixed w-full bg-[#212121]">
-            <BlogNavbar/> 
-          </div>
-          <div className="flex flex-col">{children}</div>
-      </div>
+    <div className="bg-background flex flex-col min-h-screen text-white">
+        <BlogNavbar/> 
+        <div className="flex flex-col">{children}</div>
+    </div>
     
   )
 }
