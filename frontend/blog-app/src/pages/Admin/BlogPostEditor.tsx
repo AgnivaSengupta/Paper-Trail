@@ -6,8 +6,31 @@ import { Label } from "@radix-ui/react-label"
 import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import toast, { Toaster } from "react-hot-toast"
+import { useState } from "react"
 
 const BlogPostEditor = () => {
+  const [title, setTitle] = useState("");
+  const [tags, setTags] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [editorJson, setEditorJson] = useState({})
+  const [editorHtml, setEditorHtml] = useState("")
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const payload = {
+      title,
+      content: {
+        json: editorJson,
+        html: editorHtml,
+      },
+      coverImageUrl,
+      tags: tags.split(',').map((tag) => tag.trim()),
+      isDraft: false,
+      generatedByAi: false,
+    }
+  }
+
   const notify = () => toast.success('Saved as Draft!', {
     duration: 2000,
     position: 'bottom-right',
@@ -19,7 +42,10 @@ const BlogPostEditor = () => {
     <Test>
       <div className="w-full flex gap-5">
         <div className="w-[70%]">
-          <SimpleEditor/>
+          <SimpleEditor onChange={(json, html) => {
+            setEditorJson(json);
+            setEditorHtml(html);
+          }}/>
         </div>
 
         <div className="w-[30%] max-h-[480px] flex justify-center">

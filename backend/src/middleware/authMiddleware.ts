@@ -7,20 +7,20 @@ interface JwtPayload {
     id: string;
     iat?: number; // issued at timestamp
     exp?: number; // expiration timestamp
-  }  
+}  
 
 
 
-  interface IUser extends Document {
-      name: string;
-      email: string;
-      profilePic?: string | null;
-      bio?: string;
-      role: 'admin' | 'member';
-      createdAt: Date;
-      updatedAt: Date;
-  }
-  
+interface IUser extends Document {
+    name: string;
+    email: string;
+    profilePic?: string | null;
+    bio?: string;
+    role: 'admin' | 'member';
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 const protect = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let token = req.headers.authorization;

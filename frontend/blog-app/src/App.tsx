@@ -35,15 +35,15 @@ function App() {
           <Route path='/:slug' element={<BlogPostView/>}/>
 
           {/* Admin routes */}
-          {/* <Route element={<PrivateRoute  allowedRole={'admin'}/>}> */}
+          <Route element={<PrivateRoute  allowedRole={'admin'}/>}>
             <Route path='/admin/overview' element={<Dashboard/>}/>
             <Route path='/admin/posts' element={<BlogPosts/>}/>
             <Route path='/admin/create' element={<BlogPostEditor/>}/>
             <Route path='/admin/profile' element={<Profile/>}/>
             <Route path='/admin/comments' element={<Comments/>}/>
 
-            <Route path='/admin/edit/:postSlug' element={<BlogPostEditor isEdit={true}/>}/>
-          {/* </Route> */}
+            {/* <Route path='/admin/edit/:postSlug' element={<BlogPostEditor isEdit={true}/>}/> */}
+          </Route>
 
           <Route path='/admin-login' element={<AdminLogin/>}/>
 

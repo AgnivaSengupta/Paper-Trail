@@ -37,10 +37,10 @@ axiosInstance.interceptors.response.use(
             // Redirect to login Page
             // window.location.href= "/";
 
-            const { clearUser, setAuthOpenForm } = useUserStore.getState();
+            const { clearUser, setOpenAuthForm } = useUserStore.getState();
 
             clearUser();
-            setAuthOpenForm(true);
+            setOpenAuthForm(true);
         }
         else if (error.response.status === 500){
             console.error("Server error. Please try again later");

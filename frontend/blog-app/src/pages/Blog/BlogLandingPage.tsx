@@ -7,8 +7,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import AuthForm from "@/components/auth/AuthForm";
+
 
 const BlogLandingPage = () => {
+
+  const [openSignUp, setOpenSignUp] = useState(false);
+  const [openLogIn, setOpenLogIn] = useState(false);
 
   const blogSectionRef = useRef<HTMLDivElement>(null);
 
@@ -51,11 +65,16 @@ const BlogLandingPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <Button variant='tab' size="sm">Sign In</Button>
-                  <Button size="sm" variant='preview' className="text-white">
+                  <Button size="sm" 
+                  className="bg-secondary text-secondary-foreground cursor-pointer hover:bg-secondary/80"
+                  onClick={() => setOpenSignUp(true)}
+                  >
+                    Sign In
+                  </Button>
+                  {/* <Button size="sm" className="text-white">
                     <PenTool className="w-4 h-4 mr-2" />
                     Write
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
@@ -80,7 +99,7 @@ const BlogLandingPage = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" 
-              className="bg-primary hover:bg-primary/90  text-secondary-foreground focus-visible:ring-ring cursor-pointer px-8 text-base h-12"
+              className="bg-primary hover:bg-primary/90  text-foreground focus-visible:ring-ring cursor-pointer px-8 text-base h-12"
               onClick={() => {
                 const element = document.getElementById("PostsSection");
                 if (element) {
@@ -222,6 +241,19 @@ const BlogLandingPage = () => {
           </div>
         </div>
       </footer>
+
+<Dialog open={openSignUp} onOpenChange={setOpenSignUp}>
+  <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden">
+    <DialogHeader className="p-6 pb-0 ">
+      <DialogTitle className="text-center text-foreground text-2xl font-playfair">Papertrail</DialogTitle>
+    </DialogHeader>
+    <div className="p-6 pt-0">
+      {/* <SignupForm /> */}
+      <AuthForm/>
+    </div>
+  </DialogContent>
+</Dialog>
+
     </div>
 
   )
