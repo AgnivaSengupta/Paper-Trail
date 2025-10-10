@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import BlogLayout from "../../components/layouts/BlogLayout"
 import { BookOpen, CircleArrowRight, Clock, Eye, Heart, PenTool, Search, Users } from 'lucide-react'
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { mockPosts, mockTrendingPosts, mockStats, mockCategories } from './mock';
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,17 +17,28 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import AuthForm from "@/components/auth/AuthForm";
+import { useAuthStore } from "@/store/useAuthStore";
+import axiosInstance from "@/utils/axiosInstance";
+import { API_PATHS } from "@/utils/apiPaths";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuLabel, DropdownMenuTrigger , DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+
 
 
 const BlogLandingPage = () => {
 
-  const [openSignUp, setOpenSignUp] = useState(false);
-  const [openLogIn, setOpenLogIn] = useState(false);
+  const {authFormOpen, setAuthFormOpen} = useAuthStore()
+  
+  // const {user} = useUser();
+  // const {openSignIn} = useClerk();
 
   const blogSectionRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const navigate = useNavigate();
+
   const handleScrollToBlogs = () => {
     blogSectionRef.current?.scrollIntoView({behavior: "smooth"})
   }
@@ -49,6 +60,38 @@ const BlogLandingPage = () => {
     });
   };
 
+  const {user, setUser} = useAuthStore();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true
+        });
+
+        setUser(response.data)
+
+      } catch (error) {
+        setUser(null)
+      }
+    }
+
+    fetchProfile();
+  }, [setUser])
+
+  const handleLogOut = async () => {
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {}, {
+        withCredentials: true
+      })
+      alert("Logged out successfully!")
+      console.log(response.data)
+    } catch (error) {
+      alert("Logout failed!")
+      console.log(error)
+    }
+  }
+
   return (
     
     <div className="min-h-screen bg-background">
@@ -65,16 +108,35 @@ const BlogLandingPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <Button size="sm" 
-                  className="bg-secondary text-secondary-foreground cursor-pointer hover:bg-secondary/80"
-                  onClick={() => setOpenSignUp(true)}
+                  {user ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button>
+                          <div className="p-2 flex justify-center items-center rounded-full bg-yellow-50">A</div>
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel>My Profile</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => navigate('/admin/overview')}>Dashboard</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate('/admin/posts')}>Blog Posts</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate('/admin/profile')}>Profile</DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem onClick={() => navigate('/admin/create')}>Create a blog</DropdownMenuItem>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem  onClick={handleLogOut}>Log out</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ): (
+                    <Button size="sm" 
+                    className="bg-secondary text-secondary-foreground cursor-pointer hover:bg-secondary/80"
+                    onClick={() => setAuthFormOpen(true)}
                   >
                     Sign In
                   </Button>
-                  {/* <Button size="sm" className="text-white">
-                    <PenTool className="w-4 h-4 mr-2" />
-                    Write
-                  </Button> */}
+                  )}
                 </div>
               </div>
             </div>
@@ -242,7 +304,7 @@ const BlogLandingPage = () => {
         </div>
       </footer>
 
-<Dialog open={openSignUp} onOpenChange={setOpenSignUp}>
+<Dialog open={authFormOpen} onOpenChange={setAuthFormOpen}>
   <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden">
     <DialogHeader className="p-6 pb-0 ">
       <DialogTitle className="text-center text-foreground text-2xl font-playfair">Papertrail</DialogTitle>

@@ -28,6 +28,7 @@ const adminOnly = (req: Request, res: Response, next: NextFunction) => {
 }
 
 router.post('/', protect, adminOnly, createPost);
+// router.post('/', createPost);
 router.get('/', getAllPosts);
 router.get('/slugs/:slug', getPostBySlug);
 router.put('/:id', protect, adminOnly, updatePost);

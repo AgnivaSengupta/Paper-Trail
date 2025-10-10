@@ -6,10 +6,10 @@ type PrivateRouteProps = {
   allowedRole: string;
 };
 
-const PrivateRoute = ({allowedRole}: PrivateRouteProps) => {
+const PrivateRoute = () => {
   const user = useUserStore((state) => state.user);
   const loading = useUserStore((state) => state.loading);
-  const fetchUser = useUserStore((state) => state.fetchUser);
+  const fetchUser = useUserStore((state) => state.fetchUser);  
 
   useEffect(() => {
     fetchUser(); // triggers loading -> sets user
@@ -23,13 +23,10 @@ const PrivateRoute = ({allowedRole}: PrivateRouteProps) => {
     )
   }
 
-  if (!user){
-    return <Navigate to='/' replace/>
-  }
 
-  if (user.role != allowedRole){
-    return <Navigate to='/' replace/>
-  }
+  // if (user.role != allowedRole){
+  //   return <Navigate to='/' replace/>
+  // }
   return (
     <Outlet/>
   )

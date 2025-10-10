@@ -2,8 +2,32 @@ import BlogLayout from "@/components/layouts/BlogLayout"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Share2 } from "lucide-react"
+import "@/components/tiptap-node/blockquote-node/blockquote-node.scss"
+import "@/components/tiptap-node/code-block-node/code-block-node.scss"
+import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
+import "@/components/tiptap-node/list-node/list-node.scss"
+import "@/components/tiptap-node/image-node/image-node.scss"
+import "@/components/tiptap-node/heading-node/heading-node.scss"
+import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import { useEffect, useState } from "react"
 
 const BlogPostView = () => {
+
+  const [htmlContent, setHtmlContent] = useState('');
+
+  useEffect(() => {
+    // Fetch the HTML file
+    fetch('/content.html')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch HTML');
+        }
+        return response.text();
+      })
+      .then((data) => setHtmlContent(data))
+      .catch((error) => console.error(error));
+  }, []);
+
   return (
     <BlogLayout>
       <div className=" w-full flex justify-center mt-10"> 
@@ -29,9 +53,8 @@ const BlogPostView = () => {
                 </div>
               </div>
 
-              <Button size='sm' className="text-sm h-9 bg-green-500">
+              <Button size='sm' variant='link' className="text-sm h-9 text-secondary cursor-pointer">
                 <Share2 />
-                Share
               </Button>
             </div>
 
@@ -42,8 +65,10 @@ const BlogPostView = () => {
               Image
             </div>
 
-            <div className="flex flex-col gap-3 text-lg mb-5 text-foreground">
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
+            <div id='blog-content' className="flex flex-col gap-3 text-lg mb-5 text-foreground tiptap ProseMirror" 
+            dangerouslySetInnerHTML={{ __html: htmlContent }} 
+            >
+              {/* <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
               <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione eveniet temporibus voluptatem quos debitis, sit ad quo tenetur tempore enim, fugit distinctio itaque delectus! Suscipit deleniti in inventore dolores ipsam?</p>
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
@@ -56,7 +81,7 @@ const BlogPostView = () => {
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              
+               */}
             
             </div>
 

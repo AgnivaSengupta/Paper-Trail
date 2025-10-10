@@ -5,6 +5,10 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {/* <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <BrowserRouter> */}
+        <App />
+      {/* </BrowserRouter>
+    </ClerkProvider> */}
   </StrictMode>,
 )

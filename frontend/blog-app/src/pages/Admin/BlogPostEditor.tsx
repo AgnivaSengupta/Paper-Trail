@@ -7,6 +7,10 @@ import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import toast, { Toaster } from "react-hot-toast"
 import { useState } from "react"
+import useEditorStore from "@/store/tempStore"
+import { Upload } from "lucide-react"
+import axiosInstance from "@/utils/axiosInstance"
+import { API_PATHS } from "@/utils/apiPaths"
 
 const BlogPostEditor = () => {
   const [title, setTitle] = useState("");
@@ -15,20 +19,34 @@ const BlogPostEditor = () => {
   const [editorJson, setEditorJson] = useState({})
   const [editorHtml, setEditorHtml] = useState("")
 
+
+  
+  const json = useEditorStore((state) => state.json)
+  const html = useEditorStore((state) => state.html)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const payload = {
       title,
       content: {
-        json: editorJson,
-        html: editorHtml,
+        json: json,
+        html: html,
       },
       coverImageUrl,
       tags: tags.split(',').map((tag) => tag.trim()),
       isDraft: false,
       generatedByAi: false,
     }
+
+    console.log(payload)
+
+    const response = await axiosInstance.post(API_PATHS.POST.CREATE_POST, payload)
+    console.log(response)
+  }
+
+  const handleSave = async () => {
+
   }
 
   const notify = () => toast.success('Saved as Draft!', {
@@ -38,17 +56,19 @@ const BlogPostEditor = () => {
     className: 'text-sm w-[200px] mx-15 mb-5'
   });
 
+  const setContent = useEditorStore((state) => state.setContent)
+
+
   return (
     <Test>
       <div className="w-full flex gap-5">
         <div className="w-[70%]">
           <SimpleEditor onChange={(json, html) => {
-            setEditorJson(json);
-            setEditorHtml(html);
+            setContent(html, json)
           }}/>
         </div>
 
-        <div className="w-[30%] max-h-[480px] flex justify-center">
+        <div className="w-[30%] max-h-[480px] flex items-center flex-col">
           <Card className="w-[80%] h-auto max-w-sm bg-card text-card-foreground border-accent">
             <CardHeader>
               <CardTitle className="text-lg">Blog details</CardTitle>
@@ -58,12 +78,32 @@ const BlogPostEditor = () => {
             </CardHeader>
             <CardContent>
               <form>
+
+                
                 <div className="flex flex-col gap-4">
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="fileUpload" className="text-base text-foreground">Cover Image</Label>
+                    <div id='fileUpload' className="border-1 border-dashed min-h-[100px] flex justify-center items-center rounded-lg hover:border-ring">           
+                      <Label htmlFor="coverImage" className="text-sm text-foreground cursor-pointer flex items-center gap-5">
+                        <Upload className="text-gray-400"/>
+                        <p className="text-purple-500 underline">Clcik to upload</p>
+                      </Label>
+                      <Input
+                        id="coverImage"
+                        type="file"
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                  
                   <div className="grid gap-2">
                     <Label htmlFor="title" className="text-base text-foreground">Title</Label>
                     <Input
                       id="title"
                       type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
                       required
                     />
                   </div>
@@ -73,15 +113,8 @@ const BlogPostEditor = () => {
                     <Input
                       id="tags"
                       type="text"
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="title" className="text-base text-foreground">Cover Image</Label>
-                    <Input
-                      id="title"
-                      type="text"
-                      required
+                      value={tags}
+                      onChange={(e) => setTags(e.target.value)}
                     />
                   </div>
 
@@ -89,7 +122,13 @@ const BlogPostEditor = () => {
               </form>
             </CardContent>
             <CardFooter className="flex-col gap-3">
-              <Button type="submit" className="w-full cursor-pointer">
+              <Button 
+                type="submit" 
+                className="w-full cursor-pointer" 
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleSubmit(e)
+                }}>
                 Publish
               </Button>
               <div className="w-full flex justify-between">
@@ -125,6 +164,7 @@ const BlogPostEditor = () => {
               </div>
             </CardFooter>
           </Card>
+
         </div>
       </div>
     </Test>

@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
     password: {type: String, required: true},
     profilePic: {type:String, default: null},
     bio: {type: String, default: ""},
-    role: {type: String, enum: ['admin', 'member'], default: 'member'}
+    // role: {type: String, enum: ['admin', 'member'], default: 'member'}
 }, {timestamps: true})
 
 const User = mongoose.model('User', UserSchema);

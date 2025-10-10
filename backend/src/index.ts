@@ -9,17 +9,21 @@ import authRouter from "./routes/authRoute";
 import blogPostRouter from "./routes/blogPostRoute";
 import commentsRouter from "./routes/commentsRoute";
 import dashboardRouter from "./routes/dashboardRoute";
+import cookieParser from "cookie-parser"
 
 const app = express();
 
 // global middleware
+
 app.use(
     cors({
-        origin: '*',
+        origin: "http://localhost:5173",
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
     })
 )
+app.use(cookieParser())
 
 // connecting to DB
 connectDb();

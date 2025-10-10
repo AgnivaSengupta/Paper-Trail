@@ -13,26 +13,54 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useAuthStore } from "@/store/useAuthStore"
+import { API_PATHS, BASE_URL } from "@/utils/apiPaths"
+import axiosInstance from "@/utils/axiosInstance"
 import { useState } from "react"
 
-export function SignupForm({ authState, setAuthState } : { authState: "signup" | "login", setAuthState: React.Dispatch<React.SetStateAction<"signup" | "login">>}) {
+export function SignupForm({ authState, setAuthState }: { authState: "signup" | "login", setAuthState: React.Dispatch<React.SetStateAction<"signup" | "login">> }) {
 
     const [username, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
+    const setAuthFormOpen = useAuthStore((state) => state.setAuthFormOpen)
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (password !== confirmPassword){
-            alert("Passwords do not match!")
-            return
+        if (!username || !email || !password || !confirmPassword) {
+            alert("All fields are required!");
+            return;
         }
 
-        
-    }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        const user = {
+            name: username,
+            email,
+            password,
+            bio: "",
+            profileImageUrl: "",
+            adminAccessToken: "",
+        };
+
+        try {
+            const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, user, { withCredentials: true });
+            alert("Registration successful!");
+            setAuthFormOpen(false)
+            console.log("Response:", response.data);
+            useAuthStore.getState().setUser(response.data);
+
+        } catch (error: any) {
+            console.error("Registration Failed:", error);
+            alert(error.response?.data?.message || "Something went wrong!");
+        }
+    };
+
 
     return (
         <div className={"flex flex-col gap-6"}>
@@ -44,18 +72,18 @@ export function SignupForm({ authState, setAuthState } : { authState: "signup" |
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={handleFormSubmit}>
                         <FieldGroup>
                             <Field>
                                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
                                 <Input
-                                    id="name" 
-                                    type="text" 
-                                    placeholder="John Doe" 
-                                    required 
+                                    id="name"
+                                    type="text"
+                                    placeholder="John Doe"
+                                    required
                                     value={username}
                                     onChange={(e) => setUserName(e.target.value)}
-                                    />
+                                />
                             </Field>
                             <Field>
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -72,25 +100,25 @@ export function SignupForm({ authState, setAuthState } : { authState: "signup" |
                                 <Field className="grid grid-cols-2 gap-4">
                                     <Field>
                                         <FieldLabel htmlFor="password">Password</FieldLabel>
-                                        <Input 
-                                            id="password" 
-                                            type="password" 
-                                            required 
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            required
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            />
+                                        />
                                     </Field>
                                     <Field>
                                         <FieldLabel htmlFor="confirm-password">
                                             Confirm Password
                                         </FieldLabel>
-                                        <Input 
-                                            id="confirm-password" 
-                                            type="password" 
-                                            required 
+                                        <Input
+                                            id="confirm-password"
+                                            type="password"
+                                            required
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            />
+                                        />
                                     </Field>
                                 </Field>
                                 <FieldDescription>
@@ -98,7 +126,7 @@ export function SignupForm({ authState, setAuthState } : { authState: "signup" |
                                 </FieldDescription>
                             </Field>
                             <Field>
-                                <Button type="submit">Create Account</Button>
+                                <Button type="submit" className="bg-primary text-foreground hover:bg-primary/80 cursor-pointer">Create Account</Button>
                                 <FieldDescription className="text-center">
                                     Already have an account? <Button variant='link' className="cursor-pointer" onClick={() => setAuthState('login')}>Sign in</Button>
                                 </FieldDescription>

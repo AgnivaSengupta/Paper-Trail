@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 
 
 // create a new blog post
-// @route POST/api/posts
+// @route POST/api/post
 // admin only
 const createPost = async (req: Request, res: Response) => {
     try {
@@ -21,7 +21,7 @@ const createPost = async (req: Request, res: Response) => {
             content,
             coverImageUrl,
             tags,
-            author: req.user._id,
+            author: "Test User",
             isDraft,
             generatedByAi
         })
@@ -29,6 +29,7 @@ const createPost = async (req: Request, res: Response) => {
         await newPost.save();
         res.status(201).json(newPost);
     } catch (error) {
+        console.log(error)
         res.status(500).json({msg: "Failed to create post", error})
     }
 }

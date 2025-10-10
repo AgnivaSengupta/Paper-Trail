@@ -26,16 +26,17 @@ function App() {
     }
   }, [theme]);
 
-
   return (
     <div className="text-5xl t">
+      
+
       <Router>
         <Routes>
           <Route path='/' element={<BlogLandingPage/>}/>
           <Route path='/:slug' element={<BlogPostView/>}/>
 
           {/* Admin routes */}
-          <Route element={<PrivateRoute  allowedRole={'admin'}/>}>
+          <Route /*element={<PrivateRoute/>}*/>
             <Route path='/admin/overview' element={<Dashboard/>}/>
             <Route path='/admin/posts' element={<BlogPosts/>}/>
             <Route path='/admin/create' element={<BlogPostEditor/>}/>

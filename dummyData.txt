@@ -1,0 +1,58 @@
+<p></p><p>Excellent question — this is a <strong>very common use case</strong> when working with <strong>Tiptap + Zustand</strong>, especially if you want to store both:</p><ul><li><p>the <strong>HTML</strong> (for rendering later)</p></li><li><p>and the <strong>JSON</strong> (for restoring the editor’s exact state).</p></li></ul><p>Let’s walk through it clearly 👇</p><div data-type="horizontalRule"><hr></div><h2>🧠 Step 1: Define a Zustand Store</h2><p>Create a store file, e.g. <code>useEditorStore.ts</code> (or <code>.js</code>):</p><pre><code class="language-ts">import { create } from 'zustand'
+
+interface EditorState {
+  html: string
+  json: any
+  setContent: (html: string, json: any) =&gt; void
+}
+
+const useEditorStore = create&lt;EditorState&gt;((set) =&gt; ({
+  html: '',
+  json: null,
+  setContent: (html, json) =&gt; set({ html, json }),
+}))
+
+export default useEditorStore
+</code></pre><p>This store:</p><ul><li><p>keeps both <code>html</code> and <code>json</code> versions of your editor content,</p></li><li><p>provides a <code>setContent</code> action to update them together.</p></li></ul><div data-type="horizontalRule"><hr></div><h2>🧩 Step 2: Connect It to Your Tiptap Editor</h2><p>Inside your Tiptap editor component:</p><pre><code class="language-tsx">import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import useEditorStore from '@/store/useEditorStore'
+
+export default function MyEditor() {
+  const setContent = useEditorStore((state) =&gt; state.setContent)
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '&lt;p&gt;Hello World!&lt;/p&gt;',
+    onUpdate: ({ editor }) =&gt; {
+      const html = editor.getHTML()
+      const json = editor.getJSON()
+
+      // 🧠 Store both in Zustand
+      setContent(html, json)
+    },
+  })
+
+  return &lt;EditorContent editor={editor} /&gt;
+}
+</code></pre><h3>💡 What’s Happening:</h3><ul><li><p><code>onUpdate</code> runs every time content changes in the editor.</p></li><li><p><code>editor.getHTML()</code> → gets current HTML.</p></li><li><p><code>editor.getJSON()</code> → gets current JSON document.</p></li><li><p>You save both to Zustand with one call.</p></li></ul><div data-type="horizontalRule"><hr></div><h2>📦 Step 3: Access Content Anywhere</h2><p>In any component:</p><pre><code class="language-tsx">import useEditorStore from '@/store/useEditorStore'
+
+function Preview() {
+  const { html, json } = useEditorStore()
+
+  return (
+    &lt;div&gt;
+      &lt;h3&gt;Preview:&lt;/h3&gt;
+      &lt;div dangerouslySetInnerHTML={{ __html: html }} /&gt;
+    &lt;/div&gt;
+  )
+}
+</code></pre><div data-type="horizontalRule"><hr></div><h2>🧩 (Optional) Step 4: Restore Editor Content from Zustand</h2><p>If you want the editor to reload saved content (say on refresh or route change):</p><pre><code class="language-tsx">const { json } = useEditorStore()
+
+const editor = useEditor({
+  extensions: [StarterKit],
+  content: json || '&lt;p&gt;Start typing...&lt;/p&gt;',
+  onUpdate: ({ editor }) =&gt; {
+    setContent(editor.getHTML(), editor.getJSON())
+  },
+})
+</code></pre><div data-type="horizontalRule"><hr></div><h2>✅ Summary</h2><p>Task Tiptap API Zustand Integration Get content <code>editor.getHTML()</code> / <code>editor.getJSON()</code> Save via <code>setContent()</code> Restore content <code>content: savedJson</code> Load from <code>useEditorStore()</code> Use anywhere <code>useEditorStore((s) =&gt; s.html)</code> Render/Preview content</p><div data-type="horizontalRule"><hr></div><p>Would you like me to show you how to <strong>persist this editor state in localStorage</strong> too (so it stays after refresh)?</p>

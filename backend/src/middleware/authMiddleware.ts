@@ -23,28 +23,28 @@ interface IUser extends Document {
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let token = req.headers.authorization;
+        let token = req.cookies.token;
 
-        if (token && token.startsWith('Bearer ')){
-            token = token.split(" ")[1];
-
-            if (!token) {
-                return res.status(401).json({ message: "Not authorized, invalid token format" });
-            }
-            
-            const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-            // req.user = ...: The entire result of the database query—the user document (without the password)—is assigned to a new property on the request object called user.
-            // This makes the user's information accessible in all subsequent middleware and route handlers in the request-response cycle.
-            req.user = await User.findById(decoded.id).select("-password") as IUser;
-            console.log(req.user)
-            next();
-        }
-        else{
-            res.status(401).json({message: "Not authorized --> No token !!"})
+        if (!token) {
+            return res.status(401).json({ message: "Not authorized, invalid token format" });
         }
         
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+        // req.user = ...: The entire result of the database query—the user document (without the password)—is assigned to a new property on the request object called user.
+        // This makes the user's information accessible in all subsequent middleware and route handlers in the request-response cycle.
+        const user = await User.findById(decoded.id).select("-password") as IUser;
+        //console.log(req.user)
+
+        if (!user){
+            return res.status(401).json({ msg: "User not found" });
+        }
+
+        req.user = user
+        next();
+
     } catch (error) {
-        res.status(401).json({message: "Token failed. Error: ", error});
+        console.error("Auth Middleware Error:", error);
+        return res.status(401).json({ msg: "Not authorized, invalid token" });
     }
 }
 
