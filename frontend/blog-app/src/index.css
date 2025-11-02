@@ -9,9 +9,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face{
+    font-family: munoch;
+    src: url("/MUNOCH.otf") format("opentype");
+}
+
 @theme {
   --font-arvo: "Arvo", serif;
   --font-playfair: "Playfair Display", serif;
+  --font-munoch: "munoch", serif;
 }
 
 @layer base {
@@ -89,24 +95,24 @@
 }
 
 :root {
-    --background: #ffffff;
-    --foreground: #111827;
-    --card: #ffffff;
-    --card-foreground: #111827;
+    --background: #ede9e5;
+    --foreground: #1a1a1a;
+    --card: #e6e0db;
+    --card-foreground: #1a1a1a;
     --popover: #ffffff;
     --popover-foreground: #111827;
     --primary: #d87943;
     --primary-foreground: #ffffff;
-    --secondary: #527575;
-    --secondary-foreground: #ffffff;
+    --secondary: #ffffff;
+    --secondary-foreground: #1a1a1a;
     --muted: #f3f4f6;
     --muted-foreground: #6b7280;
     --accent: #eeeeee;
     --accent-foreground: #111827;
     --destructive: #ef4444;
     --destructive-foreground: #fafafa;
-    --border: #e5e7eb;
-    --input: #e5e7eb;
+    --border: #6b7280;
+    --input:  #6b7280;
     --ring: #d87943;
     --chart-1: #5f8787;
     --chart-2: #e78a53;

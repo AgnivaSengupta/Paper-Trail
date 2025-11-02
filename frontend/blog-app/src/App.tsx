@@ -19,10 +19,10 @@ function App() {
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark'){
-      root.classList.add('dark');
+      root.classList.add('light');
     }
     else {
-      root.classList.add('dark');
+      root.classList.add('light');
     }
   }, [theme]);
 

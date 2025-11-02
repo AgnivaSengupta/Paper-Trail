@@ -109,7 +109,7 @@ const BlogPostEditor = () => {
   return (
     <Test>
       <div className="w-full flex gap-5">
-        <div className="w-[70%]">
+        <div className="w-[70%] bg-background rounded-md border-1 border-border">
           <SimpleEditor
             onChange={(json, html) => {
               setContent(html, json);
@@ -118,7 +118,7 @@ const BlogPostEditor = () => {
         </div>
 
         <div className="w-[30%] max-h-[480px] flex items-center flex-col">
-          <Card className="w-[80%] h-auto max-w-sm bg-card text-card-foreground border-accent">
+          <Card className="w-[80%] h-auto max-w-sm bg-card text-card-foreground border-border">
             <CardHeader>
               <CardTitle className="text-lg">Blog details</CardTitle>
               <CardDescription>Enter the blog details below</CardDescription>
@@ -194,7 +194,7 @@ const BlogPostEditor = () => {
               <div className="w-full flex justify-between">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button className="w-2/5 bg-background text-accent-foreground border-1 border-accent hover:bg-accent cursor-pointer">
+                    <Button className="w-2/5 bg-red-500/60 border-1 border-accent hover:bg-red-500/70 cursor-pointer">
                       Delete
                     </Button>
                   </AlertDialogTrigger>

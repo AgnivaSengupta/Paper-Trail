@@ -10,6 +10,7 @@ import blogPostRouter from "./routes/blogPostRoute";
 import commentsRouter from "./routes/commentsRoute";
 import dashboardRouter from "./routes/dashboardRoute";
 import cookieParser from "cookie-parser"
+import uploadRouter from "./routes/uploadRoute";
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.use(express.json()) // --> automatically parses every incoming json payload 
     app.use("/api/comments", commentsRouter);
     
     app.use("/api/dashboard-summary", dashboardRouter);
+
+    app.use("/api", uploadRouter);
 
 
 const PORT = process.env.PORT || 5000

@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
-import BlogLayout from "../../components/layouts/BlogLayout";
 import {
   BookOpen,
-  CircleArrowRight,
   Clock,
   Eye,
   Heart,
@@ -13,9 +11,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import {
   mockPosts,
-  mockTrendingPosts,
+  // mockTrendingPosts,
   mockStats,
-  mockCategories,
+  // mockCategories,
 } from "./mock";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,35 +24,42 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuthStore } from "@/store/useAuthStore";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import BlogNavbar from "@/components/layouts/BlogNavbar";
+import gsap from 'gsap';
+import { useGSAP } from "@gsap/react";
 
 const BlogLandingPage = () => {
   const { authFormOpen, setAuthFormOpen } = useAuthStore();
-
-  // const {user} = useUser();
-  // const {openSignIn} = useClerk();
-
   const blogSectionRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // const [posts, setPosts] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState("");
+  
+  
+  gsap.registerPlugin(useGSAP);
+  const navRef = useRef(null);
+  
+  useGSAP(() => {
+    if (!navRef.current) return;
+    
+    gsap.from(navRef.current, {
+      scaleX: 0,
+      opacity: 0,
+      duration: 1,
+      delay: 0.35,
+      ease: "power3.out",
+    })
+  }, [])
 
   const navigate = useNavigate();
 
@@ -118,91 +123,26 @@ const BlogLandingPage = () => {
       console.log(error);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="flex justify-center items-end w-full backdrop-blur-sm sticky top-0 z-50 h-20">
-        <header className="bg-[#212121] text-sm min-w-[400px] sm:min-w-[500px] md:min-w-[700px] lg:min-w-[900px] xl:min-w-[1200px] rounded-lg">
-          <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 ">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-2xl text-white font-playfair">
-                  Papertrail
-                </h1>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                {user ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button>
-                        <div className="p-2 flex justify-center items-center rounded-full bg-yellow-50">
-                          A
-                        </div>
-                      </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>My Profile</DropdownMenuLabel>
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={() => navigate("/admin/overview")}
-                        >
-                          Dashboard
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => navigate("/admin/posts")}
-                        >
-                          Blog Posts
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => navigate("/admin/profile")}
-                        >
-                          Profile
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => navigate("/admin/create")}
-                      >
-                        Create a blog
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogOut}>
-                        Log out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Button
-                    size="sm"
-                    className="bg-secondary text-secondary-foreground cursor-pointer hover:bg-secondary/80"
-                    onClick={() => setAuthFormOpen(true)}
-                  >
-                    Sign In
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-24">
+        <BlogNavbar ref={navRef} />
       </div>
 
       {/* Hero Section */}
-      <section className="relative py-30 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
             <Users className="w-4 h-4 mr-2" />
             Join {mockStats.totalAuthors}+ writers in our community
           </div>
-          <h1 className="text-5xl md:text-7xl font-playfair text-foreground mb-6 leading-tight">
+          <h1 className="text-[5rem] md:text-7xl font-bold font-munoch text-foreground mb-4 leading-tight">
             A journal of ideas, Open to all
           </h1>
-          <p className="text-xl font-playfair italic text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-2xl font-munoch text-muted-foreground mb-12 leading-snug max-w-2xl mx-auto ">
             A minimal space where I share my thoughts, projects, and daily
             learnings — and where you can share yours too.
           </p>
@@ -225,13 +165,12 @@ const BlogLandingPage = () => {
               size="lg"
               className="px-8 h-12 text-base bg-secondary hover:bg-secondary/80 focus-visible:ring-ring text-secondary-foreground cursor-pointer"
               onClick={() => {
-                // if (user){
-                //   navigate('/admin/create')
-                // }
-                // else {
-                //   setAuthFormOpen(true)
-                // }
-                //
+                if (user){
+                  navigate('/admin/create')
+                }
+                else {
+                  setAuthFormOpen(true)
+                }
                 console.log(user);
               }}
             >
@@ -242,13 +181,13 @@ const BlogLandingPage = () => {
         </div>
       </section>
 
-      <section id="PostsSection" className="py-25 px-4 sm:px-6 lg:px-8">
+      <section id="PostsSection" className="py-15 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-semibold text-foreground font-playfair">
+            <h2 className="text-5xl font-semibold text-foreground font-munoch">
               Latest Posts
             </h2>
-            <div className="relative w-full lg:w-96">
+            {/*<div className="relative w-full lg:w-96">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
@@ -257,9 +196,10 @@ const BlogLandingPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-3 w-full border-input focus-visible:ring-ring text-muted-foreground"
               />
-            </div>
+            </div>*/}
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          {/*<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => (
               <Card
                 key={post.id}
@@ -320,11 +260,19 @@ const BlogLandingPage = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>*/}
+          
+          <div className="w-full h-[500px] bg-amber-200">
+            <div className="w-1/2 group transition-all relative rounded-none hover:rounded-3xl overflow-hidden">
+              <img src={mockPosts[0].image} alt="Image"/>
+            </div>
           </div>
+            
+          
         </div>
 
         <div className="w-full flex justify-center mt-15">
-          <Button className="bg-secondary hover:bg-secondary/80 text-base cursor-pointer">
+          <Button className="bg-secondary rounded-sm hover:bg-secondary/80 text-secondary-foreground cursor-pointer">
             Load more
           </Button>
         </div>
@@ -429,7 +377,7 @@ const BlogLandingPage = () => {
       </footer>
 
       <Dialog open={authFormOpen} onOpenChange={setAuthFormOpen}>
-        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-card">
           <DialogHeader className="p-6 pb-0 ">
             <DialogTitle className="text-center text-foreground text-2xl font-playfair">
               Papertrail

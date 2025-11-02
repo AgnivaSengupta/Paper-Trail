@@ -1,5 +1,10 @@
-import type { ReactNode } from "react"
+import { useEffect, useRef, type ReactNode } from "react"
 import BlogNavbar from "./BlogNavbar"
+import { useGSAP } from "@gsap/react";
+import gsap from 'gsap';
+import { useAuthStore } from "@/store/useAuthStore";
+import axiosInstance from "@/utils/axiosInstance";
+import { API_PATHS } from "@/utils/apiPaths";
 //import PageTransition from "../PageTransition";
 
 type Props = {
@@ -7,11 +12,66 @@ type Props = {
 }
 
 const BlogLayout = ({children} : Props) => {
+  
+  gsap.registerPlugin(useGSAP);
+  const navRef = useRef(null);
+  
+  useGSAP(() => {
+    if (!navRef.current) return;
+    
+    gsap.from(navRef.current, {
+      scaleX: 0,
+      opacity: 0,
+      duration: 1,
+      delay: 0.35,
+      ease: "power3.out",
+    })
+  }, [])
+  
+  const { user, setUser } = useAuthStore();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true,
+        });
+
+        setUser(response.data);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+
+    fetchProfile();
+  }, [setUser]);
+
+  console.log(user);
+  const handleLogOut = async () => {
+    try {
+      const response = await axiosInstance.post(
+        API_PATHS.AUTH.LOGOUT,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      alert("Logged out successfully!");
+      console.log(response.data);
+    } catch (error) {
+      alert("Logout failed!");
+      console.log(error);
+    }
+  };
   return (
     
-    <div className="bg-background flex flex-col min-h-screen text-white">
-        <BlogNavbar/> 
-        <div className="flex flex-col">{children}</div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-24">
+        <BlogNavbar ref={navRef} />
+      </div>
+      {/*<BlogNavbar/> */}
+      <div className="flex flex-col">{children}</div>
     </div>
     
   )

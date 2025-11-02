@@ -1,7 +1,7 @@
 import BlogLayout from "@/components/layouts/BlogLayout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Share2 } from "lucide-react";
+import { Divide, Share2 } from "lucide-react";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
@@ -56,6 +56,10 @@ const BlogPostView = () => {
 
   return (
     <BlogLayout>
+
+
+
+
       <div className=" w-full flex justify-center mt-10">
         <div className="w-5/10 flex p-10">
           <div id="BlogContainer" className="flex flex-col gap-2 w-full">
@@ -102,20 +106,6 @@ const BlogPostView = () => {
               className="flex flex-col gap-3 text-lg mb-5 text-foreground tiptap ProseMirror"
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             >
-              {/* <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione eveniet temporibus voluptatem quos debitis, sit ad quo tenetur tempore enim, fugit distinctio itaque delectus! Suscipit deleniti in inventore dolores ipsam?</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, illo culpa? Consequuntur, illo. Nemo odit placeat sunt, impedit pariatur eos debitis, reprehenderit libero assumenda corrupti quia accusamus, eaque voluptas cum.</p>
-               */}
             </div>
 
             <div className="h-[1px] w-full bg-gray-500"></div>
