@@ -28,7 +28,7 @@
     body {
         background-color: #212121 ;
         overflow-x: hidden;
-    letter-spacing: var(--tracking-normal);
+        letter-spacing: var(--tracking-normal);
     }
 }
 
@@ -97,6 +97,7 @@
 :root {
     --background: #ede9e5;
     --foreground: #1a1a1a;
+    --editor: #ffffff/50;
     --card: #e6e0db;
     --card-foreground: #1a1a1a;
     --popover: #ffffff;

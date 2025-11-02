@@ -1,9 +1,7 @@
-import DashboardNavbar from '@/components/dashboard/DashboardNavbar'
-import DashboardLayout from '@/components/layouts/DashboardLayout'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Check, Pencil } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Test from './Test'
 
 type editType = {
@@ -29,11 +27,10 @@ const Profile = () => {
 
   return (
     <Test>
-        
-        <div className='p-5 flex flex-col gap-5 px-10 w-[60%]'>
+        <div className='p-5 flex flex-col gap-5 px-10 w-[60%] font-munoch'>
             <div>
-                <h1 className='text-3xl font-medium'>My Profile</h1>
-                <p className='text-sm'>Manage the profile settings</p>
+                <h1 className='text-3xl font-semibold'>My Profile</h1>
+                <p className='text-base text-muted-foreground'>Manage the profile settings</p>
             </div>
 
             <div className='relative'>
@@ -53,20 +50,20 @@ const Profile = () => {
               <div id='NameField' className='flex items-center gap-10'>
                 {editField.name ? 
                   <div className='flex flex-col gap-2 w-full'>
-                    <Label htmlFor='Name' >Name</Label>
+                    <Label htmlFor='Name' className='text-xl'>Name</Label>
                     <div className='flex gap-8 items-center'>
                       <Input id='Name'
-                       className='bg-white/5 border-none w-full'
+                       className='bg-white/5 border-border w-full'
                        value='e.target.value'
                        />
-                      <Check className='size-7 cursor-pointer text-gray-400 hover:text-white' onClick={() => setEditField({...editField, name: false})}/>
+                      <Check className='size-6 cursor-pointer text-foreground' onClick={() => setEditField({...editField, name: false})}/>
                     </div>
                   </div> 
                   :
 
                   <div className='flex gap-10'>
-                    <h1 className='text-lg'>Agniva Sengupta</h1>
-                    <Pencil className='size-5 text-gray-400 cursor-pointer hover:text-white' onClick={() => setEditField({...editField, name: true})}/>
+                    <h1 className='text-2xl'>Agniva Sengupta</h1>
+                    <Pencil className='size-5 text-foreground cursor-pointer' onClick={() => setEditField({...editField, name: true})}/>
                   </div>
                 }
                 {/* <div className='flex gap-10'>
@@ -78,19 +75,19 @@ const Profile = () => {
               <div id='EmailField' className='mt-2'>
                 {editField.email ? 
                   <div className='flex flex-col gap-2'>
-                    <Label htmlFor='Email'>Email</Label>
+                    <Label htmlFor='Email' className='text-xl'>Email</Label>
                     <div className='flex gap-8 items-center'>
                       <Input id='Name'
-                       className='bg-white/5 border-none w-full'
+                       className='bg-white/5 border-border w-full'
                        value='e.target.value'
                        />
-                      <Check className='size-7 cursor-pointer text-gray-400 hover:text-white' onClick={() => setEditField({...editField, email: false})}/>
+                      <Check className='size-6 cursor-pointer text-foreground' onClick={() => setEditField({...editField, email: false})}/>
                     </div>
                   </div>
                   :
                   <div className='flex gap-10'>
-                    <h1 className='text-[14px] font-extralight'>agnivasengupta11@gmail.com</h1>
-                    <Pencil className='size-5 text-gray-400 cursor-pointer hover:text-white' onClick={() => setEditField({...editField, email: true})}/>
+                    <h1 className='text-lg font-extralight'>agnivasengupta11@gmail.com</h1>
+                    <Pencil className='size-5 text-foreground cursor-pointer' onClick={() => setEditField({...editField, email: true})}/>
                   </div>  
                 }
               </div>
@@ -98,19 +95,19 @@ const Profile = () => {
               <div id='BioField' className='mt-5'>
                 {editField.bio ? 
                   <div className='flex flex-col gap-2'>
-                    <Label htmlFor='Email'>Bio</Label>
+                    <Label htmlFor='Bio' className='text-xl'>Bio</Label>
                     <div className='flex gap-8 items-center'>
-                      <textarea id='Name'
-                       className='bg-white/5 border-none w-full rounded-lg py-2 px-3 text-sm'
+                      <textarea id='Bio'
+                       className='bg-white/5 border-border w-full rounded-lg py-2 px-3 text-sm'
                        value='e.target.value'
                        />
-                      <Check className='size-7 cursor-pointer text-gray-400 hover:text-white' onClick={() => setEditField({...editField, bio: false})}/>
+                      <Check className='size-6 text-foreground cursor-pointer' onClick={() => setEditField({...editField, bio: false})}/>
                     </div>
                   </div>
                   :
                   <div className='flex gap-10'>
-                    <p className='text-[14px] font-extralight w-[60%]'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam doloribus aliquam esse, cum autem reiciendis exercitationem molestiae labore ipsum quibusdam dolores, quis illum maiores ut alias nostrum iste eveniet in!</p>
-                    <Pencil className='size-5 text-gray-400 cursor-pointer hover:text-white' onClick={() => setEditField({...editField, bio: true})}/>
+                    <p className='text-base font-extralight w-[60%]'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam doloribus aliquam esse, cum autem reiciendis exercitationem molestiae labore ipsum quibusdam dolores, quis illum maiores ut alias nostrum iste eveniet in!</p>
+                    <Pencil className='size-5 text-foreground cursor-pointer' onClick={() => setEditField({...editField, bio: true})}/>
                   </div>  
                 }
               </div>

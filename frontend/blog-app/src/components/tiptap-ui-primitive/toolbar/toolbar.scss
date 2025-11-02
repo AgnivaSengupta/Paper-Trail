@@ -12,8 +12,9 @@
 
 .tiptap-toolbar {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0.25rem;
+  /* gap: 1rem; */
 
   &-group {
     display: flex;
@@ -95,4 +96,41 @@
       box-shadow: none;
     }
   }
+  
+  &[data-variant="custom"] {
+      position: sticky;
+      top: 0;
+      margin-top: 10px;
+      z-index: 10;
+      width: 100%;
+      min-height: var(--tt-toolbar-height);
+      background-color: transparent;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      gap:0.5;
+      
+      &::-webkit-scrollbar{
+          display: none;
+      }
+      
+      @media (max-width: 480px) {
+        position: absolute;
+        top: auto;
+        height: calc(var(--tt-toolbar-height) + var(--tt-safe-area-bottom));
+        border-top: 1px solid var(--tt-toolbar-border-color);
+        border-bottom: none;
+        padding: 0 0.5rem var(--tt-safe-area-bottom);
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+  
+        .tiptap-toolbar-group {
+          flex: 0 0 auto;
+        }
+      }
+  }
+  
 }
+

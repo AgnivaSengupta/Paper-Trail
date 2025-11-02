@@ -169,17 +169,6 @@ export function RedditComments({postId}: {postId: string}) {
 
   const addReply = async (parentCommentId, content) => {
     try {
-      // const response = await fetch(`/api/comments/${postId}`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     content,
-      //     parentComment: parentCommentId,
-      //   }),
-      // });
-
       const response = await axiosInstance.post(API_PATHS.COMMENTS.ADD_COMMENT(postId), {
         content: content,
         parentComment: parentCommentId,
@@ -190,7 +179,7 @@ export function RedditComments({postId}: {postId: string}) {
       // Refresh comments to get the nested structure
       await fetchComment();
     } catch (err) {
-      alert('Failed to add reply: ');
+      alert(`Failed to add reply: ${err}`);
     }
   };
 
@@ -218,15 +207,15 @@ export function RedditComments({postId}: {postId: string}) {
       </h1>
 
       {/* New comment form */}
-      <div className=" rounded-lg p-4 shadow-sm mb-6">
+      <div className=" rounded-lg p-4 shadow-lg mb-6">
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="What are your thoughts?"
-          className="w-full p-2 text-base border border-input rounded-md focus-visible:ring-accent resize-none"
+          className="w-full p-2 text-base border border-input bg-white rounded-md focus-visible:ring-accent resize-none"
           rows={4}
         />
-        <Button onClick={handleAddTopLevelComment} className="">
+        <Button onClick={handleAddTopLevelComment} className="cursor-pointer">
           Comment
         </Button>
       </div>

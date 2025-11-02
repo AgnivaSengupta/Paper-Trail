@@ -84,7 +84,7 @@ const MainToolbarContent = ({
 }) => {
   return (
     
-      <div className="flex rounded-md py-1 mt-2 border-1 border-black">
+      <div className="flex gap-1 rounded-md py-1 mt-2 border-1 border-black bg-white">
         <Spacer />
   
         <ToolbarGroup>
@@ -145,10 +145,10 @@ const MainToolbarContent = ({
         <Spacer />
   
         {isMobile && <ToolbarSeparator />}
-  
+  {/*
         <ToolbarGroup>
           <ThemeToggle />
-        </ToolbarGroup>
+        </ToolbarGroup>*/}
       </div>
     
   )
