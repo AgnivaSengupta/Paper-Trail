@@ -54,14 +54,14 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
   };
 
   return (
-    <header ref={ref} className="bg-[#1a1a1a] text-sm min-w-[400px] sm:min-w-[400px] md:min-w-[500px] lg:min-w-[700px] 2xl:min-w-[900px] rounded-lg">
+    <header ref={ref} className="bg-[#1a1a1a] text-sm min-w-[400px] sm:min-w-[400px] md:min-w-[700px] lg:min-w-[700px] 2xl:min-w-[1200px] rounded-lg">
       <div className="max-w-8xl mx-auto px-2 sm:px-6 lg:px-8 ">
-        <div className="flex items-center justify-between h-12">
+        <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-1 p-1">
             {/*<div className="w-8 h-8 rounded-lg flex items-center justify-center">*/}
-            <BookOpen className="w-4 h-4 text-white translate-y-[2px]" />
+            <BookOpen className="w-6 h-6 text-white translate-y-[2px]" />
             {/*</div>*/}
-            <h1 className="text-xl text-white font-playfair inline-block">
+            <h1 className="text-2xl text-white font-playfair inline-block">
               Papertrail
             </h1>
           </div>

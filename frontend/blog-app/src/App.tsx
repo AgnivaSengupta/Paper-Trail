@@ -12,6 +12,10 @@ import { useThemeStore } from './store/themeStore';
 import { useEffect } from 'react';
 import Test from './pages/Admin/Test';
 import Comments from './pages/Admin/Comments';
+import Test2 from './pages/Admin/Test2';
+import Test3 from './pages/Admin/Test3';
+import Test4 from './pages/Admin/Test4';
+import Test5 from './pages/Admin/Test5';
 
 function App() {
 
@@ -34,14 +38,18 @@ function App() {
         <Routes>
           <Route path='/' element={<BlogLandingPage/>}/>
           <Route path='/:slug' element={<BlogPostView/>}/>
-
+          <Route path='/test2' element={<Test2/>}/>
+          <Route path='/test3' element={<Test3/>}/>
+          <Route path='/test4' element={<Test4/>}/>
+          <Route path='/test5' element={<Test5/>}/>
+          
           {/* Admin routes */}
           <Route /*element={<PrivateRoute/>}*/>
-            <Route path='/admin/overview' element={<Dashboard/>}/>
-            <Route path='/admin/posts' element={<BlogPosts/>}/>
+            <Route path='/admin/overview' element={<Test5/>}/>
+            <Route path='/admin/posts' element={<Test4/>}/>
             <Route path='/admin/create' element={<BlogPostEditor/>}/>
-            <Route path='/admin/profile' element={<Profile/>}/>
-            <Route path='/admin/comments' element={<Comments/>}/>
+            <Route path='/admin/profile' element={<Test2/>}/>
+            <Route path='/admin/comments' element={<Test3/>}/>
 
             {/* <Route path='/admin/edit/:postSlug' element={<BlogPostEditor isEdit={true}/>}/> */}
           </Route>

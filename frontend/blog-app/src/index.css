@@ -2,6 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Kapakana:wght@300..400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import './styles/_variables.scss';
@@ -15,15 +18,16 @@
 }
 
 @theme {
-  --font-arvo: "Arvo", serif;
+  /*--font-arvo: "Arvo", serif;*/
   --font-playfair: "Playfair Display", serif;
   --font-munoch: "munoch", serif;
+  --font-primary: "Instrument Serif", serif;
 }
 
 @layer base {
-    html {
+    /*html {
         font-family: var(--font-arvo);
-    }
+    }*/
 
     body {
         background-color: #212121 ;

@@ -3,12 +3,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
+import { generateOTP, hashOtp } from "../utils/otp_utils";
+import { mailTrapClient, sender, sendTestEmail } from "../utils/resendClient";
+import { otpEmail } from "../utils/email";
 
 const secret = process.env.JWT_SECRET;
-console.log("JWT_SECRET:", secret);
 
 if (!secret) {
-  console.log("JWT_SECRET:", secret);
   throw new Error("JWT secrert not read from env file");
 }
 
@@ -18,8 +19,7 @@ const generateToken = (userId: Types.ObjectId) => {
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, profileImageUrl, bio, adminAccessToken } =
-      req.body;
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -30,42 +30,99 @@ const registerUser = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //let role = 'member';
-
-    // if (adminAccessToken && adminAccessToken == process.env.ADMIN_ACCESS_TOKEN){
-    //     role = 'admin';
-    // }
-
     // creating the user
     const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
-      profilePic: profileImageUrl,
-      bio,
-      // role,
+      isVerified: false,
     });
 
-    const token = generateToken(newUser._id);
+    const otp = generateOTP();
+    newUser.verificationToken = hashOtp(otp);
+    newUser.verificationTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    await newUser.save();
+
+    // email verification
+    try {
+      // await mailTrapClient.send({
+      //   from: sender,
+      //   to: newUser.email,
+      //   subject: "Verify your email",
+      //   html: otpEmail.replace("{{OTP_CODE}}", otp),
+      //   category: "Email verification",
+      // });
+      
+      await sendTestEmail(otpEmail.replace("{{OTP_CODE}}", otp))
+    } catch (emailError) {
+      console.error("Email send failed:", emailError);
+
+      return res.status(500).json({
+        msg: "Account created, but failed to send verification email. Please try again.",
+        userId: newUser._id,
+      });
+    }
 
     res.status(201).json({
-      _id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      profilePic: newUser.profilePic,
-      bio: newUser.bio,
-      // role,
-      msg: "User successfully registered!",
+      msg: "Registration Successfull. Please verify your email.",
+      userId: newUser._id,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { userId, otp } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid user" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ msg: "Email already verified" });
+    }
+
+    if (!user.verificationToken || !user.verificationTokenExpiresAt) {
+      return res.status(400).json({ msg: "No verification in progress" });
+    }
+
+    if (Date.now() > user.verificationTokenExpiresAt.getTime()) {
+      return res.status(400).json({ msg: "OTP expired" });
+    }
+
+    if (hashOtp(otp) != user.verificationToken) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = null;
+    user.verificationTokenExpiresAt = null;
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = generateToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV == "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      msg: "Email verified successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "Server Error" });
   }
 };
 
@@ -143,4 +200,4 @@ const logOut = async (req: Request, res: Response) => {
     return res.status(500).json({ msg: "Server error - Not logged out!" });
   }
 };
-export { registerUser, loginUser, getUserProfile, logOut };
+export { registerUser, verifyEmail, loginUser, getUserProfile, logOut };

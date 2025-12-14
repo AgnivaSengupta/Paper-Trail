@@ -31,7 +31,7 @@ import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { useNavigate } from "react-router-dom";
 import BlogNavbar from "@/components/layouts/BlogNavbar";
-import gsap from 'gsap';
+import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 const BlogLandingPage = () => {
@@ -44,22 +44,21 @@ const BlogLandingPage = () => {
   // const [posts, setPosts] = useState([]);
   // const [loading, setLoading] = useState(true);
   // const [error, setError] = useState("");
-  
-  
+
   gsap.registerPlugin(useGSAP);
   const navRef = useRef(null);
-  
+
   useGSAP(() => {
     if (!navRef.current) return;
-    
+
     gsap.from(navRef.current, {
       scaleX: 0,
       opacity: 0,
       duration: 1,
       delay: 0.35,
       ease: "power3.out",
-    })
-  }, [])
+    });
+  }, []);
 
   const navigate = useNavigate();
 
@@ -123,31 +122,34 @@ const BlogLandingPage = () => {
       console.log(error);
     }
   };
-  
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-24">
+      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-28">
         <BlogNavbar ref={navRef} />
       </div>
 
       {/* Hero Section */}
-      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
+      <section className="relative mt-10 py-10 px-10 sm:px-6 lg:px-26 flex justify-between">
+        <div className="max-w-5xl text-left">
+          {/*<div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-6">
             <Users className="w-4 h-4 mr-2" />
             Join {mockStats.totalAuthors}+ writers in our community
-          </div>
-          <h1 className="text-[5rem] md:text-7xl font-bold font-munoch text-foreground mb-4 leading-tight">
-            A journal of ideas, Open to all
+          </div>*/}
+          <h1 className="text-9xl font-primary text-foreground mb-4 leading-tight">
+            A Journal
+            <br />
+            of Ideas,
+            <br />
+            Open to all
           </h1>
-          <p className="text-2xl font-munoch text-muted-foreground mb-12 leading-snug max-w-2xl mx-auto ">
-            A minimal space where I share my thoughts, projects, and daily
-            learnings — and where you can share yours too.
+          <p className="text-3xl font-primary text-muted-foreground mb-12 leading-snug max-w-2xl ">
+            A minimal space where I share my thoughts, projects, <br />
+            and daily learnings — and where you can share yours too.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/*<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90  text-foreground focus-visible:ring-ring cursor-pointer px-8 text-base h-12"
@@ -165,11 +167,10 @@ const BlogLandingPage = () => {
               size="lg"
               className="px-8 h-12 text-base bg-secondary hover:bg-secondary/80 focus-visible:ring-ring text-secondary-foreground cursor-pointer"
               onClick={() => {
-                if (user){
-                  navigate('/admin/create')
-                }
-                else {
-                  setAuthFormOpen(true)
+                if (user) {
+                  navigate("/admin/create");
+                } else {
+                  setAuthFormOpen(true);
                 }
                 console.log(user);
               }}
@@ -177,98 +178,26 @@ const BlogLandingPage = () => {
               <PenTool className="w-5 h-5 mr-2" />
               Write Your Story
             </Button>
-          </div>
+          </div>*/}
+        </div>
+
+        <div>
+          {/*Animation part -- to be done later .... */}
+          <img src="Animation-1.png" width={1200} />
         </div>
       </section>
 
-      <section id="PostsSection" className="py-15 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-5xl font-semibold text-foreground font-munoch">
+      <section id="PostsSection" className="py-15 px-4 sm:px-6 lg:px-26">
+        <div className="relative max-w-7xl flex flex-col min-w-full">
+          <div className="mb-12">
+            <h2 className="text-5xl text-foreground font-primary">
               Latest Posts
             </h2>
-            {/*<div className="relative w-full lg:w-96">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search posts, authors, or topics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-3 w-full border-input focus-visible:ring-ring text-muted-foreground"
-              />
-            </div>*/}
           </div>
-          
-          {/*<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
-              <Card
-                key={post.id}
-                className="group hover:shadow-xl transition-all duration-300 shadow-md bg-card border-border border-1 p-0 cursor-pointer"
-              >
-                <div className="relative overflow-hidden rounded-t-lg">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="secondary">{post.category}</Badge>
-                    <div className="flex items-center text-sm text-gray-400">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {post.readTime}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-medium text-foreground mb-3 group-hover:text-white/80 cursor-pointer transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-muted-foreground font-extralight text-sm mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage
-                          src={post.author.avatar}
-                          alt={post.author.name}
-                        />
-                        <AvatarFallback>
-                          {post.author.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {post.author.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(post.publishedAt)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-400">
-                      <div className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        {post.views}
-                      </div>
-                      <div className="flex items-center">
-                        <Heart className="w-4 h-4 mr-1" />
-                        {post.likes}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>*/}
-          
-          <div className="w-full h-[500px] bg-amber-200">
-            <div className="w-1/2 group transition-all relative rounded-none hover:rounded-3xl overflow-hidden">
-              <img src={mockPosts[0].image} alt="Image"/>
-            </div>
+
+          <div className="w-full flex justify-center">
+            <img src="stock-1.jpeg" height={700} width={1300} />
           </div>
-            
-          
         </div>
 
         <div className="w-full flex justify-center mt-15">
@@ -279,15 +208,13 @@ const BlogLandingPage = () => {
       </section>
 
       {/* footer */}
-      <footer className="bg-[#282727] text-white py-16 px-4 sm:px-6 lg:px-8 text-base">
+      <footer className="bg-[#1a1a1a] text-white py-16 px-4 sm:px-6 lg:px-8 text-base">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold">BlogSphere</h3>
+                <BookOpen className="w-5 h-5 text-white" />
+                <h3 className="text-xl font-bold">PaperTrail</h3>
               </div>
               <p className="text-gray-400 mb-4">
                 Where personal stories become community wisdom. Join thousands
@@ -371,13 +298,13 @@ const BlogLandingPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 BlogSphere. All rights reserved.</p>
+            <p>&copy; 2025 PaperTrail. All rights reserved.</p>
           </div>
         </div>
       </footer>
 
       <Dialog open={authFormOpen} onOpenChange={setAuthFormOpen}>
-        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-card">
+        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-stone-100">
           <DialogHeader className="p-6 pb-0 ">
             <DialogTitle className="text-center text-foreground text-2xl font-playfair">
               Papertrail

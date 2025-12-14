@@ -1,83 +1,79 @@
 import Arrow from '@/assets/arrow'
-import { ChartPie, FileText, MessageCircle, UserCircle } from 'lucide-react'
+import { Box, ChartPie, FileText, HelpCircle, LayoutDashboard, MessageCircle, MessageSquare, PanelLeft, PanelLeftClose, Settings, UserCircle } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
 
 
+const SidebarItem = ({ icon: Icon, label, active, badge, collapsed, path }) => {
+  const navigate = useNavigate();
+  return (
+    <div
+      className={`
+      flex items-center 
+      ${collapsed ? 'justify-center px-2' : 'justify-between px-4'} 
+      py-3 mb-1 cursor-pointer rounded-lg transition-colors 
+      ${active
+          ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white'
+          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'}
+    `}
+      title={collapsed ? label : ''}
+      onClick={() => navigate(path)}
+    >
+      <div className="flex items-center gap-3">
+        <Icon size={18} />
+        {!collapsed && <span className="text-base whitespace-nowrap">{label}</span>}
+      </div>
+      {!collapsed && badge && (
+        <span className="bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300 text-sm px-2 py-0.5 rounded">{badge}</span>
+      )}
+      {collapsed && badge && (
+        <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full"></div>
+      )}
+    </div>
+  )
+};
 
-const Sidebar = () => {
 
-    const navigate = useNavigate();
-
+const Sidebar = ({isSidebarOpen, setIsSidebarOpen}) => {
+  const navigate = useNavigate();
     return (
-        <div className="w-58 border-r-1 border-gray-500 h-screen p-5 sticky top-0">
-            {/* <div className="flex justify-start items-center mb-10">
-                <h1 className="text-2xl">Papertrail</h1>
-            </div> */}
-
-            <div className="flex flex-col">
-                <div className="flex justify-start gap-5 items-center border-b-1 border-gray-700 pb-2">
-                    {/* <CircleUserRound className="size-7"/> */}
-                    {/* <img src="../../../public/profilePicPlaceholder.png" alt="profilePic" className="size-7"/> */}
-                    <img
-                        src="https://api.dicebear.com/9.x/notionists/svg?seed=Kingston"
-                        alt="avatar"
-                        className="size-8 bg-amber-100 rounded shrink-0"
-                    />
-
-                    <div className="flex flex-col">
-                        <h1 className="text-base font-semibold">Agniv</h1>
-                        <p className="text-sm text-gray-300">agniva@gmai.com</p>
-                    </div>
-
-                </div>
-
-                <div className="mt-5 flex flex-col gap-2">
-
-                    <div className='text-base text-white/30 mb-2 '>Dashboard</div>
-                    <div className="group text-base flex gap-3 items-center hover:bg-white/5 hover:px-7 py-1 rounded-md cursor-pointer"
-                        onClick={() => navigate('/admin/overview')}   
-                    >
-                        <Arrow className="w-4 h-4 text-gray-500 group-hover:hidden" />
-                        <ChartPie className="size-5" />
-                        Overview
-                    </div>
-
-                    <div className="group text-base flex gap-3 items-center hover:bg-white/5 hover:px-7 py-1 rounded-md cursor-pointer"
-                        onClick={() => navigate('/admin/posts')}    
-                    >
-                        <Arrow className="w-4 h-4 text-gray-500 group-hover:hidden" />
-                        <FileText className="size-5" />
-                        Blog Posts
-                    </div>
-
-                    <div className="group text-base flex gap-3 items-center hover:bg-white/5 hover:px-7 py-1 rounded-md cursor-pointer"
-                        onClick={() => navigate('/admin/comments')}   
-                    >
-                        <Arrow className="w-4 h-4 text-gray-500 group-hover:hidden" />
-                        <MessageCircle className="size-5" />
-                        Comments
-                    </div>
-
-                    <div className="group text-base flex gap-3 items-center hover:bg-white/5 hover:px-7 py-1 rounded-md cursor-pointer"
-                        onClick={() => navigate('/admin/profile')}  
-                    >
-                        <Arrow className="w-4 h-4 text-gray-500 group-hover:hidden" />
-                        <UserCircle className="size-5" />
-                        Profile
-                    </div>
-                </div>
-
-                <div className="absolute bottom-18 left-5">
-                    <Button variant='secondary' className="text-lg w-48 cursor-pointer">Logout</Button>
-                </div>
-
-                <div className="absolute bottom-5 left-15 font-playfair">
-                    <h1 className="text-2xl text-white/60">Papertrail</h1>
-                </div>
+        <aside 
+          className={`
+            border-r border-zinc-200 dark:border-zinc-800 flex flex-col p-4 fixed h-full left-0 top-0 overflow-y-auto hide-scrollbar z-50 
+            bg-white dark:bg-[#0f1014]
+            transition-all duration-300 ease-in-out
+            ${isSidebarOpen ? 'w-64' : 'w-20'}
+          `}
+        >
+          <div className={`flex items-center ${isSidebarOpen ? 'justify-between px-2' : 'justify-center'} mb-8 transition-all duration-300`}>
+            <div className={`flex items-center gap-2 cursor-pointer ${!isSidebarOpen && 'hidden'}`} onClick={() => navigate('/')}>
+              <div className="w-6 h-6 bg-zinc-900 dark:bg-zinc-700 rounded flex items-center justify-center">
+                <div className="w-3 h-3 bg-zinc-400 rounded-sm"></div>
+              </div>
+              <span className="font-primary text-3xl tracking-tight whitespace-nowrap dark:text-white text-zinc-900">PaperTrails</span>
             </div>
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white transition-colors p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              {isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}
+            </button>
+          </div>
 
-        </div>
+          <div className="space-y-1 flex-1">
+            <SidebarItem icon={LayoutDashboard} label="Home" collapsed={!isSidebarOpen} path='/admin/overview' />
+            <SidebarItem icon={FileText} label="Posts" collapsed={!isSidebarOpen} badge='12' path='/admin/posts'/>
+            <SidebarItem icon={MessageSquare} label="Comments" collapsed={!isSidebarOpen} badge='3' path='/admin/comments'/>
+            {/*<SidebarItem icon={Box} label="Models" collapsed={!isSidebarOpen} />*/}
+            <SidebarItem icon={Settings} label="Profile" active collapsed={!isSidebarOpen} path='/admin/profile' />
+          </div>
+          
+          <div className="space-y-1">
+             <SidebarItem icon={Settings} label="Settings" collapsed={!isSidebarOpen}/>
+             <SidebarItem icon={HelpCircle} label="Help Center" collapsed={!isSidebarOpen} />
+          </div>
+        </aside>
     )
 }
 
