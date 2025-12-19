@@ -33,6 +33,7 @@ import {
 } from "recharts";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useThemeStore } from "@/store/themeStore";
 
 // --- Mock Data ---
 const performanceData = [
@@ -114,18 +115,19 @@ const StatCard = ({
 
 const Test5 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   // Helper for Chart Colors based on theme
-  const chartGridColor = isDarkMode ? "#27272a" : "#e4e4e7";
-  const chartTextColor = isDarkMode ? "#71717a" : "#a1a1aa";
-  const tooltipBg = isDarkMode ? "#18181b" : "#ffffff";
-  const tooltipBorder = isDarkMode ? "#27272a" : "#e4e4e7";
-  const tooltipText = isDarkMode ? "#e4e4e7" : "#18181b";
+  const chartGridColor = theme === 'dark' ? "#27272a" : "#e4e4e7";
+  const chartTextColor = theme === 'dark' ? "#71717a" : "#a1a1aa";
+  const tooltipBg = theme === 'dark' ? "#18181b" : "#ffffff";
+  const tooltipBorder = theme === 'dark' ? "#27272a" : "#e4e4e7";
+  const tooltipText = theme === 'dark' ? "#e4e4e7" : "#18181b";
 
   return (
     // The "dark" class wrapper allows Tailwind's dark mode to work within this component
-    <div className={isDarkMode ? "dark" : ""}>
+    <div className={theme === 'dark' ? "dark" : ""}>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
         <Sidebar
           isSidebarOpen={isSidebarOpen}
@@ -159,10 +161,10 @@ const Test5 = () => {
                 />
               </div>
               <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
               >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                {theme ? <Sun size={18} /> : <Moon size={18} />}
               </button>
 
               <button className="flex items-center gap-2 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 transition-colors shadow-sm dark:shadow-none text-zinc-700 dark:text-zinc-200">

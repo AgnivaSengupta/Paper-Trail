@@ -1,11 +1,11 @@
 import Arrow from '@/assets/arrow'
-import { Box, ChartPie, FileText, HelpCircle, LayoutDashboard, MessageCircle, MessageSquare, PanelLeft, PanelLeftClose, Settings, UserCircle } from 'lucide-react'
+import { Box, ChartPie, FileText, HelpCircle, LayoutDashboard, MessageCircle, MessageSquare, PanelLeft, PanelLeftClose, Pen, Settings, UserCircle } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 
 
-const SidebarItem = ({ icon: Icon, label, active, badge, collapsed, path }) => {
+const SidebarItem = ({ icon: Icon, label, active, badge, collapsed, path, variant }) => {
   const navigate = useNavigate();
   return (
     <div
@@ -20,7 +20,7 @@ const SidebarItem = ({ icon: Icon, label, active, badge, collapsed, path }) => {
       title={collapsed ? label : ''}
       onClick={() => navigate(path)}
     >
-      <div className="flex items-center gap-3">
+      <div className='flex items-center gap-3'>
         <Icon size={18} />
         {!collapsed && <span className="text-base whitespace-nowrap">{label}</span>}
       </div>
@@ -65,8 +65,12 @@ const Sidebar = ({isSidebarOpen, setIsSidebarOpen}) => {
             <SidebarItem icon={LayoutDashboard} label="Home" collapsed={!isSidebarOpen} path='/admin/overview' />
             <SidebarItem icon={FileText} label="Posts" collapsed={!isSidebarOpen} badge='12' path='/admin/posts'/>
             <SidebarItem icon={MessageSquare} label="Comments" collapsed={!isSidebarOpen} badge='3' path='/admin/comments'/>
-            {/*<SidebarItem icon={Box} label="Models" collapsed={!isSidebarOpen} />*/}
             <SidebarItem icon={Settings} label="Profile" active collapsed={!isSidebarOpen} path='/admin/profile' />
+            
+            <div className="my-6 border-t border-zinc-200 dark:border-zinc-800 mx-2"></div>
+            
+            <SidebarItem icon={Pen} label="Write a Post" collapsed={!isSidebarOpen} path='/admin/create' />
+            
           </div>
           
           <div className="space-y-1">

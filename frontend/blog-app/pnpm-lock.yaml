@@ -50,6 +50,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.12
         version: 4.1.13(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(sass-embedded@1.92.1)(sass@1.92.1))
+      '@tiptap/extension-code-block':
+        specifier: ^3.13.0
+        version: 3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-highlight':
         specifier: ^3.6.3
         version: 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
@@ -59,9 +62,15 @@ importers:
       '@tiptap/extension-image':
         specifier: ^3.6.3
         version: 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
+      '@tiptap/extension-link':
+        specifier: ^3.13.0
+        version: 3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-list':
         specifier: ^3.6.3
         version: 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
+      '@tiptap/extension-placeholder':
+        specifier: ^3.13.0
+        version: 3.13.0(@tiptap/extensions@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))
       '@tiptap/extension-subscript':
         specifier: ^3.6.3
         version: 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
@@ -1288,11 +1297,11 @@ packages:
     peerDependencies:
       '@tiptap/extension-list': ^3.6.3
 
-  '@tiptap/extension-code-block@3.6.3':
-    resolution: {integrity: sha512-RKI64JiOmy/guUXLe5rh2jD4dPG5678Fixkn+gDklMzRPFCwa7lvhRpTIJIzqqaR3ApGSqOforWQZcsiC5vrwg==}
+  '@tiptap/extension-code-block@3.13.0':
+    resolution: {integrity: sha512-kIwfQ4iqootsWg9e74iYJK54/YMIj6ahUxEltjZRML5z/h4gTDcQt2eTpnEC8yjDjHeUVOR94zH9auCySyk9CQ==}
     peerDependencies:
-      '@tiptap/core': ^3.6.3
-      '@tiptap/pm': ^3.6.3
+      '@tiptap/core': ^3.13.0
+      '@tiptap/pm': ^3.13.0
 
   '@tiptap/extension-code@3.6.3':
     resolution: {integrity: sha512-sbTCVW58gJY+1Z9685rCi3luFRmv6qqm1EGc5XWj3UlkLAatfpeq4+PKgY09f7w35hRU60RAWt0VIyysU/b8ZQ==}
@@ -1352,11 +1361,11 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.6.3
 
-  '@tiptap/extension-link@3.6.3':
-    resolution: {integrity: sha512-Lhv0HgoxCq6Y6ADS0273SAW79AyEs71CvLdZ8sf9ibinBHRBlBAHozUP8shYYXSurhPRMNJw0VmQqJZse/QZww==}
+  '@tiptap/extension-link@3.13.0':
+    resolution: {integrity: sha512-LuFPJ5GoL12GHW4A+USsj60O90pLcwUPdvEUSWewl9USyG6gnLnY/j5ZOXPYH7LiwYW8+lhq7ABwrDF2PKyBbA==}
     peerDependencies:
-      '@tiptap/core': ^3.6.3
-      '@tiptap/pm': ^3.6.3
+      '@tiptap/core': ^3.13.0
+      '@tiptap/pm': ^3.13.0
 
   '@tiptap/extension-list-item@3.6.3':
     resolution: {integrity: sha512-EL2xQfVwRbiz1lDZt63HAAkAFnzD1kyqIYS4hanfjtq7jg4b1sSplNq53Zy8fPMLtZOat9JQl/PNhfqRurQ5gw==}
@@ -1383,6 +1392,11 @@ packages:
     resolution: {integrity: sha512-E5HHEQFyEPVbZ5vyXo0CwxeNOBPyB+dEGUK5C8W5JFlWnO14kTtzuuHXkzOaCORoyQgUf/Z5SPLQEAIjLW2n6Q==}
     peerDependencies:
       '@tiptap/core': ^3.6.3
+
+  '@tiptap/extension-placeholder@3.13.0':
+    resolution: {integrity: sha512-Au4ktRBraQktX9gjSzGWyJV6kPof7+kOhzE8ej+rOMjIrHbx3DCHy1CJWftSO9BbqIyonjsFmm4nE+vjzZ3Z5Q==}
+    peerDependencies:
+      '@tiptap/extensions': ^3.13.0
 
   '@tiptap/extension-strike@3.6.3':
     resolution: {integrity: sha512-+qA+fcO0Cyxjjw6/WkMysY1eFXpA7MMUxH7em6j7zmQUxy4HL1cb2YL4YpFPxJTKhTfbvJ6Muag4mJ8zxDFe5w==}
@@ -3824,7 +3838,7 @@ snapshots:
     dependencies:
       '@tiptap/extension-list': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
 
-  '@tiptap/extension-code-block@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)':
+  '@tiptap/extension-code-block@3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)':
     dependencies:
       '@tiptap/core': 3.6.3(@tiptap/pm@3.6.3)
       '@tiptap/pm': 3.6.3
@@ -3877,7 +3891,7 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.6.3(@tiptap/pm@3.6.3)
 
-  '@tiptap/extension-link@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)':
+  '@tiptap/extension-link@3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)':
     dependencies:
       '@tiptap/core': 3.6.3(@tiptap/pm@3.6.3)
       '@tiptap/pm': 3.6.3
@@ -3903,6 +3917,10 @@ snapshots:
   '@tiptap/extension-paragraph@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))':
     dependencies:
       '@tiptap/core': 3.6.3(@tiptap/pm@3.6.3)
+
+  '@tiptap/extension-placeholder@3.13.0(@tiptap/extensions@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))':
+    dependencies:
+      '@tiptap/extensions': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
 
   '@tiptap/extension-strike@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))':
     dependencies:
@@ -3984,7 +4002,7 @@ snapshots:
       '@tiptap/extension-bold': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
       '@tiptap/extension-bullet-list': 3.6.3(@tiptap/extension-list@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))
       '@tiptap/extension-code': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
-      '@tiptap/extension-code-block': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
+      '@tiptap/extension-code-block': 3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-document': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
       '@tiptap/extension-dropcursor': 3.6.3(@tiptap/extensions@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))
       '@tiptap/extension-gapcursor': 3.6.3(@tiptap/extensions@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))
@@ -3992,7 +4010,7 @@ snapshots:
       '@tiptap/extension-heading': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
       '@tiptap/extension-horizontal-rule': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-italic': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))
-      '@tiptap/extension-link': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
+      '@tiptap/extension-link': 3.13.0(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-list': 3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3)
       '@tiptap/extension-list-item': 3.6.3(@tiptap/extension-list@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))
       '@tiptap/extension-list-keymap': 3.6.3(@tiptap/extension-list@3.6.3(@tiptap/core@3.6.3(@tiptap/pm@3.6.3))(@tiptap/pm@3.6.3))

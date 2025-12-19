@@ -98,7 +98,7 @@ const getAllPosts = async (req: Request, res: Response) => {
   try {
     const status = req.query.status || "published";
     const page = parseInt(req.query.page as string, 10) || 1;
-    const limit = 5;
+    const limit = parseInt(req.query.limit as string, 10) || 8;
     const skip = (page - 1) * limit;
 
     // Determine filter for main posts response
@@ -114,7 +114,8 @@ const getAllPosts = async (req: Request, res: Response) => {
       .populate("author", "name profilePic")
       .sort({ updatedAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      // .lean();
 
     // Count totals for pagination and tab counts
     const [totalCount, allCount, publishedCount, draftCount] =
@@ -130,6 +131,7 @@ const getAllPosts = async (req: Request, res: Response) => {
       page,
       totalPages: Math.ceil(totalCount / limit),
       totalCount,
+      allCount,
       counts: {
         all: allCount,
         published: publishedCount,

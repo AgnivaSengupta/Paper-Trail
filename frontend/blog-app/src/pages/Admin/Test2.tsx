@@ -31,6 +31,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useThemeStore } from '@/store/themeStore';
 //import { TooltipArrow } from '@radix-ui/react-tooltip';
 
 // --- Mock Data ---
@@ -87,9 +88,12 @@ const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
 const Test2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   return (
-    <div className={isDarkMode ? 'dark' : ''}>
+    <div className={theme === 'dark' ? 'dark' : ''}>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
         
         {/* --- Sidebar (Standard) --- */}
@@ -112,10 +116,10 @@ const Test2 = () => {
                  <input type="text" placeholder="Search..." className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 w-64 text-zinc-900 dark:text-zinc-300 shadow-sm dark:shadow-none" />
               </div>
               <button 
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
               >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               
               <Avatar>

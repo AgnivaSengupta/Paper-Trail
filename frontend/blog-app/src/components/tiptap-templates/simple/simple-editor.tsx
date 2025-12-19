@@ -84,7 +84,7 @@ const MainToolbarContent = ({
 }) => {
   return (
     
-      <div className="flex gap-1 rounded-md py-1 mt-2 border-1 border-black bg-white">
+      <div className="flex gap-1 rounded-md py-1 mt-2 border-1 border-black dark:border-zinc-700 bg-white dark:bg-zinc-800">
         <Spacer />
   
         <ToolbarGroup>
