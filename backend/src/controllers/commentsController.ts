@@ -91,8 +91,8 @@ const deleteComment = async (req: Request, res: Response) => {
     await Comment.deleteMany({ parentComment: commentId });
 
     res.json({ msg: "Comment deleted" });
-  } catch (error) {
-    res.status(500).json({ msg: "Failed to delete comment", error });
+  } catch (err) {
+    res.status(500).json({ msg: "Failed to delete comment", error: err });
   }
 };
 
@@ -146,7 +146,7 @@ const getAllComments = async (req: Request, res: Response) => {
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);
-    
+
     const totalCount = await Comment.countDocuments(filter)
     
     res.json({

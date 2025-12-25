@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, 
   Box, 
@@ -32,6 +32,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useThemeStore } from '@/store/themeStore';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import ProfileUpdateForm from '@/components/blogPage/ProfileUpdateForm';
 //import { TooltipArrow } from '@radix-ui/react-tooltip';
 
 // --- Mock Data ---
@@ -59,32 +61,6 @@ const activityLog = [
   { id: 5, type: 'post', content: 'Drafted "Migrating from PyTorch to JAX"', date: '3 days ago', icon: FileText, color: 'text-zinc-400' },
 ];
 
-const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
-  <div 
-    className={`
-      flex items-center 
-      ${collapsed ? 'justify-center px-2' : 'justify-between px-4'} 
-      py-3 mb-1 cursor-pointer rounded-lg transition-colors 
-      ${active 
-        ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white' 
-        : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'}
-    `}
-    title={collapsed ? label : ''}
-  >
-    <div className="flex items-center gap-3">
-      <Icon size={18} />
-      {!collapsed && <span className="text-sm font-medium whitespace-nowrap">{label}</span>}
-    </div>
-    {!collapsed && badge && (
-      <span className="bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300 text-xs px-2 py-0.5 rounded">{badge}</span>
-    )}
-    {collapsed && badge && (
-      <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full"></div>
-    )}
-  </div>
-);
-
-
 const Test2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -92,6 +68,14 @@ const Test2 = () => {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+  
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
@@ -111,10 +95,6 @@ const Test2 = () => {
           {/* Header Actions */}
           <header className="flex justify-end items-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="relative h-18">
-                 <Search className="absolute left-3 top-7 text-zinc-400 dark:text-zinc-500" size={16} />
-                 <input type="text" placeholder="Search..." className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 w-64 text-zinc-900 dark:text-zinc-300 shadow-sm dark:shadow-none" />
-              </div>
               <button 
                 onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
@@ -160,9 +140,18 @@ const Test2 = () => {
             </div>
 
             <div className="absolute -bottom-10 right-0 flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm dark:shadow-none">
-                    <Edit2 size={16} /> Edit Profile
-                </button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm dark:shadow-none">
+                      <Edit2 size={16} /> Edit Profile
+                  </button>
+                </DialogTrigger>
+                
+                <DialogContent>
+                  <ProfileUpdateForm/>
+                </DialogContent>
+              </Dialog>
+
                 <button className="px-4 py-2 cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-emerald-900/20">
                     Share Profile
                 </button>

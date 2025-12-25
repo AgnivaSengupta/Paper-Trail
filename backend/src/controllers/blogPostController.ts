@@ -6,8 +6,7 @@ import type { Request, Response } from "express";
 // admin only
 const createPost = async (req: Request, res: Response) => {
   try {
-    const { title, content, coverImageUrl, tags, isDraft, generatedByAi } =
-      req.body;
+    const { title, content, coverImageUrl, tags, isDraft } = req.body;
     const user = req.user;
     const slug = title
       .toLowerCase()
@@ -23,7 +22,6 @@ const createPost = async (req: Request, res: Response) => {
       tags,
       author: user._id,
       isDraft,
-      generatedByAi,
     });
 
     await newPost.save();
@@ -96,6 +94,9 @@ const deletePost = async (req: Request, res: Response) => {
 // public
 const getAllPosts = async (req: Request, res: Response) => {
   try {
+    console.log("1. Controller hit");
+    console.log("2. User is:", req.user);
+        
     const status = req.query.status || "published";
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 8;
@@ -217,14 +218,15 @@ const likePost = async (req: Request, res: Response) => {
 
 // @route GET/api/post/trending
 // get top trending posts --> private
-const getTopPosts = async (req: Request, res: Response) => {
+const getLatestPosts = async (req: Request, res: Response) => {
   try {
     // top performing posts
     const posts = await BlogPost.find({ isDraft: false })
-      .sort({ views: -1, likes: -1 })
-      .limit(5);
+      .populate("author", "name profilePic")
+      .sort({ updatedAt: -1 })
+      .limit(8);
 
-    res.json(posts);
+    res.json({posts});
   } catch (error) {
     res.status(500).json({ msg: "server error", error });
   }
@@ -240,5 +242,5 @@ export {
   searchPosts,
   incrementView,
   likePost,
-  getTopPosts,
+  getLatestPosts,
 };

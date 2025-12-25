@@ -5,8 +5,8 @@ import { Document, Types } from "mongoose";
 
 interface JwtPayload {
   id: string;
-  iat?: number; // issued at timestamp
-  exp?: number; // expiration timestamp
+//  iat?: number; // issued at timestamp
+  // exp?: number; // expiration timestamp
 }
 
 interface IUser extends Document {
@@ -15,7 +15,6 @@ interface IUser extends Document {
   email: string;
   profilePic?: string | null;
   bio?: string;
-  role: "admin" | "member";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,8 +40,8 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     req.user = user;
-    console.log("token", token);
-    console.log("Cookie- ", req.cookies.token);
+    // console.log("token", token);
+    // console.log("Cookie- ", req.cookies.token);
     next();
   } catch (error) {
     console.error("Auth Middleware Error:", error);

@@ -9,11 +9,12 @@ import "@/components/tiptap-node/list-node/list-node.scss";
 import "@/components/tiptap-node/image-node/image-node.scss";
 import "@/components/tiptap-node/heading-node/heading-node.scss";
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RedditComments } from "@/components/blogPage/RedditComments";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
+import BlogNavbar from "@/components/layouts/BlogNavbar";
 
 
 const BlogPostView = () => {
@@ -56,8 +57,14 @@ const BlogPostView = () => {
     fetchBlog();
   }, []);
 
+  const navRef = useRef(null);
   return (
-    <BlogLayout>
+    // <BlogLayout>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-28">
+        <BlogNavbar ref={navRef} />
+      </div>
       <div className=" w-full flex justify-center mt-10 font-munoch">
         <div className="w-5/10 flex p-10">
           <div id="BlogContainer" className="flex flex-col gap-2 w-full">
@@ -93,11 +100,13 @@ const BlogPostView = () => {
             </div>
 
             <div className="w-full h-[1px] bg-gray-600 mb-5"></div>
-
-            <div className="flex justify-center items-center w-full h-80 border-1 mb-5">
-              {/* Image */}
-              Image
+            <div>
+              <img src={coverImage} alt='Cover Image'/>
             </div>
+
+            {/*<div className="flex justify-center items-center w-full h-80 border-1 mb-5">
+              Image
+            </div>*/}
 
             <div
               id="blog-content"
@@ -111,13 +120,13 @@ const BlogPostView = () => {
             <div className="flex flex-col mt-5 gap-5">
               {/*<h1 className="text-4xl">Comments</h1>*/}
 
-              <RedditComments postId={postId}/>
+              {/*<RedditComments postId={postId}/>*/}
               <div className="flex flex-col"></div>
             </div>
           </div>
         </div>
       </div>
-    </BlogLayout>
+    </div>
   );
 };
 

@@ -18,6 +18,8 @@ import { API_PATHS, BASE_URL } from "@/utils/apiPaths";
 import axiosInstance from "@/utils/axiosInstance";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
+import OrSeperator from "../ui/OrSeperator";
+import { FcGoogle } from "react-icons/fc";
 
 export function SignupForm({
   authState,
@@ -159,6 +161,16 @@ export function SignupForm({
                   ) : (
                     "Create Account"
                   )}
+                </Button>
+                
+                <OrSeperator/>
+                
+                <Button
+                  type="submit"
+                  className="bg-white border-zinc-300 border-1 text-foreground hover:bg-zinc-100 cursor-pointer"
+                >
+                  <FcGoogle/>
+                  Sign in with Google
                 </Button>
                 <FieldDescription className="text-center">
                   Already have an account?{" "}

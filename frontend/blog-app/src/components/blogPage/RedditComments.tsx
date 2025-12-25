@@ -148,9 +148,6 @@ export function RedditComments({postId}: {postId: string}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchComment();
-  }, [postId])
 
   const fetchComment = async () => {
     try {
@@ -166,6 +163,10 @@ export function RedditComments({postId}: {postId: string}) {
       return
     }
   }
+
+  useEffect(() => {
+    fetchComment();
+  }, [postId])
 
   const addReply = async (parentCommentId, content) => {
     try {

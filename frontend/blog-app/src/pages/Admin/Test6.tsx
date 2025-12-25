@@ -48,52 +48,53 @@ import toast, { Toaster } from "react-hot-toast";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { useThemeStore } from "@/store/themeStore";
+import TagInput from "@/components/dashboard/TagInput";
 //import { TooltipArrow } from '@radix-ui/react-tooltip';
 
-const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
-  const [input, setInput] = useState("");
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && input.trim()) {
-      e.preventDefault();
-      onAddTag(input.trim());
-      setInput("");
-    }
-  };
-  return (
-    <div className="space-y-2 mt-2">
-      <div className="flex flex-wrap gap-2 mb-2">
-        {tags.map((tag, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
-          >
-            <Hash size={10} className="opacity-50" /> {tag}
-            <button
-              onClick={() => onRemoveTag(tag)}
-              className="hover:text-rose-500 ml-1"
-            >
-              <X size={12} />
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="relative h-18">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add tags..."
-          className="w-full bg-transparent border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
-        />
-        <Plus
-          size={14}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
-        />
-      </div>
-    </div>
-  );
-};
+// const TagInput = ({ tags, onAddTag, onRemoveTag }) => {
+//   const [input, setInput] = useState("");
+//   const handleKeyDown = (e) => {
+//     if (e.key === "Enter" && input.trim()) {
+//       e.preventDefault();
+//       onAddTag(input.trim());
+//       setInput("");
+//     }
+//   };
+//   return (
+//     <div className="space-y-2 mt-2">
+//       <div className="flex flex-wrap gap-2 mb-2">
+//         {tags.map((tag, index) => (
+//           <span
+//             key={index}
+//             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
+//           >
+//             <Hash size={10} className="opacity-50" /> {tag}
+//             <button
+//               onClick={() => onRemoveTag(tag)}
+//               className="hover:text-rose-500 ml-1"
+//             >
+//               <X size={12} />
+//             </button>
+//           </span>
+//         ))}
+//       </div>
+//       <div className="relative h-18">
+//         <input
+//           type="text"
+//           value={input}
+//           onChange={(e) => setInput(e.target.value)}
+//           onKeyDown={handleKeyDown}
+//           placeholder="Add tags..."
+//           className="w-full bg-transparent border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
+//         />
+//         <Plus
+//           size={14}
+//           className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
+//         />
+//       </div>
+//     </div>
+//   );
+// };
 
 const ImageUploadBox = ({ image, onUpload, onRemove }) => (
   <div className="relative group w-full aspect-video rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center mt-2 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600 overflow-hidden">
@@ -142,32 +143,42 @@ const Test6 = () => {
     slug: "",
     coverImageUrl: null,
     tags: ["Technology"],
-    //excerpt: ''
+    excerpt: ''
   });
 
-  const notify = (prop: string) => {
-    if (prop == "titleMissing") {
-      toast.error("Please enter a post title!");
-    } else if (prop == "emptyContent") {
-      toast.error("Empty post cannot be published");
-    } else if (prop == "publish") {
-      toast.success("Post published");
-    } else {
-      toast.error("Something went wrong");
-    }
-  };
+  const notify = (type: string) => {
+      switch (type) {
+        case "titleMissing":
+          toast.error("Please enter a post title!");
+          break;
+        case "emptyContent":
+          toast.error("Empty post cannot be published");
+          break;
+        case "publish":
+          toast.success("Post published successfully!");
+          break;
+        case "draft":
+          toast.success("Draft saved successfully");
+          break;
+        case "error":
+          toast.error("Something went wrong");
+          break;
+        default:
+          break;
+      }
+    };
 
   const json = useEditorStore((state) => state.json);
   const html = useEditorStore((state) => state.html);
 
-  const handleSubmit = async (status) => {
+  const handleSubmit = async (status: string) => {
     if (!meta.title.trim()) {
       notify("titleMissing");
-      <Toaster />;
+      return;
     }
     if (!json || html.length == 0) {
       notify("emptyContent");
-      <Toaster />;
+      return;
     }
 
     setIsSubmitting(true);
@@ -179,9 +190,9 @@ const Test6 = () => {
           json: json,
           html: html,
         },
-        coverImageUrl: meta.coverImageUrl,
+        coverImageUrl: meta.coverImageUrl || 'https://picsum.photos/200/300',
         tags: meta.tags,
-        isDraft: status === "Draft" ? true : false,
+        isDraft: status === "draft" ? true : false,
       };
 
       const response = await axiosInstance.post(
@@ -189,7 +200,7 @@ const Test6 = () => {
         payload,
       );
 
-      notify("publish");
+      notify(status);
     } catch (error) {
       notify("error");
     } finally {
@@ -201,6 +212,7 @@ const Test6 = () => {
 
   return (
     <div className={theme === 'dark' ? "dark" : ""}>
+      <Toaster containerClassName="text-lg"/>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
         {/* --- Sidebar (Standard) --- */}
         <Sidebar

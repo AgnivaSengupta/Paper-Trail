@@ -18,6 +18,10 @@ import Test3 from './pages/Admin/Test3';
 import Test5 from './pages/Admin/Test5';
 import Test6 from './pages/Admin/Test6';
 import Test7 from './pages/Admin/Test7';
+import BlogPage from './pages/Blog/BlogPage';
+import { useAuthStore } from './store/useAuthStore';
+import axiosInstance from './utils/axiosInstance';
+import { API_PATHS } from './utils/apiPaths';
 
 function App() {
 
@@ -25,13 +29,31 @@ function App() {
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark'){
-      root.classList.add('light');
+      root.classList.add('dark');
     }
     else {
       root.classList.add('light');
     }
   }, [theme]);
 
+  const { setUser } = useAuthStore();
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true,
+        });
+        
+        setUser(response.data);
+      } catch (error) {
+        setUser(null);
+        console.log("Error fetching user datails.", error);
+      }
+    }
+    
+    fetchProfile();
+  }, [setUser]);
+  
   return (
     <div className="text-5xl t">
       
@@ -39,7 +61,7 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<BlogLandingPage/>}/>
-          <Route path='/:slug' element={<BlogPostView/>}/>
+          <Route path='/:slug' element={<BlogPage/>}/>
           <Route path='/test2' element={<Test2/>}/>
           <Route path='/test3' element={<Test3/>}/>
           {/*<Route path='/test4' element={<Test4/>}/>*/}

@@ -10,7 +10,7 @@ import {
   searchPosts,
   incrementView,
   likePost,
-  getTopPosts,
+  getLatestPosts,
 } from "../controllers/blogPostController";
 
 import protect from "../middleware/authMiddleware";
@@ -30,13 +30,13 @@ router.post("/", protect, createPost);
 // router.post('/', createPost);
 router.get("/", getAllPosts);
 router.get("/slugs/:slug", getPostBySlug);
-router.put("/:id", protect, adminOnly, updatePost);
-router.delete("/:id", protect, adminOnly, deletePost);
+router.put("/:id", protect, updatePost);
+router.delete("/:id", protect, deletePost);
 router.get("/tag/:tag", getPostByTag);
 router.get("/search", searchPosts);
 router.post("/:id/view", incrementView);
 router.post("/:id/like", likePost);
-router.get("/trending", getTopPosts);
+router.get("/latest", getLatestPosts);
 
 const blogPostRouter = router;
 export default blogPostRouter;

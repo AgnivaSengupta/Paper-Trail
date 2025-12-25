@@ -65,13 +65,19 @@ const BlogLayout = ({children} : Props) => {
   };
   return (
     
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col items-center"
+      style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(204, 204, 204, 0.3) 1px,
+        transparent 0)`,
+        backgroundSize: "20px 20px",
+        backgroundRepeat: "repeat"
+      }}>
       {/* Header */}
-      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-24">
+      <div className="flex justify-center items-center w-full sticky top-0 z-50 h-28">
         <BlogNavbar ref={navRef} />
       </div>
       {/*<BlogNavbar/> */}
-      <div className="flex flex-col">{children}</div>
+      {children}
     </div>
     
   )

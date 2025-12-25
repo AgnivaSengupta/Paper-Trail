@@ -6,8 +6,14 @@ const UserSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    googleId: { type: String, unique: true, sparse: true },
     profilePic: { type: String, default: null },
     bio: { type: String, default: "" },
+    location: {type: String, default: ""},
+    title: { type: String, default: ""},
+    socials: {type: String, default: ""},
+    
+    skills: {type: [String], default: [], validate: {validator: function(v){return v.length <= 10}, message: 'Cannot have more than 10 skills.'}},
     lastLogin: { type: Date, default: Date.now },
     isVerified: { type: Boolean, default: false },
 

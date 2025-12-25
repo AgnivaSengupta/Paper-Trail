@@ -13,7 +13,7 @@ const router: Router = express.Router();
 router.post('/:postId', protect, addComment);
 router.get('/:postId', getCommentsByPost);
 router.delete('/:commentId', protect, deleteComment);
-router.get('/', getAllComments);
+router.get('/', protect, getAllComments);
 
 const commentsRouter = router;
 export default commentsRouter;

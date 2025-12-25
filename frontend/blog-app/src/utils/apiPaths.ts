@@ -4,10 +4,11 @@ export const API_PATHS = {
     AUTH: {
         REGISTER: "api/auth/register",
         LOGIN: "api/auth/login",
+        GOOGLE_LOGIN: "api/auth/google",
         GET_PROFILE: "api/auth/profile",
         LOGOUT: "api/auth/logout",
-        VERIFY: "api/auth/verify"
-
+        VERIFY: "api/auth/verify",
+        UPDATE: "api/auth/profile"
     },
     POST: {
         CREATE_POST: "api/post", // post req
@@ -19,7 +20,7 @@ export const API_PATHS = {
         SEARCH_POST: "api/post/search",
         INCREMENT_VIEW: (id: string) => `api/post/${id}/view`,
         LIKE_POST: (id: string) => `api/post/${id}/like`,
-        GET_TRENDING_POSTS: "api/post/trending"
+        GET_LATEST_POSTS: "api/post/latest"
     },
     DASHBOARD_SUMMARY: {
         GET_DASHBOARD_SUMMARY: "api/dashboard-summary"

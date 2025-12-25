@@ -17,6 +17,10 @@ import { useState } from "react";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Separator } from "../ui/separator";
+import OrSeperator from "../ui/OrSeperator";
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export function LoginForm({
   authState,
@@ -28,6 +32,7 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const setUser = useAuthStore((state) => state.setUser);
   const setAuthFormOpen = useAuthStore((state) => state.setAuthFormOpen);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -56,7 +61,29 @@ export function LoginForm({
       console.log("Error: ", error);
     }
   };
-
+  
+  const handleGoogleLogin = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: async (codeResponse) => {
+      try {
+        const response = await axiosInstance.post(API_PATHS.AUTH.GOOGLE_LOGIN,
+          {
+            code: codeResponse.code,
+          },
+          {
+            withCredentials: true
+          }
+        );
+        
+        setUser(response.data);
+        setAuthFormOpen(false);
+      } catch (error) {
+        console.error("Google Login Backend Error:", error);
+      }
+    },
+    onError: (error) => console.log("Google Login Failed:", error),
+  });
+ 
   return (
     <div className="flex flex-col gap-6">
       <Card className="bg-white border-none">
@@ -98,12 +125,31 @@ export function LoginForm({
                   required
                 />
               </Field>
+              
+              {/*<div className="relative">
+                <Separator className="bg-zinc-400"/>
+                <div className="absolute -top-[10px] left-[46%] w-7 h-5 flex justify-center bg-white">
+                  <p className="text-sm  text-zinc-500">or</p>
+                </div>
+              </div>*/}
+              
               <Field>
                 <Button
                   type="submit"
                   className="bg-primary text-foreground hover:bg-primary/80 cursor-pointer"
                 >
                   Login
+                </Button>
+                
+                <OrSeperator/>
+                
+                <Button
+                  type="submit"
+                  onClick={() => handleGoogleLogin()}
+                  className="bg-white border-zinc-300 border-1 text-foreground hover:bg-zinc-100 cursor-pointer"
+                >
+                  <FcGoogle/>
+                  Sign in with Google
                 </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}

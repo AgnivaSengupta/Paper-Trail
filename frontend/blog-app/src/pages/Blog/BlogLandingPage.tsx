@@ -34,6 +34,62 @@ import BlogNavbar from "@/components/layouts/BlogNavbar";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import GridComponent from "@/components/blogPage/GridComponent";
+import BlogCard from "@/components/blogPage/BlogCard";
+import type { Post, Author } from "../Admin/BlogPosts";
+
+
+const blogPosts = [
+  {
+    id: "1",
+    title: "Scaling Real-Time Chat Applications with Go and React",
+    excerpt: "A deep dive into handling thousands of concurrent WebSocket connections, managing state, and ensuring message delivery in a distributed system.",
+    coverImage: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60", // Real image
+    tags: ["System Design", "Go", "React Native"],
+    author: "Alex Dev",
+    publishedAt: "2025-12-19T10:00:00Z",
+    clampLines: 3
+  },
+  {
+    id: "2",
+    title: "Understanding Interrupts in 8085 Microprocessors",
+    excerpt: "Breaking down how hardware and software interrupts work, masking techniques, and writing efficient assembly code for legacy architecture.",
+    coverImage: null, // Test case: Needs your default illustration
+    tags: ["Assembly", "Hardware", "CS Fundamentals"],
+    author: "Sarah Chips",
+    publishedAt: "2025-11-20T14:30:00Z",
+    clampLines: 2
+  },
+  {
+    id: "3",
+    title: "Getting Started with GSoC 2026: A Contributor's Guide",
+    excerpt: "Google Summer of Code is approaching. Here is how to pick an organization, read a codebase, and make your first meaningful pull request.",
+    coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=60",
+    tags: ["Open Source", "Career", "GSoC"],
+    author: "Alex Dev",
+    publishedAt: "2025-12-18T09:15:00Z",
+    clampLines: 4
+  },
+  {
+    id: "4",
+    title: "ESP32-S3 vs Arduino: Which one for your next IoT Project?",
+    excerpt: "Comparing power consumption, Wi-Fi capabilities, and processing speed. Why I switched my home automation setup to ESP32.",
+    coverImage: null, // Test case: Needs your default illustration
+    tags: ["IoT", "Embedded Systems", "Electronics"],
+    author: "Maker Mike",
+    publishedAt: "2025-10-05T11:00:00Z",
+    clampLines: 3
+  },
+  {
+    id: "5",
+    title: "Visualizing Pathfinding Algorithms: Dijkstra vs A*",
+    excerpt: "An interactive look at how graph algorithms traverse nodes. We explore time complexity and real-world mapping use cases.",
+    coverImage: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&auto=format&fit=crop&q=60",
+    tags: ["Algorithms", "Data Structures", "Math"],
+    author: "Sarah Chips",
+    publishedAt: "2025-11-15T16:45:00Z",
+    clampLines: 3
+  }
+];
 
 const BlogLandingPage = () => {
   const { authFormOpen, setAuthFormOpen } = useAuthStore();
@@ -41,6 +97,12 @@ const BlogLandingPage = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [currPage, setCurrPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   gsap.registerPlugin(useGSAP);
   const navRef = useRef(null);
@@ -86,21 +148,46 @@ const BlogLandingPage = () => {
 
   const { user, setUser } = useAuthStore();
 
+  const fetchPosts = async (pageNumber: number) => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(API_PATHS.POST.GET_LATEST_POSTS);
+      
+      const { posts } = response.data;
+      
+      setPosts(posts);
+      //setCurrPage(page);
+      //setTotalPages(totalPages);
+      setLoading(false);
+      
+      console.log(posts);
+      
+    } catch (error) {
+      console.log("Error while fetching the posts: ", error);
+      setLoading(false);
+      // TO-DO --> in case the posts are not loading, Do not render the landing page only. Tell the user that website is under maintenance and will live shortly.
+      // Meanwhile send the notification that the website is down to the admin/maintainer....
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  const fetchProfile = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+        withCredentials: true,
+      });
+
+      setUser(response.data);
+    } catch (error) {
+      setUser(null);
+    }
+  };
+  
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
-          withCredentials: true,
-        });
-
-        setUser(response.data);
-      } catch (error) {
-        setUser(null);
-      }
-    };
-
     fetchProfile();
-  }, [setUser]);
+    fetchPosts(1);
+  }, []);
 
   const handleLogOut = async () => {
     try {
@@ -118,6 +205,8 @@ const BlogLandingPage = () => {
       console.log(error);
     }
   };
+  
+  const excerpt = "An interactive look at how graph algorithms traverse nodes. We explore time complexity and real-world mapping use cases."
 
   return (
     <div className="min-h-screen  bg-white">
@@ -128,37 +217,55 @@ const BlogLandingPage = () => {
         </div>
 
         {/* Hero Section */}
-        <section className="relative mt-10 py-10 px-15 sm:px-6 lg:px-36 flex justify-between">
-          <div className="text-left">
-            <h1 className="text-9xl font-primary text-foreground mb-4 leading-tight">
-              A Journal
-              <br />
-              of Ideas,
-              <br />
-              Open to all
-            </h1>
-
-            <p className="text-3xl font-primary text-muted-foreground mb-12 leading-snug max-w-2xl">
-              A minimal space where I share my thoughts, projects, <br />
-              and daily learnings — and where you can share yours too.
-            </p>
-          </div>
-
-          <div className="flex justify-center items-center">
-            <GridComponent />
+        <section className="relative mt-10 py-10 px-15 sm:px-6 lg:px-36 flex justify-center items-center">
+          <div className="w-full max-w-[2100px] flex items-center justify-between">          
+            <div className="text-left">
+              <h1 className="text-9xl font-primary text-foreground mb-4 leading-tight">
+                A Journal
+                <br />
+                of Ideas,
+                <br />
+                Open to all
+              </h1>
+  
+              <p className="text-3xl font-primary text-muted-foreground mb-12 leading-snug max-w-2xl">
+                A minimal space where I share my thoughts, projects, <br />
+                and daily learnings — and where you can share yours too.
+              </p>
+            </div>
+  
+            <div className="flex justify-center items-center">
+              <GridComponent />
+            </div>
           </div>
         </section>
-
-        <section id="PostsSection" className="py-15 px-4 sm:px-6 lg:px-26">
-          <div className="relative max-w-7xl flex flex-col min-w-full">
-            <div className="mb-12">
+        
+        {/* Post section */}
+        <section id="PostsSection" className="py-15 px-4 sm:px-6 lg:px-26 flex flex-col items-center">
+          <div className="relative w-full max-w-[2100px] flex flex-col">
+            <div className="mb-12 ml-10">
               <h2 className="text-5xl text-foreground font-primary">
                 Latest Posts
               </h2>
             </div>
 
             <div className="w-full flex justify-center">
-              <img src="stock-1.jpeg" height={700} width={1300} />
+              {/*<img src="stock-1.jpeg" height={700} width={1300} />*/}
+              <div className="grid grid-cols-4 gap-12 justify-items-center max-w-[1700px]">
+                {posts.map((blog) => (
+                  <BlogCard 
+                    key={blog._id}
+                    title={blog.title}
+                    author={blog.author.name}
+                    // publishedAt={Date(blog.updatedAt)}
+                    tags={blog.tags[0]}
+                    coverImage={'Default-cover.png'}
+                    excerpt={excerpt}
+                    clampLines={2}
+                  />
+                ))}
+              </div>
+
             </div>
           </div>
 

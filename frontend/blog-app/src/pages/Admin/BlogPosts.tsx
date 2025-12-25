@@ -34,13 +34,14 @@ import { useThemeStore } from "@/store/themeStore";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { Spinner } from "@/components/ui/spinner";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-type Author = {
+export type Author = {
   name: string;
   profilePic: string;
 };
 
-type Post = {
+export type Post = {
   _id: string;
   title: string;
   slug: string;
@@ -55,37 +56,6 @@ type Post = {
   createdAt: string;
   updatedAt: string;
 };
-
-const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
-  <div
-    className={`
-      flex items-center
-      ${collapsed ? "justify-center px-2" : "justify-between px-4"}
-      py-3 mb-1 cursor-pointer rounded-lg transition-colors
-      ${
-        active
-          ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
-      }
-    `}
-    title={collapsed ? label : ""}
-  >
-    <div className="flex items-center gap-3">
-      <Icon size={18} />
-      {!collapsed && (
-        <span className="text-sm font-medium whitespace-nowrap">{label}</span>
-      )}
-    </div>
-    {!collapsed && badge && (
-      <span className="bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300 text-xs px-2 py-0.5 rounded">
-        {badge}
-      </span>
-    )}
-    {collapsed && badge && (
-      <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full"></div>
-    )}
-  </div>
-);
 
 const BlogPosts = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -103,12 +73,9 @@ const BlogPosts = () => {
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-
-  // Filter Logic
-  // const filteredPosts = allPosts.filter((post) => {
-  //   if (activeTab === "all") return true;
-  //   return post.status === activeTab;
-  // });
+  
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const getAllPosts = async (pageNumber = 1, filterStatus: string) => {
     try {
@@ -150,6 +117,22 @@ const BlogPosts = () => {
       getAllPosts(newPage, activeTab);
     }
   };
+  
+  const handleDelete = async (postId: string) => {
+    try{
+      await axiosInstance.delete(API_PATHS.POST.DELETE_POST(postId));
+      console.log('Post Deleted');
+      
+      getAllPosts(currPage, activeTab);
+      
+      setDeleteDialogOpen(false);
+      setSelectedPostId(null);
+    } catch (error){
+      console.log("Failed to delete post: ", error);
+    } finally {
+      setDeleteDialogOpen(false);
+    }
+  }
 
   useEffect(() => {
     setCurrPage(1);
@@ -157,7 +140,14 @@ const BlogPosts = () => {
   }, [activeTab]);
   
   
-
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+  
   return (
     <div className={theme === "dark" ? "dark" : ""}>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
@@ -369,9 +359,49 @@ const BlogPosts = () => {
                             <button className="p-1.5 cursor-pointer text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                               <Edit3 size={16} />
                             </button>
-                            <button className="p-1.5 cursor-pointer text-zinc-400 hover:text-rose-600 dark:hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors">
-                              <Trash2 size={16} />
-                            </button>
+                            <Dialog open={deleteDialogOpen && selectedPostId == post._id} onOpenChange={setDeleteDialogOpen}>
+                              <DialogTrigger asChild>
+                                <button
+                                 onClick={() => {
+                                    setSelectedPostId(post._id);
+                                    setDeleteDialogOpen(true);
+                                 }} 
+                                  className="p-1.5 cursor-pointer text-zinc-400 hover:text-rose-600 dark:hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors">
+                                  <Trash2 size={16} />
+                                </button>
+                              </DialogTrigger>
+                              
+                              <DialogContent className="sm:max-w-[425px] bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 shadow-lg">
+                                <DialogHeader>
+                                  <DialogTitle className="text-2xl font-primary">Delete Post</DialogTitle>
+                                  <DialogDescription className="text-lg font-primary text-zinc-600 dark:text-zinc-400">
+                                    This action cannot be undone. This will permanently delete your post from our servers.
+                                  </DialogDescription>
+                                </DialogHeader>
+                            
+                                <DialogFooter className="flex gap-2">
+                                  <DialogClose asChild>
+                                    <button
+                                      onClick={() => {
+                                        setSelectedPostId(null);
+                                        setDeleteDialogOpen(false);
+                                      }}
+                                      className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors cursor-pointer">
+                                      Cancel
+                                    </button>
+                                  </DialogClose>
+                                  
+                                  {/* Primary Action Button */}
+                                  <button 
+                                    type='submit'
+                                    onClick={() => handleDelete(post._id)}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-sm tracking-wider transition-colors cursor-pointer"
+                                  >
+                                    Delete Post
+                                  </button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
                             {/*<button className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                             <MoreHorizontal size={16} />
                           </button>*/}

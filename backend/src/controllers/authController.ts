@@ -4,14 +4,29 @@ import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import { generateOTP, hashOtp } from "../utils/otp_utils";
-import { mailTrapClient, sender, sendTestEmail } from "../utils/resendClient";
+// import { mailTrapClient, sender, sendTestEmail } from "../utils/resendClient";
 import { otpEmail } from "../utils/email";
+import crypto from "crypto";
+
+import { OAuth2Client } from "google-auth-library";
+// import crypto from crypto;
 
 const secret = process.env.JWT_SECRET;
+const oAuthclientID = process.env.OAUTH_CLIENT_ID;
+const oAuthclientSecret = process.env.OAUTH_CLIENT_SECRET;
 
 if (!secret) {
   throw new Error("JWT secrert not read from env file");
 }
+
+if (!oAuthclientID || !oAuthclientSecret) {
+  throw new Error("OAuth set up issue");
+}
+const googleClient = new OAuth2Client(
+  process.env.OAUTH_CLIENT_ID,
+  process.env.OAUTH_CLIENT_SECRET,
+  "postmessage",
+);
 
 const generateToken = (userId: Types.ObjectId) => {
   return jwt.sign({ id: userId }, secret, { expiresIn: "7d" });
@@ -53,8 +68,8 @@ const registerUser = async (req: Request, res: Response) => {
       //   html: otpEmail.replace("{{OTP_CODE}}", otp),
       //   category: "Email verification",
       // });
-      
-      await sendTestEmail(otpEmail.replace("{{OTP_CODE}}", otp))
+
+      await sendTestEmail(otpEmail.replace("{{OTP_CODE}}", otp));
     } catch (emailError) {
       console.error("Email send failed:", emailError);
 
@@ -123,6 +138,69 @@ const verifyEmail = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { code } = req.body;
+
+    const { tokens } = await googleClient.getToken(code);
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: tokens.id_token!,
+      audience: oAuthclientID,
+    });
+
+    const payload = ticket.getPayload();
+    console.log(payload);
+    if (!payload) return res.status(400).json({ msg: "Invalid google token" });
+
+    const { email, name, picture, sub: googleId } = payload;
+    if (!email)
+      return res.status(400).json({ msg: "Email not provided by Google" });
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      // New user
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+      user = await User.create({
+        name,
+        email,
+        profilePic: picture,
+        googleId: googleId,
+        isVerified: true,
+      });
+
+      // Token and cookie
+      const token = generateToken(user._id);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "strict" : "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+    }
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePic: user.profilePic,
+      bio: user.bio,
+      msg: "Google Login successful",
+    });
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.status(500).json({ msg: "Google authentication failed" });
   }
 };
 
@@ -200,4 +278,51 @@ const logOut = async (req: Request, res: Response) => {
     return res.status(500).json({ msg: "Server error - Not logged out!" });
   }
 };
-export { registerUser, verifyEmail, loginUser, getUserProfile, logOut };
+
+const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const {
+      user,
+      username,
+      title,
+      bio,
+      location,
+      skills,
+      website,
+      profileImage,
+    } = req.body;
+
+    const updatedData = {
+      name: username,
+      title: title,
+      bio: bio,
+      location: location,
+      skills: skills,
+      socials: website,
+      profilePic: profileImage,
+    };
+
+    const updatedUser = await User.findById(
+      user._id,
+      { $set: updatedData },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    res.status(200).json({ msg: "User Updated" });
+    return updatedUser;
+  } catch (error) {
+    console.error("Update failed: ", error);
+  }
+};
+export {
+  registerUser,
+  verifyEmail,
+  loginUser,
+  getUserProfile,
+  logOut,
+  updateProfile,
+  googleLogin,
+};

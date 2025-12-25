@@ -1,4 +1,4 @@
-import { BookOpen, Menu, PenTool } from "lucide-react";
+import { BookOpen, Menu, PenTool, User } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -14,12 +14,14 @@ import { useNavigate } from "react-router-dom";
 import { forwardRef, useEffect } from "react";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const { authFormOpen, setAuthFormOpen } = useAuthStore();
-
+  // const { user, logout } = useAuthStore();
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -34,7 +36,7 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
       }
     };
     fetchProfile();
-  }, [setUser]);
+  }, []);
 
   const handleLogOut = async () => {
     try {
@@ -54,9 +56,9 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
   };
 
   return (
-    <header ref={ref} className="bg-[#1a1a1a] text-sm min-w-[400px] sm:min-w-[400px] md:min-w-[700px] lg:min-w-[700px] 2xl:min-w-[1200px] rounded-lg">
+    <header ref={ref} className="bg-[#1a1a1a] text-sm min-w-[300px] sm:min-w-[500px] md:min-w-[700px] lg:min-w-[700px] 2xl:min-w-[1200px] rounded-lg">
       <div className="max-w-8xl mx-auto px-2 sm:px-6 lg:px-8 ">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           <div className="flex items-center space-x-1 p-1">
             {/*<div className="w-8 h-8 rounded-lg flex items-center justify-center">*/}
             <BookOpen className="w-6 h-6 text-white translate-y-[2px]" />
@@ -71,11 +73,12 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button>
-                    <div className="p-2 flex justify-center items-center rounded-full bg-yellow-50">
-                      A
-                    </div>
-                  </Button>
+                  <Avatar>
+                    <AvatarImage src={ user.profilePic } alt='User Image'/>
+                    <AvatarFallback>
+                      <User/>
+                    </AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent>
