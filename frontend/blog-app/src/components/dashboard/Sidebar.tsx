@@ -30,6 +30,9 @@ import {
 } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import axiosInstance from "@/utils/axiosInstance";
+import { API_PATHS } from "@/utils/apiPaths";
+import { useUserStore } from "@/store/userStore";
 
 const SidebarItem = React.forwardRef(
   (
@@ -90,6 +93,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  
+  const user = useUserStore((state) => state.user);
+  const clearUser = useUserStore((state) => state.clearUser)
 
   useEffect(() => {
     if (theme === "dark") {
@@ -98,6 +104,20 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
+  
+  
+  const handleLogOut = async () => {
+    try{    
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
+        withCredentials: true,
+      });
+      clearUser();
+    } catch (error) {
+      console.log("Error while logging out.", error);
+    }
+  }
+  
+  
   return (
     <aside
       className={`
@@ -199,11 +219,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </div>
               </div>
               <Separator />
-              <div className="group">
+              <div className="group" onClick={() => handleLogOut()}>
                 <div className="p-2 flex gap-3 item-center rounded-sm  group-hover:bg-red-200/30 cursor-pointer">
                   <Avatar className="size-6">
                     <AvatarImage
-                      src="https://github.com/shadcn.png"
+                      src={ user?.profilePic || "https://github.com/shadcn.png"}
                       alt="@shadcn"
                     />
                     <AvatarFallback>CN</AvatarFallback>

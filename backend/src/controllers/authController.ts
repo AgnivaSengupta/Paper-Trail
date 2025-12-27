@@ -124,7 +124,7 @@ const verifyEmail = async (req: Request, res: Response) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -144,16 +144,14 @@ const verifyEmail = async (req: Request, res: Response) => {
 const googleLogin = async (req: Request, res: Response) => {
   try {
     const { code } = req.body;
-
     const { tokens } = await googleClient.getToken(code);
-
     const ticket = await googleClient.verifyIdToken({
       idToken: tokens.id_token!,
       audience: oAuthclientID,
     });
 
     const payload = ticket.getPayload();
-    console.log(payload);
+    // console.log(payload);
     if (!payload) return res.status(400).json({ msg: "Invalid google token" });
 
     const { email, name, picture, sub: googleId } = payload;
@@ -176,20 +174,23 @@ const googleLogin = async (req: Request, res: Response) => {
       user = await User.create({
         name,
         email,
+        password: hashedPassword,
         profilePic: picture,
         googleId: googleId,
         isVerified: true,
       });
-
-      // Token and cookie
-      const token = generateToken(user._id);
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
     }
+    
+    
+    // Token and cookie
+    const token = generateToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    
     res.status(200).json({
       _id: user._id,
       name: user.name,
@@ -207,7 +208,6 @@ const googleLogin = async (req: Request, res: Response) => {
 const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -225,7 +225,7 @@ const loginUser = async (req: Request, res: Response) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -235,7 +235,6 @@ const loginUser = async (req: Request, res: Response) => {
       email: user.email,
       profilePic: user.profilePic,
       bio: user.bio,
-      //role: user.role,
       msg: "Login successfull",
     });
   } catch (error) {
@@ -268,7 +267,7 @@ const logOut = async (req: Request, res: Response) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     res.json({

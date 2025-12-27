@@ -80,7 +80,7 @@ const BlogPosts = () => {
   const getAllPosts = async (pageNumber = 1, filterStatus: string) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(API_PATHS.POST.GET_ALL_POSTS, {
+      const response = await axiosInstance.get(API_PATHS.POST.GET_ALL_POSTS_BY_USER, {
         params: {
           status: filterStatus.toLowerCase(),
           page: pageNumber,

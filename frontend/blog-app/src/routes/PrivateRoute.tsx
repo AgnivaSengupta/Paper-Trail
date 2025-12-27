@@ -1,15 +1,19 @@
-import { useAuthStore } from "@/store/useAuthStore"
+import { useUserStore } from "@/store/userStore"
 import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom"
 
+type PrivateRouteProps = {
+  allowedRole: string;
+};
+
 const PrivateRoute = () => {
-  const { user, loading, fetchProfile } = useAuthStore();
+  const user = useUserStore((state) => state.user);
+  const loading = useUserStore((state) => state.loading);
+  const fetchUser = useUserStore((state) => state.fetchUser);  
 
   useEffect(() => {
-    if (!user) {
-      fetchProfile();
-    }
-  }, [fetchProfile, user]);
+    fetchUser(); // triggers loading -> sets user
+  }, [fetchUser]);
 
   if (loading){
     return (
@@ -19,11 +23,10 @@ const PrivateRoute = () => {
     )
   }
 
-  // If you want to enforce auth, you can uncomment this
-  // if (!user) {
-  //   return <Navigate to="/" replace />;
-  // }
 
+  // if (user.role != allowedRole){
+  //   return <Navigate to='/' replace/>
+  // }
   return (
     <Outlet/>
   )

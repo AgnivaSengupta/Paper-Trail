@@ -1,0 +1,160 @@
+import { ArrowDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+
+const Hero = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation after mount
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  
+  const { user, setUser } = useAuthStore();
+  const { authFormOpen, setAuthFormOpen } = useAuthStore();
+  
+  
+  return (
+    <section className="min-h-screen flex flex-col items-center justify-center relative dot-grid">
+      {/* Technical annotation - top left */}
+      <div
+        className={`absolute top-24 left-8 hidden lg:block transition-all duration-700 delay-700 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
+      >
+        <span className="font-sketch text-lg text-muted-foreground rotate-[-5deg] inline-block italic">
+          ← margin notes here
+        </span>
+      </div>
+
+      {/* Technical annotation - top right */}
+      <div
+        className={`absolute top-32 right-12 hidden lg:block transition-all duration-700 delay-700 ${
+          isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+        }`}
+      >
+        <span className="font-sketch text-lg text-muted-foreground rotate-[3deg] inline-block">
+          [ draft v1.0 ]
+        </span>
+      </div>
+
+      <div className="container max-w-4xl text-center px-6">
+        {/* Main heading with sketch styling */}
+        <h1 className="font-primary tracking-wider text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold leading-tight  mb-8">
+          <span
+            className={`block transform transition-all duration-700  ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            A Journal
+          </span>
+          <span
+            className={`block transition-all duration-700 delay-150 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            of Ideas,
+          </span>
+          <span
+            className={`block text-muted-foreground italic transition-all duration-700 delay-300 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
+          >
+            Open to all
+          </span>
+        </h1>
+
+        {/* Subheading */}
+        <p
+          className={`font-mono text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed transition-all duration-700 delay-500 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          A minimal space where I share my thoughts, projects, and daily
+          learnings — and where you can share yours too.
+        </p>
+
+        {/* CTA Buttons */}
+        <div
+          className={`flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-700 delay-[600ms] ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          <Button
+            size="lg"
+            className="font-mono text-sm px-8 sketch-border cursor-pointer"
+            onClick={() =>
+              document
+                .getElementById("posts")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
+            Start Reading
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="font-mono text-sm px-8 cursor-pointer"
+            onClick={() => setAuthFormOpen(true)}
+          >
+            Create Account
+          </Button>
+        </div>
+
+        {/* Technical bracket annotation */}
+        <div
+          className={`mt-16 flex justify-center transition-all duration-700 delay-[800ms] ${
+            isVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <span className="font-sketch text-muted-foreground text-lg italic">
+            {"{ scroll to explore }"}
+          </span>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce transition-all duration-700 delay-[900ms] ${
+          isVisible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <ArrowDown className="h-6 w-6 text-muted-foreground" />
+      </div>
+
+      {/* Corner annotations */}
+      <div
+        className={`absolute bottom-12 left-8 hidden lg:block transition-all duration-700 delay-[1000ms] ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        }`}
+      >
+        <div className="font-mono text-xs text-muted-foreground">
+          <div>fig. 1.0</div>
+          <div className="font-sketch text-base mt-1 italic">hero section</div>
+        </div>
+      </div>
+
+      <div
+        className={`absolute bottom-12 right-8 hidden lg:block transition-all duration-700 delay-[1000ms] ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        }`}
+      >
+        <div className="font-mono text-xs text-muted-foreground text-right">
+          <div>REV. 2025</div>
+          <div className="font-sketch text-base mt-1 italic">
+            blueprint theme
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;

@@ -13,6 +13,7 @@ export const API_PATHS = {
     POST: {
         CREATE_POST: "api/post", // post req
         GET_ALL_POSTS: "api/post", //get req
+        GET_ALL_POSTS_BY_USER: "api/post/byuser",
         GET_POST_BY_SLUG: (slug: string) => `api/post/slugs/${slug}`,
         UPDATE_POST: (id: string) => `api/post/${id}`,
         DELETE_POST: (id: string) => `api/post/${id}`,

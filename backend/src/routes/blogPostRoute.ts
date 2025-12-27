@@ -11,6 +11,7 @@ import {
   incrementView,
   likePost,
   getLatestPosts,
+  getAllPostsByUser,
 } from "../controllers/blogPostController";
 
 import protect from "../middleware/authMiddleware";
@@ -29,6 +30,7 @@ const adminOnly = (req: Request, res: Response, next: NextFunction) => {
 router.post("/", protect, createPost);
 // router.post('/', createPost);
 router.get("/", getAllPosts);
+router.get("/byuser", protect, getAllPostsByUser);
 router.get("/slugs/:slug", getPostBySlug);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);

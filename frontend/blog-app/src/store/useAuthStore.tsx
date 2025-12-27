@@ -1,47 +1,35 @@
-import { create } from 'zustand'
+import {create} from 'zustand'
+import type {User} from './userStore'
 import axiosInstance from '@/utils/axiosInstance';
 import { API_PATHS } from '@/utils/apiPaths';
 
-export interface User {
-    _id: string;
-    name: string;
-    email: string;
-    profilePic?: string;
-    bio?: string;
-    role?: "member" | "admin";
-}
-
 interface AuthUser {
     user: User | null;
+    isCheckingAuth: boolean;
     authFormOpen: boolean;
-    loading: boolean;
     setAuthFormOpen: (val: boolean) => void;
-    setUser: (user: User | null) => void;
-    fetchProfile: () => Promise<void>;
-    logout: () => Promise<void>;
+    setUser: () => Promise<void>;
+    logout: () => void;
 }
 
 export const useAuthStore = create<AuthUser>((set) => ({
     user: null,
+    isCheckingAuth: true,
     authFormOpen: false,
-    loading: true,
-    setAuthFormOpen: (val) => set({ authFormOpen: val }),
-    setUser: (user) => set({ user: user, loading: false }),
-    fetchProfile: async () => {
-        try {
-            const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE);
-            set({ user: response.data, loading: false });
-        } catch (error) {
-            set({ user: null, loading: false });
-            console.error("Error fetching profile:", error);
+    setAuthFormOpen: (val) => set({authFormOpen: val}),
+    setUser: async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true,
+        })
+        
+        if (response.data){
+          set({ user: response.data, isCheckingAuth: false });
         }
+      } catch (error) {
+        set({ user: null, isCheckingAuth: false });
+        console.log("Error fetching user datails.", error);
+      }
     },
-    logout: async () => {
-        try {
-            await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
-            set({ user: null });
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    }
+    logout: () => set({user: null})
 }))

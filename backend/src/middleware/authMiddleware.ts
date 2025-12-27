@@ -15,6 +15,11 @@ interface IUser extends Document {
   email: string;
   profilePic?: string | null;
   bio?: string;
+  location?: string;
+  title?: string;
+  socials?: string;
+  skills: string[];
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

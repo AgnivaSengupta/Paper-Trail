@@ -33,7 +33,8 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useThemeStore } from '@/store/themeStore';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import ProfileUpdateForm from '@/components/blogPage/ProfileUpdateForm';
+import { ProfileUpdateForm } from '@/components/dashboard/ProfileUpdateForm';
+// import ProfileUpdateForm from '@/components/blogPage/ProfileUpdateForm';
 //import { TooltipArrow } from '@radix-ui/react-tooltip';
 
 // --- Mock Data ---

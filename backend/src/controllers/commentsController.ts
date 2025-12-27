@@ -16,7 +16,6 @@ export interface IComment extends Document {
 // Add a comment to a blog post
 // @route POST/api/comments/:postId
 // private
-
 const addComment = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;

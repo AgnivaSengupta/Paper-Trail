@@ -94,8 +94,8 @@ const deletePost = async (req: Request, res: Response) => {
 // public
 const getAllPosts = async (req: Request, res: Response) => {
   try {
-    console.log("1. Controller hit");
-    console.log("2. User is:", req.user);
+    // console.log("1. Controller hit");
+    // console.log("2. User is:", req.user);
         
     const status = req.query.status || "published";
     const page = parseInt(req.query.page as string, 10) || 1;
@@ -144,9 +144,64 @@ const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
+// get posts written by user
+// @route GET/api/post
+// private
+const getAllPostsByUser = async (req:Request, res:Response) => {
+  try{
+    const user = req.user;
+    
+    const status = req.query.status || 'published';
+    const page = parseInt(req.query.page as string, 10) | 1;
+    const limit = parseInt(req.query.limit as string, 10) || 8;
+    const skip = (page - 1) * limit;
+    
+    let filter: {author: string, isDraft?: boolean} = {
+      author: user._id
+    }
+    
+    if (status === 'published'){
+      filter.isDraft = false;
+    } else if (status === 'draft'){
+      filter.isDraft = true;
+    }
+    
+    const posts = await BlogPost.find(filter)
+      .populate("author", "name profilePic")
+      .sort({updatedAt: -1})
+      .skip(skip)
+      .limit(limit)
+    
+    // Count totals for pagination and tab counts
+    const [totalCount, allCount, publishedCount, draftCount] =
+      await Promise.all([
+        BlogPost.countDocuments(filter), // for pagination of current tab
+        BlogPost.countDocuments(),
+        BlogPost.countDocuments({ isDraft: false }),
+        BlogPost.countDocuments({ isDraft: true }),
+      ]);
+
+    res.json({
+      posts,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      allCount,
+      counts: {
+        all: allCount,
+        published: publishedCount,
+        draft: draftCount,
+      },
+    });
+    
+  } catch (error){
+    res.status(500).json({ msg: "Server error while fetching the posts.", error });
+  }
+}
+
 // get posts by slug
 // @route GET/api/posts/slugs/:slug
-// punlic
+// public
 
 const getPostBySlug = async (req: Request, res: Response) => {
   try {
@@ -243,4 +298,5 @@ export {
   incrementView,
   likePost,
   getLatestPosts,
+  getAllPostsByUser,
 };

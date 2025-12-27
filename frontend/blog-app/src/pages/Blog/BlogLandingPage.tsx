@@ -34,7 +34,7 @@ import BlogNavbar from "@/components/layouts/BlogNavbar";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import GridComponent from "@/components/blogPage/GridComponent";
-import BlogCard from "@/components/blogPage/BlogCard";
+// import BlogCard from "@/components/blogPage/BlogCard";
 import type { Post, Author } from "../Admin/BlogPosts";
 
 
@@ -251,7 +251,7 @@ const BlogLandingPage = () => {
 
             <div className="w-full flex justify-center">
               {/*<img src="stock-1.jpeg" height={700} width={1300} />*/}
-              <div className="grid grid-cols-4 gap-12 justify-items-center max-w-[1700px]">
+              {/*<div className="grid grid-cols-4 gap-12 justify-items-center max-w-[1700px]">
                 {posts.map((blog) => (
                   <BlogCard 
                     key={blog._id}
@@ -264,7 +264,7 @@ const BlogLandingPage = () => {
                     clampLines={2}
                   />
                 ))}
-              </div>
+              </div>*/}
 
             </div>
           </div>

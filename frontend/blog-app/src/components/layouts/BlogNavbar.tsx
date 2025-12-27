@@ -1,4 +1,4 @@
-import { BookOpen, User } from "lucide-react";
+import { BookOpen, Menu, PenTool, User } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -11,21 +11,47 @@ import {
 } from "../ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
+import axiosInstance from "@/utils/axiosInstance";
+import { API_PATHS } from "@/utils/apiPaths";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
   const navigate = useNavigate();
-  const { user, setAuthFormOpen, logout } = useAuthStore();
+  const { user, setUser } = useAuthStore();
+  const { authFormOpen, setAuthFormOpen } = useAuthStore();
+  // const { user, logout } = useAuthStore();
   
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true,
+        });
+
+        setUser(response.data);
+      } catch (error) {
+        setUser(null);
+        console.log(error);
+      }
+    };
+    fetchProfile();
+  }, [user, setUser]);
+
   const handleLogOut = async () => {
     try {
-      await logout();
+      const response = await axiosInstance.post(
+        API_PATHS.AUTH.LOGOUT,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
       alert("Logged out successfully!");
-      navigate("/");
+      console.log(response.data);
     } catch (error) {
       alert("Logout failed!");
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -33,36 +59,42 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
     <header ref={ref} className="bg-[#1a1a1a] text-sm min-w-[300px] sm:min-w-[500px] md:min-w-[700px] lg:min-w-[700px] 2xl:min-w-[1200px] rounded-lg">
       <div className="max-w-8xl mx-auto px-2 sm:px-6 lg:px-8 ">
         <div className="flex items-center justify-between h-12">
-          <div className="flex items-center space-x-1 p-1 cursor-pointer" onClick={() => navigate("/")}>
+          <div className="flex items-center space-x-1 p-1">
+            {/*<div className="w-8 h-8 rounded-lg flex items-center justify-center">*/}
             <BookOpen className="w-6 h-6 text-white translate-y-[2px]" />
+            {/*</div>*/}
             <h1 className="text-2xl text-white font-playfair inline-block">
               Papertrail
             </h1>
           </div>
 
+          {/*<Switch/>*/}
           <div className="flex items-center space-x-4">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage src={user.profilePic} alt={user.name} />
+                  <Avatar>
+                    <AvatarImage src={ user.profilePic } alt='User Image'/>
                     <AvatarFallback>
-                      <User />
+                      <User/>
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Profile</DropdownMenuLabel>
                   <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate("/admin/overview")}>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/admin/overview")}
+                    >
                       Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/admin/posts")}>
                       Blog Posts
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/admin/profile")}>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/admin/profile")}
+                    >
                       Profile
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
@@ -71,7 +103,7 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
                     Create a blog
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogOut} className="text-red-500 focus:text-red-500">
+                  <DropdownMenuItem onClick={handleLogOut}>
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -92,6 +124,6 @@ const BlogNavbar = forwardRef<HTMLElement>((_, ref) => {
   );
 });
 
-BlogNavbar.displayName = "BlogNavbar";
+
 
 export default BlogNavbar;
