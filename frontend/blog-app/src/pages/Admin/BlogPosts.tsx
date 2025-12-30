@@ -1,32 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-  LayoutDashboard,
-  Box,
-  Activity,
-  PieChart,
-  Cpu,
-  HardDrive,
-  Wallet,
-  Settings,
-  HelpCircle,
-  Search,
-  Bell,
-  RefreshCcw,
-  ChevronDown,
-  X,
-  PanelLeft,
-  PanelLeftClose,
   Sun,
   Moon,
   FileText,
   Edit3,
   Trash2,
-  MoreHorizontal,
   ThumbsUp,
   Eye,
   Calendar,
-  Filter,
-  Plus,
+  Search
 } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

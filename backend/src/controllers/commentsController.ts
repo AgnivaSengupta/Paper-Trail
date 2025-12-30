@@ -1,17 +1,54 @@
 import Comment from "../models/Comment";
 import BlogPost from "../models/BlogPost";
 import type { Request, Response } from "express";
-import { Document, Types } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface IComment extends Document {
   post: Types.ObjectId | { title: string; coverImageUrl?: string }; // populated post
   author: Types.ObjectId | { name: string; profilePic?: string }; // populated author
   content: string;
   parentComment?: Types.ObjectId | null;
+  ancestors: Types.ObjectId[];
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
-  replies?: IComment[]; // for nested comments
+  // replies?: IComment[]; // for nested comments
 }
+
+// =================================================================================================================================================
+const createComment = async (req:Request, res:Response) => {
+  try{
+    const { _id: authorId } = req.user;
+    // const author = { name, profilePic };
+    
+    const { content, post, parentComment } = req.body;
+    let ancestors: mongoose.Types.ObjectId[] = [];
+    
+    // If parent exists -> meaning its a reply to some comment
+    if (parentComment){
+      const parent = await Comment.findById(parentComment); // find the parent Comment
+      if (!parent) return res.status(400).json({ msg: "Parent not found" });
+      
+      // now we construct the new ancestor array -> parentId + parent's ancestor array
+      ancestors = [...parent.ancestors, parent._id as mongoose.Types.ObjectId];
+    }
+    // Else its a new root level comment
+    const newComment = await Comment.create({
+      post,
+      content,
+      author: authorId,
+      parentComment: parentComment || null,
+      ancestors,
+      postAuthor: post.author._id,
+    });
+    
+    res.status(201).json(newComment);
+  } catch (error){
+    console.log("Add comment controller error: ", error);
+    res.status(500).json({ error: "Failed to create comment" });
+  }
+}
+
 
 // Add a comment to a blog post
 // @route POST/api/comments/:postId
@@ -48,29 +85,29 @@ const getCommentsByPost = async (req: Request, res: Response) => {
     const comments = await Comment.find({ post: postId })
       .populate("author", "name profilePic")
       .populate("post", "title coverImageUrl")
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: -1 });
 
-    const commentMap: Record<string, any> = {};
+    // const commentMap: Record<string, any> = {};
 
-    comments.forEach((comment) => {
-      const c: any = comment.toObject(); // ignore TS
-      c.replies = [];
-      commentMap[c._id.toString()] = c;
-    });
+    // comments.forEach((comment) => {
+    //   const c: any = comment.toObject(); // ignore TS
+    //   c.replies = [];
+    //   commentMap[c._id.toString()] = c;
+    // });
 
-    const nestedComments: any[] = [];
-    comments.forEach((comment) => {
-      const c: any = commentMap[comment._id.toString()];
-      if (c.parentComment) {
-        const parent: any = commentMap[c.parentComment];
-        if (parent) parent.replies.push(c);
-        else nestedComments.push(c);
-      } else {
-        nestedComments.push(c);
-      }
-    });
+    // const nestedComments: any[] = [];
+    // comments.forEach((comment) => {
+    //   const c: any = commentMap[comment._id.toString()];
+    //   if (c.parentComment) {
+    //     const parent: any = commentMap[c.parentComment];
+    //     if (parent) parent.replies.push(c);
+    //     else nestedComments.push(c);
+    //   } else {
+    //     nestedComments.push(c);
+    //   }
+    // });
 
-    res.json(nestedComments);
+    res.json(comments);
   } catch (error) {
     res.status(500).json({ msg: "Failed to get comment for the post", error });
   }
@@ -160,4 +197,4 @@ const getAllComments = async (req: Request, res: Response) => {
   }
 };
 
-export { addComment, deleteComment, getAllComments, getCommentsByPost };
+export { addComment, deleteComment, getAllComments, getCommentsByPost, createComment };

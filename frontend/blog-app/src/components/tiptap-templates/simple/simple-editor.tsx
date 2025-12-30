@@ -72,6 +72,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
+import { uploadImageToR2 } from "@/utils/r2-upload"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -225,7 +226,7 @@ export function SimpleEditor({onChange}: { onChange: (json: any, html: string) =
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
         limit: 3,
-        upload: handleImageUpload,
+        upload: uploadImageToR2,
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],

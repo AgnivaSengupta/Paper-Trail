@@ -1,6 +1,6 @@
 import AuthForm from "@/components/auth/AuthForm";
-import Footer from "@/components/blogPage/Footer";
-import Header from "@/components/blogPage/Header";
+// import Footer from "@/components/blogPage/Footer";
+// import Header from "@/components/blogPage/Header";
 import Hero from "@/components/blogPage/Hero";
 import LatestPosts from "@/components/blogPage/LatestPosts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +9,7 @@ import { API_PATHS } from "@/utils/apiPaths";
 import axiosInstance from "@/utils/axiosInstance";
 import { useEffect, useState } from "react";
 import type { Post } from "../Admin/BlogPosts";
+import BlogLayout from "@/components/layouts/BlogLayout";
 
 const LandingPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -62,13 +63,13 @@ const LandingPage = () => {
   }, []);
   
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <BlogLayout>
+      
       <main>
         <Hero />
         <LatestPosts />
       </main>
-      <Footer />
+  
       
       <Dialog open={authFormOpen} onOpenChange={setAuthFormOpen}>
         <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-stone-100">
@@ -83,7 +84,7 @@ const LandingPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </BlogLayout>
   );
 };
 

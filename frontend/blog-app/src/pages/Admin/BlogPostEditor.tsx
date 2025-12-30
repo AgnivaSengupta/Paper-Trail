@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Test from "./Test";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import {
   Card,
@@ -33,8 +32,6 @@ const BlogPostEditor = () => {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
-  // const [editorJson, setEditorJson] = useState({})
-  // const [editorHtml, setEditorHtml] = useState("")
 
   const json = useEditorStore((state) => state.json);
   const html = useEditorStore((state) => state.html);

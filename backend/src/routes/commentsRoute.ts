@@ -4,13 +4,14 @@ import {
     addComment,
     getCommentsByPost,
     deleteComment,
-    getAllComments
+    getAllComments,
+    createComment
 } from '../controllers/commentsController'
 import protect from '../middleware/authMiddleware';
 
 const router: Router = express.Router();
 
-router.post('/:postId', protect, addComment);
+router.post('/:postId', protect, createComment);
 router.get('/:postId', getCommentsByPost);
 router.delete('/:commentId', protect, deleteComment);
 router.get('/', protect, getAllComments);

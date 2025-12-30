@@ -1,5 +1,7 @@
 import BlogPost from "../models/BlogPost";
 import type { Request, Response } from "express";
+import extractImages from "../utils/extractImages";
+import MediaAsset from "../models/MediaAsset";
 
 // create a new blog post
 // @route POST/api/post
@@ -23,8 +25,18 @@ const createPost = async (req: Request, res: Response) => {
       author: user._id,
       isDraft,
     });
-
+    
     await newPost.save();
+
+    const usedImageUrls = extractImages(content.json);
+    
+    if (usedImageUrls.length > 0){
+      await MediaAsset.updateMany(
+        { url: { $in: usedImageUrls } },
+        { $set: { status: 'active' } },
+      );
+    };
+    
     res.status(201).json(newPost);
   } catch (error) {
     console.log(error);

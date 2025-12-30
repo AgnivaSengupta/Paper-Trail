@@ -2,6 +2,7 @@ import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { motion } from "framer-motion";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,11 +13,30 @@ const Hero = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  
   const { user, setUser } = useAuthStore();
   const { authFormOpen, setAuthFormOpen } = useAuthStore();
-  
-  
+
+  const containerVariants = {
+    hidden: { opacity: 0, blur: 20 },
+    visible: {
+      opacity: 1,
+      blur: 0,
+      transition: {
+        staggerChildren: 0.2, // Time between each child's animation
+        delayChildren: 0, // Initial delay before the first child starts
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeOut" },
+    },
+  };
+
   return (
     <section className="min-h-screen flex flex-col items-center justify-center relative dot-grid">
       {/* Technical annotation - top left */}
@@ -41,8 +61,13 @@ const Hero = () => {
 
       <div className="container max-w-4xl text-center px-6">
         {/* Main heading with sketch styling */}
-        <h1 className="font-primary tracking-wider text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-bold leading-tight  mb-8">
-          <span
+        <motion.h1
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="font-primary text-5xl sm:text-6xl md:text-7xl lg:text-9xl  leading-tight  mb-8"
+        >
+          <motion.span variants={itemVariants}
             className={`block transform transition-all duration-700  ${
               isVisible
                 ? "opacity-100 translate-y-0"
@@ -50,8 +75,8 @@ const Hero = () => {
             }`}
           >
             A Journal
-          </span>
-          <span
+          </motion.span>
+          <motion.span variants={itemVariants}
             className={`block transition-all duration-700 delay-150 ${
               isVisible
                 ? "opacity-100 translate-y-0"
@@ -59,8 +84,8 @@ const Hero = () => {
             }`}
           >
             of Ideas,
-          </span>
-          <span
+          </motion.span>
+          <motion.span variants={itemVariants}
             className={`block text-muted-foreground italic transition-all duration-700 delay-300 ${
               isVisible
                 ? "opacity-100 translate-y-0"
@@ -68,8 +93,8 @@ const Hero = () => {
             }`}
           >
             Open to all
-          </span>
-        </h1>
+          </motion.span>
+        </motion.h1>
 
         {/* Subheading */}
         <p
@@ -98,14 +123,17 @@ const Hero = () => {
           >
             Start Reading
           </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="font-mono text-sm px-8 cursor-pointer"
-            onClick={() => setAuthFormOpen(true)}
-          >
-            Create Account
-          </Button>
+
+          {!user && (
+            <Button
+              variant="outline"
+              size="lg"
+              className="font-mono text-sm px-8 cursor-pointer"
+              onClick={() => setAuthFormOpen(true)}
+            >
+              Create Account
+            </Button>
+          )}
         </div>
 
         {/* Technical bracket annotation */}

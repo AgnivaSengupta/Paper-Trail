@@ -31,5 +31,8 @@ export const API_PATHS = {
         GET_COMMENT_BY_POST: (postId: string) => `api/comments/${postId}`,
         GET_ALL_POSTS: "api/comments",
         DELETE_COMMENT: (commentId: string) => `api/comments/${commentId}`
+    },
+    UPLOAD: {
+      GET_URL: "api/get-upload-url",
     }
 }
