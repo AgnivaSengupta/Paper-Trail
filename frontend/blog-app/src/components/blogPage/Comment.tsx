@@ -27,11 +27,11 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
   return (
   <div className="flex flex-col mb-4">
         {/* 1. Comment Card */}
-        <div className="border border-gray-200 p-3 rounded-md bg-white">
+        <div className="border border p-3 rounded-md bg-white">
           <div className="flex gap-5">
             <div>
               <Avatar>
-                <AvatarImage src={comment.author.profilePic}/>
+                <AvatarImage src={comment.author.profilePic}  className="object-cover"/>
                 <AvatarFallback>
                   <User2/>
                 </AvatarFallback>
@@ -42,7 +42,7 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
                 {comment.isDeleted ? "[deleted]" : comment.author.name}
               </div>
     
-              <div className="text-gray-800 text-sm mb-2">
+              <div className="text-gray-800 text-sm mb-2 font-content">
                 {comment.isDeleted ? <span className="italic text-gray-400">This comment was deleted.</span> : comment.content}
               </div>
     
@@ -70,14 +70,14 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
                 <div className="ml-8 mt-2">
                   <Input
                     type="text"
-                    className="border bg-input p-2 min-h-14 w-full text-sm rounded"
+                    className="border-input bg-background p-2 min-h-14 w-full text-sm rounded"
                     placeholder="Type your reply..."
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                   />
                   <div className="mt-2 flex gap-2">
-                    <Button size='sm' onClick={handleReply} className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded cursor-pointer">Post</Button>
-                    <Button variant='outline' size='sm' onClick={() => setIsReplying(false)} className="text-gray-500 text-xs px-3 py-1 rounded cursor-pointer">Cancel</Button>
+                    <Button size='sm' onClick={handleReply} className="bg-black hover:bg-black/80 text-white text-xs px-3 py-1 rounded cursor-pointer">Post</Button>
+                    <Button variant='outline' size='sm' onClick={() => setIsReplying(false)} className="text-gray-500 text-xs px-3 py-1 rounded cursor-pointer bg-white">Cancel</Button>
                   </div>
                 </div>
               )}

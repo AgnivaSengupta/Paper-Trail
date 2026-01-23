@@ -29,8 +29,9 @@ const Hero = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
     visible: {
+      filter: "blur(0px)",
       opacity: 1,
       y: 0,
       transition: { duration: 0.7, ease: "easeOut" },
@@ -40,16 +41,28 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex flex-col items-center justify-center relative dot-grid">
       {/* Technical annotation - top left */}
-      <div
+      <motion.div
+        initial={{x: -150, y: -20, filter: "blur(20px)"}}
+        animate={{x: 0, y: 0, filter: "blur(0px)"}}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+        }}
         className={`absolute top-24 left-8 hidden lg:block transition-all duration-700 delay-700 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
       >
         <span className="font-sketch text-lg text-muted-foreground rotate-[-5deg] inline-block italic">
           ← margin notes here
         </span>
-      </div>
+      </motion.div>
 
       {/* Technical annotation - top right */}
-      <div
+      <motion.div
+        initial={{x: 150, y: -20, filter: "blur(20px)"}}
+        animate={{x: 0, y: 0, filter: "blur(0px)"}}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+        }}
         className={`absolute top-32 right-12 hidden lg:block transition-all duration-700 delay-700 ${
           isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
         }`}
@@ -57,7 +70,7 @@ const Hero = () => {
         <span className="font-sketch text-lg text-muted-foreground rotate-[3deg] inline-block">
           [ draft v1.0 ]
         </span>
-      </div>
+      </motion.div>
 
       <div className="container max-w-4xl text-center px-6">
         {/* Main heading with sketch styling */}
@@ -68,46 +81,46 @@ const Hero = () => {
           className="font-primary text-5xl sm:text-6xl md:text-7xl lg:text-9xl  leading-tight  mb-8"
         >
           <motion.span variants={itemVariants}
-            className={`block transform transition-all duration-700  ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
+            className={`block `}
           >
             A Journal
           </motion.span>
           <motion.span variants={itemVariants}
-            className={`block transition-all duration-700 delay-150 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
+            className={`block`}
           >
             of Ideas,
           </motion.span>
           <motion.span variants={itemVariants}
-            className={`block text-muted-foreground italic transition-all duration-700 delay-300 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
+            className={`block text-muted-foreground italic`}
           >
             Open to all
           </motion.span>
         </motion.h1>
 
         {/* Subheading */}
-        <p
+        <motion.p
+          initial={{ y: -20, filter: "blur(10px)"}}
+          animate={{ y: 0, filter: "blur(0px)"}}
+          transition={{
+            duration: 0.5,
+            delay: 0.2,
+          }}
           className={`font-mono text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed transition-all duration-700 delay-500 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
           A minimal space where I share my thoughts, projects, and daily
           learnings — and where you can share yours too.
-        </p>
+        </motion.p>
 
         {/* CTA Buttons */}
-        <div
+        <motion.div
+          initial={{ y: -20, filter: "blur(10px)"}}
+          animate={{ y: 0, filter: "blur(0px)"}}
+          transition={{
+            duration: 0.5,
+            delay: 0.4,
+          }}
           className={`flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-700 delay-[600ms] ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
@@ -134,7 +147,7 @@ const Hero = () => {
               Create Account
             </Button>
           )}
-        </div>
+        </motion.div>
 
         {/* Technical bracket annotation */}
         <div
@@ -158,7 +171,13 @@ const Hero = () => {
       </div>
 
       {/* Corner annotations */}
-      <div
+      <motion.div
+        initial={{x: -150, y: 20, filter: "blur(20px)"}}
+        animate={{x: 0, y: 0, filter: "blur(0px)"}}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+        }}
         className={`absolute bottom-12 left-8 hidden lg:block transition-all duration-700 delay-[1000ms] ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
@@ -167,9 +186,15 @@ const Hero = () => {
           <div>fig. 1.0</div>
           <div className="font-sketch text-base mt-1 italic">hero section</div>
         </div>
-      </div>
+      </motion.div>
 
-      <div
+      <motion.div
+        initial={{x: 150, y: 20, filter: "blur(20px)"}}
+        animate={{x: 0, y: 0, filter: "blur(0px)"}}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+        }}
         className={`absolute bottom-12 right-8 hidden lg:block transition-all duration-700 delay-[1000ms] ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
@@ -180,7 +205,7 @@ const Hero = () => {
             blueprint theme
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

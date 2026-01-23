@@ -3,8 +3,24 @@ import type {User} from './userStore'
 import axiosInstance from '@/utils/axiosInstance';
 import { API_PATHS } from '@/utils/apiPaths';
 
+type UserType = {
+  _id: string;
+  name: string;
+  email: string;
+  profilePic?: string;
+  bio?: string;
+  // role: "member" | "admin";
+  location: string;
+  title: string;
+  socials: string;
+  skills: string[];
+  lastLogin: string;
+  isVerified: boolean;
+}
+
+
 interface AuthUser {
-    user: User | null;
+    user: UserType | null;
     isCheckingAuth: boolean;
     authFormOpen: boolean;
     setAuthFormOpen: (val: boolean) => void;

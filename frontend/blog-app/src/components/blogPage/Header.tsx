@@ -6,6 +6,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {motion} from 'framer-motion'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,9 +60,33 @@ const Header = () => {
     { href: "#", label: "About" },
   ];
 
+  const navigate = useNavigate();
+
+  const handleLogOut = async () => {
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
+        withCredentials: true,
+      })
+      console.log(response);
+    } catch (error) {
+      console.log("Error while logging out..")
+    }
+  }
+  
   return (
     <header className="fixed top-4 left-4 right-4 z-[100]">
-      <div className="container max-w-6xl mx-auto flex h-14 items-center justify-between px-6 rounded-full border border-border/50 bg-gradient-to-b from-background/80 to-background/60 backdrop-blur-xl shadow-lg">
+      <motion.div
+        initial={{ width: "0%", opacity: 0, y: -20 }}
+          animate={{ width: "100%", opacity: 1, y: 0 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 100, 
+            damping: 20, 
+            delay: 0.2,
+            // Width animation usually looks better with a slightly longer duration
+            width: { duration: 1.0, ease: "easeOut" } 
+          }}
+        className="container max-w-6xl mx-auto flex h-14 items-center justify-between px-6 rounded-full border border-border/50 bg-gradient-to-b from-background/80 to-background/60 backdrop-blur-xl shadow-lg">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <PenLine className="h-5 w-5" />
@@ -93,12 +120,47 @@ const Header = () => {
             Sign In
           </Button>*/}
           {user ? (
-            <Avatar>
-              <AvatarImage src={ user.profilePic } alt='User Image'/>
-              <AvatarFallback>
-                <User/>
-              </AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Avatar>
+                      <AvatarImage src={ user.profilePic } alt='User Image'/>
+                      <AvatarFallback>
+                        <User/>
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mt-3" align="start">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={() => navigate('/admin/profile')}>
+                        Profile
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => navigate('/admin/overview')}>
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/admin/posts')}>
+                        My Posts
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => navigate('/admin/comments')}>
+                        My comments
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={() => navigate('/admin/create')}>Create a new post</DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogOut}>
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
           ): (
             <Button size="sm" variant='signin' className="font-mono text-sm sketch-border cursor-pointer rounded-full" onClick={() => setAuthFormOpen(true)}>
               Start Writing
@@ -161,7 +223,7 @@ const Header = () => {
             </SheetContent>
           </Sheet>
         </div>
-      </div>
+      </motion.div>
     </header>
   );
 };

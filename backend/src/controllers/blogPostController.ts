@@ -164,7 +164,7 @@ const getAllPostsByUser = async (req:Request, res:Response) => {
     const user = req.user;
     
     const status = req.query.status || 'published';
-    const page = parseInt(req.query.page as string, 10) | 1;
+    const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 8;
     const skip = (page - 1) * limit;
     
@@ -219,7 +219,7 @@ const getPostBySlug = async (req: Request, res: Response) => {
   try {
     const post = await BlogPost.findOne({ slug: req.params.slug }).populate(
       "author",
-      "name profilePic",
+      "_id name profilePic",
     );
 
     if (!post) return res.status(404).json({ msg: "Post not found" });

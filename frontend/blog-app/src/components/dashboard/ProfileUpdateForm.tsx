@@ -19,6 +19,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Edit2 } from "lucide-react";
 import { ProfileSchema } from "@/utils/zodSchema";
 import type { ProfileFormValues } from "@/utils/zodSchema";
+import axiosInstance from "@/utils/axiosInstance";
+import { API_PATHS } from "@/utils/apiPaths";
+import { uploadImageToR2 } from "@/utils/r2-upload";
 
 export function ProfileUpdateForm() {
   const [previewUrl, setPreviewUrl] = useState("");
@@ -39,8 +42,38 @@ export function ProfileUpdateForm() {
 
   // const [skills, setSkills] = useState<string[]>([]);
 
-  const onSubmit = (values: ProfileFormValues) => {
-    console.log(values);
+  const onSubmit = async (values: ProfileFormValues) => {
+    // console.log(values);
+    try {
+
+      let finalPicUrl = values.picture;
+      // console.log(values.picture)
+      if (values.picture instanceof File){
+        console.log("New image detected.Uploading to R2...");
+        
+        finalPicUrl = await uploadImageToR2(values.picture, (event) => {
+          console.log(`Upload progress: ${event.progress}%`)
+        })
+        console.log("Upload complete. URL:", finalPicUrl);
+      }
+
+      const payload = {
+        name: values.name,
+        title: values.title,
+        bio: values.bio,
+        location: values.location,
+        website: values.website,
+        skills: values.skills, 
+        picture: finalPicUrl, 
+      };
+
+      const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE, payload, {
+        withCredentials: true
+      })
+      // console.log([...formData])
+    } catch (error) {
+      console.log("Error while profile updation: ", error);
+    }
   };
 
   // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -10,6 +10,11 @@ import {
   Sun,
   Moon,
   Rocket,
+  Clock,
+  FileText,
+  Users,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 import {
   AreaChart,
@@ -23,6 +28,8 @@ import {
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useThemeStore } from "@/store/themeStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useDashboard } from "@/hooks/useDashBoard";
 
 // --- Mock Data ---
 const performanceData = [
@@ -78,26 +85,57 @@ const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
   </div>
 );
 
+
+// Helper to format seconds into "2m 30s"
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}m ${s}s`;
+};
+
+// Helper to format large numbers (1500 -> 1.5k)
+const formatNumber = (num: number) => {
+  return new Intl.NumberFormat('en-US', {
+      notation: "compact",
+      maximumFractionDigits: 1
+  }).format(num);
+};
+
 const StatCard = ({
   title,
   value,
   subtext,
   trend,
-  trendValue,
-  trendPositive,
+  icon: Icon,
+  loading,
+  // trendValue,
+  // trendPositive,
 }) => (
   <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
-    <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">
-      {title}
-    </h3>
-    <div className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
-      {value}
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-1">
+          {title}
+        </h3>
+        {loading ? (
+            <div className="h-8 w-24 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded" />
+        ) : (
+            <div className="text-3xl font-bold text-zinc-900 dark:text-white">
+            {value}
+            </div>
+        )}
+      </div>
+      <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-zinc-500 dark:text-zinc-400">
+        <Icon size={20} />
+      </div>
     </div>
+    
     <div className="flex items-center gap-2 text-xs">
-      <span className={trendPositive ? "text-emerald-500" : "text-rose-500"}>
-        {trendPositive ? "↑" : "↓"} {trendValue}
+        {/* Placeholder for trend - typically calculated vs previous period */}
+      <span className="text-emerald-500 flex items-center gap-0.5 font-medium">
+         {trend}
       </span>
-      <span className="text-zinc-500">{subtext}</span>
+      <span className="text-zinc-500 dark:text-zinc-500">{subtext}</span>
     </div>
   </div>
 );
@@ -106,6 +144,17 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  const {user} = useAuthStore();
+
+  // ----------------------------------------------------------------------------------------------
+  const {data, loading, error, timeRange, setTimeRange} = useDashboard();
+  
+  if (error) {
+    return <div className="p-8 text-red-500">Failed to load dashboard: {error}</div>;
+  }
+  // ----------------------------------------------------------------------------------------------
+
+
 
   // Helper for Chart Colors based on theme
   const chartGridColor = theme === "dark" ? "#27272a" : "#e4e4e7";
@@ -134,7 +183,7 @@ const Dashboard = () => {
           {/* ================================================================= */}
           {/* COMING SOON OVERLAY                         */}
           {/* ================================================================= */}
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-sm rounded-xl">
+          {/* <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-sm rounded-xl">
             <div className="text-center p-8 bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl border border-zinc-200 dark:border-zinc-800 max-w-md mx-4">
               <div className="mx-auto w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
                 <Rocket className="text-emerald-500" size={32} />
@@ -150,7 +199,7 @@ const Dashboard = () => {
                 Notify Me
               </button>
             </div>
-          </div>
+          </div> */}
           {/* ================================================================= */}
           {/* END OVERLAY                                 */}
           {/* ================================================================= */}
@@ -163,7 +212,7 @@ const Dashboard = () => {
             </h1>
 
             <div className="flex items-center gap-3">
-              <div className="relative h-18">
+              {/* <div className="relative h-18">
                 <Search
                   className="absolute left-3 top-7 text-zinc-400 dark:text-zinc-500"
                   size={16}
@@ -173,7 +222,7 @@ const Dashboard = () => {
                   placeholder="Search..."
                   className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 w-64 text-zinc-900 dark:text-zinc-300 shadow-sm dark:shadow-none"
                 />
-              </div>
+              </div> */}
               <button
                 onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
@@ -181,17 +230,36 @@ const Dashboard = () => {
                 {theme ? <Sun size={18} /> : <Moon size={18} />}
               </button>
 
-              <button className="flex items-center gap-2 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 transition-colors shadow-sm dark:shadow-none text-zinc-700 dark:text-zinc-200">
+              {/* <button className="flex items-center gap-2 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 transition-colors shadow-sm dark:shadow-none text-zinc-700 dark:text-zinc-200">
                 Last 7 days <ChevronDown size={14} />
-              </button>
+              </button> */}
+
+              <div className="flex bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 p-1">
+                {['24h', '7d', '30d'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setTimeRange(range)}
+                    className={`
+                      px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer
+                      ${timeRange === range
+                        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
+                        : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"}
+                  `}
+                  >
+                    {range.toUpperCase()}
+                  </button>
+                ))}
+
+              </div>
               <button className="p-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none">
                 <RefreshCcw size={18} />
               </button>
 
               <Avatar>
                 <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
+                  src={user?.profilePic || "https://github.com/shadcn.png"}
+                  alt="user"
+                  className="object-cover"
                 />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
@@ -201,49 +269,48 @@ const Dashboard = () => {
           {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-6 mb-6">
             <StatCard
-              title="Active Models"
-              value="24"
-              trendValue="+3"
-              trendPositive={true}
-              subtext="This Week"
+              title="Total Views"
+              value={data ? formatNumber(data.stats.totalViews) : 0}
+              loading={loading}
+              icon={Eye}
+              subtext="Unique page views"
+              trend={null}
             />
             <StatCard
-              title="Avg Accuracy"
-              value="94.7%"
-              trendValue="-0.3%"
-              trendPositive={false}
-              subtext="From Last Week"
+              title="Avg Read Time"
+              value={data ? formatTime(data.stats.avgReadTime) : "0s"}
+              loading={loading}
+              icon={Clock}
+              subtext="Engagement score"
+              trend={null}
             />
             <StatCard
-              title="API Requests (24h)"
-              value="847K"
-              trendValue="+12.4%"
-              trendPositive={true}
-              subtext="From Yesterday"
+              title="Total Visitors"
+              value={data ? formatNumber(data.stats.totalVisitors) : "0"}
+              loading={loading}
+              icon={Users}
+              subtext="Unique devices"
+              trend={null}
             />
             <StatCard
-              title="Avg Latency"
-              value="124ms"
-              trendValue="-8ms"
-              trendPositive={false}
-              subtext="From Last Week"
+              title="Content Library"
+              value={data ? data.stats.totalPosts : "0"}
+              loading={loading}
+              icon={FileText}
+              subtext={`${data?.stats?.published || 0} Pub · ${data?.stats?.drafts || 0} Draft`}
+              trend={null}
             />
           </div>
 
           {/* Main Chart Section */}
           <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 mb-6 shadow-sm dark:shadow-none transition-colors">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">
-                Model Performance
+              <h3 className="text-zinc-500 dark:text-zinc-400 text-sm font-content font-semibold uppercase tracking-wider">
+                Top Performing Content
               </h3>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <span className="uppercase">Last 30 Days</span>
-                <span className="text-zinc-600 dark:text-zinc-500">
-                  [ Accuracy % ]
-                </span>
-              </div>
+              <span className="text-xs text-zinc-500">Sorted by Views</span>
             </div>
-            <div className="h-64 w-full">
+            {/* <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={performanceData}>
                   <defs>
@@ -294,6 +361,63 @@ const Dashboard = () => {
                   />
                 </AreaChart>
               </ResponsiveContainer>
+            </div> */}
+
+<div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                    <thead className="bg-zinc-50 dark:bg-zinc-800/30 text-zinc-500 dark:text-zinc-400 uppercase text-xs">
+                        <tr>
+                            <th className="px-6 py-4 font-medium">Rank</th>
+                            <th className="px-6 py-4 font-medium">Post Title</th>
+                            <th className="px-6 py-4 font-medium text-right">Views</th>
+                            <th className="px-6 py-4 font-medium text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                        {loading ? (
+                            // Skeleton Rows
+                            [1,2,3].map(i => (
+                                <tr key={i}>
+                                    <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse"/></td>
+                                    <td className="px-6 py-4"><div className="h-4 w-48 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse"/></td>
+                                    <td className="px-6 py-4"><div className="h-4 w-16 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto"/></td>
+                                    <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto"/></td>
+                                </tr>
+                            ))
+                        ) : (
+                            data?.topPosts.map((post, index) => (
+                                <tr key={post._id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
+                                    <td className="px-6 py-4 text-zinc-500 font-mono">#{index + 1}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            {post.coverImageUrl && (
+                                                <img src={post.coverImageUrl} alt="" className="w-10 h-10 rounded-md object-cover" />
+                                            )}
+                                            <span className="font-medium text-zinc-900 dark:text-zinc-200 line-clamp-1">
+                                                {post.title}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">
+                                        {formatNumber(post.views)}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <a href={`/post/${post._id}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-block">
+                                            <ExternalLink size={16} />
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                        {!loading && data?.topPosts.length === 0 && (
+                            <tr>
+                                <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
+                                    No posts found. Start writing to see analytics!
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
           </div>
 

@@ -11,16 +11,18 @@ import { useThemeStore } from "@/store/themeStore";
 import TagInput from "@/components/dashboard/TagInput";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { uploadImageToR2 } from "@/utils/r2-upload";
+import { Spinner } from "@/components/ui/spinner";
 
-const ImageUploadBox = ({ image, onUpload, onRemove }) => (
+const ImageUploadBox = ({ previewUrl, setPreviewUrl, setCoverFile }) => (
   <div className="relative group w-full aspect-video rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center mt-2 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600 overflow-hidden">
-    {image ? (
+    {previewUrl ? (
       <>
-        <img src={image} alt="Cover" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+        <img src={previewUrl} alt="Cover" className="w-full h-full object-cover" />
+        <div className="absolute z-10 inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
           <button
-            onClick={onRemove}
-            className="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+            onClick={() => setPreviewUrl("")}
+            className="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors cursor-pointer z-100"
           >
             <X size={16} />
           </button>
@@ -39,9 +41,12 @@ const ImageUploadBox = ({ image, onUpload, onRemove }) => (
     <input
       type="file"
       className="absolute inset-0 opacity-0 cursor-pointer"
+      accept="image/png, image/jpeg, image/webp"
       onChange={(e) => {
-        if (e.target.files?.[0])
-          onUpload(URL.createObjectURL(e.target.files[0]));
+        const file = e.target.files?.[0];
+        if (file)
+          setPreviewUrl(URL.createObjectURL(file));
+          setCoverFile(file);
       }}
     />
   </div>
@@ -51,6 +56,8 @@ const EditorPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAiTabOpen, setIsAiTabOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [coverFile, setCoverFile] = useState(null);
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
@@ -101,18 +108,35 @@ const EditorPage = () => {
     setIsSubmitting(true);
 
     try {
+
+      // Image upload:
+      // let finalPicUrl = await uploadImageToR2()
+      let finalCoverUrl = meta.coverImageUrl;
+
+      if (coverFile){
+        try {
+          finalCoverUrl = await uploadImageToR2(coverFile);
+        } catch (error) {
+          console.error("Upload failed", error);
+          // toast.error("Failed to upload cover image");
+          notify("error");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const payload = {
         title: meta.title,
         content: {
           json: json,
           html: html,
         },
-        coverImageUrl: meta.coverImageUrl || "https://picsum.photos/200/300",
+        coverImageUrl: finalCoverUrl || "https://picsum.photos/200/300",
         tags: meta.tags,
         isDraft: status === "draft" ? true : false,
       };
 
-      const response = await axiosInstance.post(
+      await axiosInstance.post(
         API_PATHS.POST.CREATE_POST,
         payload,
       );
@@ -140,7 +164,8 @@ const EditorPage = () => {
         {/* --- Main Content --- */}
         <main
           className={`
-            flex-1 py-8
+            flex flex-col
+            flex-1 pt-4
             transition-all duration-300 ease-in-out h-full overflow-hidden
             ${isSidebarOpen ? "ml-64" : "ml-20"}
           `}
@@ -187,15 +212,15 @@ const EditorPage = () => {
             {/* Left: Editor Canvas */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
               {/* Top Header */}
-              <header className="h-16 border-b-4 border-double border-zinc-200 dark:border-zinc-800 flex justify-between items-center px-8 bg-zinc-50 dark:bg-[#0f1014]">
-                <div className="flex items-center gap-3">
+              <header className="h-16 border-b-4 border-double border-zinc-200 dark:border-zinc-800 flex justify-end items-center px-8 bg-zinc-50 dark:bg-[#0f1014]">
+                {/* <div className="flex items-center gap-3">
                   <span className="px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 text-xs font-medium rounded border border-amber-200 dark:border-amber-500/20">
                     Draft
                   </span>
                   <span className="text-zinc-400 text-sm">
                     Last saved just now
                   </span>
-                </div>
+                </div> */}
 
                 <div className="flex items-center gap-3">
                   <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium cursor-pointer text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
@@ -205,19 +230,34 @@ const EditorPage = () => {
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium cursor-pointer text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     onClick={(e) => handleSubmit("draft")}
                   >
-                    <Save size={16} /> Save
+                    {isSubmitting ? 
+                      (<>
+                        <Spinner/>
+                      </>): 
+                      (<>
+                        <Save size={16} /> Save
+                        </>
+                      )}
                   </button>
                   <button
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium cursor-pointer text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-lg shadow-emerald-900/20 transition-colors"
                     onClick={(e) => handleSubmit("publish")}
                   >
-                    <Send size={16} /> Publish
+                    {isSubmitting ? 
+                      (<>
+                        <Spinner/>
+                      </>): 
+                      (<>
+                        <Send size={16} /> Publish
+                        </>
+                      )}
+                    
                   </button>
                 </div>
               </header>
 
               {/* Editor Area */}
-              <div className="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 scroll-smooth">
+              <div className="flex-1 overflow-auto bg-white dark:bg-zinc-900 scroll-smooth">
                 <SimpleEditor
                   onChange={(json, html) => {
                     setContent(html, json);
@@ -227,7 +267,7 @@ const EditorPage = () => {
             </div>
 
             {/* Right: Metadata Form */}
-            <aside className="relative w-[500px] border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0f1014] flex flex-col h-full overflow-y-auto hide-scrollbar z-40">
+            <aside className="relative w-[500px] border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0f1014] flex flex-col h-full overflow-y-scroll z-40">
               <div className="p-6">
                 <h2 className="text-xl font-primary text-zinc-900 dark:text-zinc-100 uppercase tracking-wider mb-4 flex items-center gap-2">
                   Post Settings
@@ -254,11 +294,13 @@ const EditorPage = () => {
                       Cover Image
                     </label>
                     <ImageUploadBox
-                      image={meta.coverImage}
-                      onUpload={(url) =>
-                        setMeta({ ...meta, coverImageUrl: url })
-                      }
-                      onRemove={() => setMeta({ ...meta, coverImage: null })}
+                      previewUrl={previewUrl}
+                      setPreviewUrl={setPreviewUrl}
+                      setCoverFile={setCoverFile}
+                      // onUpload={(url) =>
+                      //   setMeta({ ...meta, coverImageUrl: url })
+                      // }
+                      // onRemove={() => setPreviewUrl("")}
                     />
                   </div>
 

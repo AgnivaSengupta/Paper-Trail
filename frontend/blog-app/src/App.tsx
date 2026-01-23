@@ -18,6 +18,9 @@ import BlogPage from './pages/Blog/BlogPage';
 import EditorPage from './pages/Admin/EditorPage';
 import ProfilePage from './pages/Admin/ProfilePage';
 import CommentsPage from './pages/Admin/CommentsPage';
+import Test from './pages/Admin/Test';
+import BlogPage2 from './pages/Blog/BlogPage2';
+import Profile2 from './pages/Admin/Profile2';
 
 function App() {
 
@@ -44,18 +47,18 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<LandingPage/>}/>
-          <Route path='/:slug' element={<BlogPage/>}/>
+          <Route path='/:slug' element={<BlogPage2/>}/>
           {/*<Route path='/test2' element={<Test2/>}/>*/}
           {/*<Route path='/test3' element={<Test3/>}/>*/}
           {/*<Route path='/test4' element={<Test4/>}/>*/}
-          {/*<Route path='/test7' element={<Test7/>}/>*/}
+          <Route path='/test' element={<Test/>}/>
           
           {/* Admin routes */}
           <Route element={<ProtectedRoute/>}>
             <Route path='/admin/overview' element={<Dashboard/>}/>
             <Route path='/admin/posts' element={<BlogPosts/>}/>
             <Route path='/admin/create' element={<EditorPage/>}/>
-            <Route path='/admin/profile' element={<ProfilePage/>}/>
+            <Route path='/admin/profile' element={<Profile2/>}/>
             <Route path='/admin/comments' element={<CommentsPage/>}/>
 
             {/* <Route path='/admin/edit/:postSlug' element={<BlogPostEditor isEdit={true}/>}/> */}

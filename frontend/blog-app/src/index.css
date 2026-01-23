@@ -4,6 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
@@ -23,6 +24,7 @@
     --font-munoch: "munoch", serif;
     --font-primary: "Instrument Serif", serif;
     --font-sketch: "Instrument Serif", serif;
+    --font-content: "Source Serif 4", serif;
     
     --animate-accordion-down: accordion-down 0.2s ease-out;
       --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -369,6 +371,14 @@ body {
   body {
     @apply bg-background text-foreground font-mono;
   }
+  
+  table {
+    margin-top: 0 !important;
+  }
+  
+  table thead th {
+      padding: 18px 24px !important ;
+  }
 }
 
 /* Grid paper background pattern */
@@ -412,67 +422,65 @@ body {
   border-radius: 2px 4px 3px 5px;
 }
 
-@layer components {
-  .tiptap-content {
-    @apply text-gray-800 dark:text-gray-200 leading-relaxed;
-  }
-
-  /* Headings */
-  .tiptap-content h1 {
-    @apply text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white;
-  }
-  .tiptap-content h2 {
-    @apply text-2xl font-semibold mt-6 mb-3 text-gray-900 dark:text-white;
-  }
-  .tiptap-content h3 {
-    @apply text-xl font-medium mt-4 mb-2 text-gray-900 dark:text-white;
-  }
-
-  /* Paragraphs */
-  .tiptap-content p {
-    @apply mb-4 text-lg text-gray-700 dark:text-gray-300;
-  }
-
-  /* Lists */
-  .tiptap-content ul {
-    @apply list-disc list-outside ml-6 mb-4 text-gray-700 dark:text-gray-300;
-  }
-  .tiptap-content ol {
-    @apply list-decimal list-outside ml-6 mb-4 text-gray-700 dark:text-gray-300;
-  }
-  .tiptap-content li {
-    @apply mb-1 pl-1;
-  }
-
-  /* Blockquotes (Medium-style) */
-  .tiptap-content blockquote {
-    @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 py-1 italic text-gray-600 dark:text-gray-400 my-6;
-  }
-
-  /* Links */
-  .tiptap-content a {
-    @apply text-blue-600 dark:text-blue-400 underline decoration-blue-300 underline-offset-4 hover:text-blue-800 dark:hover:text-blue-300 transition-colors;
-  }
-
-  /* Code Blocks */
-  .tiptap-content pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6 font-mono text-sm shadow-md;
-  }
-  .tiptap-content code {
-    @apply font-mono bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-sm;
-  }
-  /* Fix: Don't double-style code inside pre */
-  .tiptap-content pre code {
-    @apply bg-transparent text-inherit p-0;
-  }
-
-  /* Images */
-  .tiptap-content img {
-    @apply w-full h-auto rounded-lg shadow-sm my-8;
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-primary);
   }
   
-  /* Horizontal Rule */
-  .tiptap-content hr {
-    @apply my-8 border-gray-200 dark:border-gray-700;
+  .font-sans {
+    font-family: var(--font-content);
+  }
+  
+  .prose-docs {
+    @apply text-foreground leading-relaxed;
+  }
+  
+  .prose-docs h1 {
+    @apply font-content text-3xl font-bold mt-12 mb-4 pb-2 border-b border-border;
+  }
+  .prose-docs h2 {
+    @apply font-content text-2xl font-semibold mt-12 mb-4 pb-2 border-b border-border;
+  }
+  
+  .prose-docs h3 {
+    @apply font-content text-xl font-medium mt-8 mb-3;
+  }
+  
+  .prose-docs h4 {
+    @apply font-content text-base font-semibold mt-6 mb-2;
+  }
+  
+  .prose-docs p {
+    @apply mb-4 text-base leading-7 font-content;
+  }
+  
+  .prose-docs > ul {
+    @apply mb-5 pl-0 list-none space-y-2 text-base;
+  }
+  
+  .prose-docs > ul > li {
+    @apply relative text-base pl-5 before:content-[''] before:absolute before:left-0 before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-red-400;
+  }
+  
+  .prose-docs > ol {
+    @apply mb-5 pl-0 list-none space-y-2 text-base;
+    counter-reset: list-counter;
+  }
+  
+  .prose-docs > ol > li {
+    @apply relative pl-7 before:absolute before:left-0 before:top-0 before:text-sm before:font-medium before:text-red-500 before:bg-red-500/20 before:w-5 before:h-5 before:rounded-full before:flex before:items-center before:justify-center;
+    counter-increment: list-counter;
+  }
+  
+  .prose-docs > ol > li::before {
+    content: counter(list-counter);
+  }
+  
+  .prose-docs strong {
+    @apply font-semibold text-foreground;
+  }
+  
+  .prose-docs a {
+    @apply text-[#D14718] underline underline-offset-2 hover:text-accent/80 transition-colors;
   }
 }

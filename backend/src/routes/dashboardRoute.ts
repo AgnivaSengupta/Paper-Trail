@@ -14,7 +14,7 @@ const adminOnly = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-router.get('/', protect, adminOnly, getDashboardSummary);
+router.get('/', protect, getDashboardSummary);
 
 const dashboardRouter = router;
 export default dashboardRouter;

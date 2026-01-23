@@ -8,7 +8,7 @@ import {
   ThumbsUp,
   Eye,
   Calendar,
-  Search
+  Search,
 } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,18 @@ import { useThemeStore } from "@/store/themeStore";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { Spinner } from "@/components/ui/spinner";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export type Author = {
   name: string;
@@ -55,27 +66,32 @@ const BlogPosts = () => {
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+
+  const {user} = useAuthStore();
+  const navigate = useNavigate();
 
   const getAllPosts = async (pageNumber = 1, filterStatus: string) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(API_PATHS.POST.GET_ALL_POSTS_BY_USER, {
-        params: {
-          status: filterStatus.toLowerCase(),
-          page: pageNumber,
-          limit: 8,
+      const response = await axiosInstance.get(
+        API_PATHS.POST.GET_ALL_POSTS_BY_USER,
+        {
+          params: {
+            status: filterStatus.toLowerCase(),
+            page: pageNumber,
+            limit: 8,
+          },
         },
-      });
+      );
 
       const { posts, totalPages, totalCount, allCount } = response.data;
       setPosts(posts);
       setTotalPages(totalPages);
       setTotalCount(totalCount);
       setAllPosts(allCount);
-      
     } catch (error) {
       console.log("Error fetching the posts:--> ", error);
       setPosts([]);
@@ -88,7 +104,7 @@ const BlogPosts = () => {
     if (currPage < totalPages) {
       const newPage = currPage + 1;
       setCurrPage(newPage);
-      getAllPosts(newPage, activeTab);
+      //getAllPosts(newPage, activeTab);
     }
   };
 
@@ -96,32 +112,35 @@ const BlogPosts = () => {
     if (currPage > 1) {
       const newPage = currPage - 1;
       setCurrPage(newPage);
-      getAllPosts(newPage, activeTab);
+      //getAllPosts(newPage, activeTab);
     }
   };
-  
+
   const handleDelete = async (postId: string) => {
-    try{
+    try {
       await axiosInstance.delete(API_PATHS.POST.DELETE_POST(postId));
-      console.log('Post Deleted');
-      
+      console.log("Post Deleted");
+
       getAllPosts(currPage, activeTab);
-      
+
       setDeleteDialogOpen(false);
       setSelectedPostId(null);
-    } catch (error){
+    } catch (error) {
       console.log("Failed to delete post: ", error);
     } finally {
       setDeleteDialogOpen(false);
     }
-  }
+  };
 
   useEffect(() => {
     setCurrPage(1);
-    getAllPosts(1, activeTab);
+    // getAllPosts(1, activeTab);
   }, [activeTab]);
-  
-  
+
+  useEffect(() => {
+    getAllPosts(currPage, activeTab);
+  }, [currPage, activeTab]);
+
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -129,7 +148,7 @@ const BlogPosts = () => {
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
-  
+
   return (
     <div className={theme === "dark" ? "dark" : ""}>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0f1014] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-emerald-500/30 transition-colors duration-300">
@@ -179,8 +198,9 @@ const BlogPosts = () => {
 
                 <Avatar>
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
+                    src={user?.profilePic || "https://github.com/shadcn.png"}
                     alt="@shadcn"
+                    className='object-cover'
                   />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
@@ -217,22 +237,22 @@ const BlogPosts = () => {
           {/* Table Container */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse ">
                 <thead>
-                  <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
-                    <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-[40%]">
+                  <tr className="py-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-[40%]">
                       Post Details
                     </th>
-                    <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Status
                     </th>
-                    <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Engagement
                     </th>
-                    <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Date
                     </th>
-                    <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 text-right">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Actions
                     </th>
                   </tr>
@@ -256,13 +276,15 @@ const BlogPosts = () => {
                         className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
                       >
                         {/* Title & Category */}
-                        <td className="py-4 px-6">
+                        <td className="py-6 px-6">
                           <div className="flex items-start gap-3">
                             <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded text-zinc-400">
                               <FileText size={20} />
                             </div>
                             <div>
-                              <div className="font-primary text-xl text-zinc-900 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer">
+                              <div
+                                onClick={() => navigate(`/${post.slug}`)}
+                                className="font-primary text-xl text-zinc-900 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer">
                                 {post.title}
                               </div>
                               <div className="text-sm text-zinc-500 mt-1 flex items-center gap-2">
@@ -275,7 +297,7 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Status */}
-                        <td className="py-4 px-6">
+                        <td className="py-6 px-6">
                           <span
                             className={`
                           inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border
@@ -294,7 +316,7 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Engagement (Likes/Views) */}
-                        <td className="py-4 px-6">
+                        <td className="py-6 px-6">
                           <div className="flex items-center gap-4 text-base text-zinc-600 dark:text-zinc-400">
                             <div
                               className="flex items-center gap-1.5 min-w-[60px]"
@@ -328,7 +350,7 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Date */}
-                        <td className="py-4 px-6">
+                        <td className="py-6 px-6">
                           <div className="flex items-center gap-2 text-base text-zinc-500 dark:text-zinc-400">
                             <Calendar size={14} />
                             <span>{post.updatedAt}</span>
@@ -336,31 +358,41 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Actions */}
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <td className="py-6 px-6 text-center">
+                          <div className="flex items-center justify-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity pl-4">
                             <button className="p-1.5 cursor-pointer text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                               <Edit3 size={16} />
                             </button>
-                            <Dialog open={deleteDialogOpen && selectedPostId == post._id} onOpenChange={setDeleteDialogOpen}>
+                            <Dialog
+                              open={
+                                deleteDialogOpen && selectedPostId == post._id
+                              }
+                              onOpenChange={setDeleteDialogOpen}
+                            >
                               <DialogTrigger asChild>
                                 <button
-                                 onClick={() => {
+                                  onClick={() => {
                                     setSelectedPostId(post._id);
                                     setDeleteDialogOpen(true);
-                                 }} 
-                                  className="p-1.5 cursor-pointer text-zinc-400 hover:text-rose-600 dark:hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors">
+                                  }}
+                                  className="p-1.5 cursor-pointer text-zinc-400 hover:text-rose-600 dark:hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors"
+                                >
                                   <Trash2 size={16} />
                                 </button>
                               </DialogTrigger>
-                              
+
                               <DialogContent className="sm:max-w-[425px] bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 shadow-lg">
                                 <DialogHeader>
-                                  <DialogTitle className="text-2xl font-primary">Delete Post</DialogTitle>
+                                  <DialogTitle className="text-2xl font-primary">
+                                    Delete Post
+                                  </DialogTitle>
                                   <DialogDescription className="text-lg font-primary text-zinc-600 dark:text-zinc-400">
-                                    This action cannot be undone. This will permanently delete your post from our servers.
+                                    This action cannot be undone. This will
+                                    permanently delete your post from our
+                                    servers.
                                   </DialogDescription>
                                 </DialogHeader>
-                            
+
                                 <DialogFooter className="flex gap-2">
                                   <DialogClose asChild>
                                     <button
@@ -368,14 +400,15 @@ const BlogPosts = () => {
                                         setSelectedPostId(null);
                                         setDeleteDialogOpen(false);
                                       }}
-                                      className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors cursor-pointer">
+                                      className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors cursor-pointer"
+                                    >
                                       Cancel
                                     </button>
                                   </DialogClose>
-                                  
+
                                   {/* Primary Action Button */}
-                                  <button 
-                                    type='submit'
+                                  <button
+                                    type="submit"
                                     onClick={() => handleDelete(post._id)}
                                     className="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-sm tracking-wider transition-colors cursor-pointer"
                                   >
@@ -394,7 +427,7 @@ const BlogPosts = () => {
                   )}
 
                   {/* Empty State if no results */}
-                  {posts.length === 0 && (
+                  {!loading && posts.length === 0 && (
                     <tr>
                       <td
                         colSpan={Number(5)}

@@ -48,10 +48,11 @@ const LandingPage = () => {
         withCredentials: true,
       });
 
-      setUser(response.data);
+      await setUser();
       console.log(response.data);
     } catch (error) {
-      setUser(null);
+      // setUser(null);
+      console.log("Error while fetching user profile");
     } finally {
       console.log(user);
     }
@@ -59,7 +60,7 @@ const LandingPage = () => {
   
   useEffect(() => {
     fetchProfile();
-    fetchPosts(1);
+    //fetchPosts(1);
   }, []);
   
   return (
@@ -67,7 +68,7 @@ const LandingPage = () => {
       
       <main>
         <Hero />
-        <LatestPosts />
+        <LatestPosts posts={posts} />
       </main>
   
       

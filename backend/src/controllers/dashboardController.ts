@@ -1,84 +1,94 @@
 import BlogPost from "../models/BlogPost";
 import Comment from "../models/Comment";
-import type {Request, Response} from 'express'
+import type { Request, Response } from 'express'
+import { analyticsClient } from "../grpc/analyticsClieint";
+import { AuthorStatsResponse } from "../proto/generated/analytics/AuthorStatsResponse";
+
+// helper func to promisify:
+const fetchAnalytics = (authorId: string, timeRange: string): Promise<AuthorStatsResponse> => {
+    return new Promise((resolve, reject) => {
+
+        const payload = {
+            authorId: authorId,
+            timeRange: timeRange,
+        }
+        analyticsClient.GetAuthorStats({ authorId: authorId }, (err, response) => {
+            if (err) {
+                console.error("grpc Error:", err);
+                resolve({
+                    totalViews: 0,
+                    totalVisitors: 0,
+                    overallAvgReadTime: 0,
+                    topPosts: []
+                });
+            } else {
+                resolve(response || {});
+            }
+        })
+    })
+}
 
 // @route POST/api/dashboard-summary
 const getDashboardSummary = async (req: Request, res: Response) => {
     try {
-        const [totalPosts, drafts, published] = 
-            await Promise.all([
-                BlogPost.countDocuments({author: req.user._id}),
-                BlogPost.countDocuments({author: req.user._id, isDraft: true}),
-                BlogPost.countDocuments({ author: req.user._id, isDraft: false}),
-                // Comment.countDocuments(),
-            ]);
+        const userId = req.user._id;
+        const range = (req.query.range as string) || '24h';
+        const [
+            mongoStats,
+            analyticsStats,
+        ] = await Promise.all([
+            Promise.all([
+                BlogPost.countDocuments({ author: userId }),
+                BlogPost.countDocuments({ author: userId, isDraft: true }),
+                BlogPost.countDocuments({ author: userId, isDraft: false }),
+            ]),
+            // gRPC: performance stats
+            fetchAnalytics(userId, range),
+        ])
+        // const [totalPosts, drafts, published] = 
+        //     await Promise.all([
+        //         BlogPost.countDocuments({author: req.user._id}),
+        //         BlogPost.countDocuments({author: req.user._id, isDraft: true}),
+        //         BlogPost.countDocuments({ author: req.user._id, isDraft: false}),
+        //         // Comment.countDocuments(),
+        //     ]);
 
+        const [totalPosts, drafts, published] = mongoStats;
 
-            const totalCommentAgg = await Comment.aggregate([
-                {
-                    $lookup: {
-                        from: "BlogPost",
-                        localField: "post",
-                        foreignField: "_id",
-                        as: "postDoc"
-                    }
-                },
-                { $unwind: "$postDoc" },
-                { $match: {"$postDoc.author": req.user._id}},
-                { $count: "total"}
-            ]);
+        // hydrating gRPC top posts -> merge grpc post ids with title and images from mongo
+        let hydratedTopPosts = [];
+        if (analyticsStats.topPosts && analyticsStats.topPosts.length > 0) {
+            const topPostsIds = analyticsStats.topPosts.map(p => p.postId);
 
-            const totalComments = totalCommentAgg[0]?.total || 0;
+            const postDetails = await BlogPost.find({ _id: { $in: topPostsIds } }).select('title coverImageUrl');
 
-            const totalViewsAgg = await BlogPost.aggregate([
-                { $group: { _id: null, total: { $sum: "$views" } } }
-            ]);
-
-            const totalLikesAgg = await BlogPost.aggregate([
-                { $group: { _id: null, total: { $sum: "$likes" } } }
-            ])
-
-            const totalViews = totalViewsAgg[0]?.total || 0;
-            const totalLikes = totalLikesAgg[0]?.total || 0;
-
-            // top performing posts
-            const topPosts = await BlogPost.find({isDraft: false})
-                .select("title coverImageUrl views likes")
-                .sort({views: -1, likes: -1})
-                .limit(5)
-
-            // recent comments
-            const recentComments = await Comment.find()
-                .sort({createdAt: -1})
-                .limit(5)
-                .populate("author", "name profilePic")
-                .populate("post", "title coverImageUrl")
-
-            // tag usage aggregate
-            const tagUsage = await BlogPost.aggregate([
-                { $unwind: "$tags" },
-                { $group: {_id: "$tags", count: {$sum: 1} } },
-                { $project: { tag: "$_id", count: 1, _id: 0 } },
-                { $sort: { count: -1 } },
-            ]);
+            hydratedTopPosts = analyticsStats.topPosts.map(gPost => {
+                const details = postDetails.find(d => d._id.toString() === gPost.postId);
+                return {
+                    _id: gPost.postId,
+                    title: details?.title || gPost.title,
+                    coverImageUrl: details?.coverImageUrl || "",
+                    views: gPost.views
+                }
+            });
 
             res.json({
                 stats: {
                     totalPosts,
                     drafts,
                     published,
-                    totalViews,
-                    totalLikes,
-                    totalComments
+                    // totalComments,
+                    // New Stats from Go Service
+                    totalViews: analyticsStats.totalViews || 0,
+                    totalVisitors: analyticsStats.totalVisitors || 0,
+                    avgReadTime: analyticsStats.overallAvgReadTime || 0
                 },
-                topPosts,
-                recentComments,
-                tagUsage
+                topPosts: hydratedTopPosts,
             });
-
+        }
     } catch (error) {
-        res.status(500).json({msg: "Failed to fetch dashboard summary", error});
-    }
-}
 
-export default getDashboardSummary
+    }
+
+};
+export default getDashboardSummary;

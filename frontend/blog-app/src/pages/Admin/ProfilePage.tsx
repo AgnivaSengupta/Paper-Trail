@@ -22,6 +22,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useThemeStore } from '@/store/themeStore';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProfileUpdateForm } from '@/components/dashboard/ProfileUpdateForm';
+import { useAuthStore } from '@/store/useAuthStore';
+import axiosInstance from '@/utils/axiosInstance';
+import { API_PATHS } from '@/utils/apiPaths';
 
 
 // --- Mock Data ---
@@ -52,9 +55,32 @@ const activityLog = [
 const ProfilePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  // const [profile, setProfile] = useState();
+
+  const {user, setUser} = useAuthStore();
   
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+        withCredentials: true,
+      });
+
+      setUser(response.data);
+      console.log(response.data);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      console.log(user);
+    }
+  };
+  
+  useEffect(() => {
+    fetchProfile();
+    //fetchPosts(1);
+  }, []);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -91,7 +117,7 @@ const ProfilePage = () => {
               </button>
               
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src={user?.profilePic || "https://github.com/shadcn.png"} alt="@shadcn" className='object-cover' />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </div>
@@ -105,7 +131,7 @@ const ProfilePage = () => {
             <div className="absolute -bottom-14 left-8 flex items-end gap-6">
                 <div className="relative group">
                     <div className="w-32 h-32 rounded-full border-4 border-zinc-50 dark:border-[#0f1014] overflow-hidden bg-zinc-800">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" className="w-full h-full object-cover" />
+                        <img src={user?.profilePic ||"https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"} alt="Felix" className="w-full h-full object-cover" />
                     </div>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -119,11 +145,11 @@ const ProfilePage = () => {
                     </Tooltip>
                 </div>
                 <div className="mb-2">
-                    <h1 className="text-5xl font-primary text-zinc-50 dark:text-zinc-100 flex items-center gap-2">
-                        {userProfile.name} 
+                    <h1 className="text-5xl font-primary text-black dark:text-zinc-100 flex items-center gap-2">
+                        {user?.name} 
                         <CheckCircle2 size={18} className="text-emerald-500" />
                     </h1>
-                    <p className="font-primary text-2xl text-zinc-500 dark:text-zinc-400">{userProfile.role}</p>
+                    <p className="font-primary text-2xl text-zinc-500 dark:text-zinc-400">{user?.title}</p>
                 </div>
             </div>
 
@@ -156,21 +182,21 @@ const ProfilePage = () => {
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none">
                     <h3 className="text-zinc-900 dark:text-zinc-100 font-semibold font-primary text-2xl mb-4">About</h3>
                     <p className="font-primary text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
-                        {userProfile.bio}
+                        {user?.bio}
                     </p>
                     
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                             <MapPin size={16} className="text-zinc-400 dark:text-zinc-500" />
-                            {userProfile.location}
+                            {user?.location}
                         </div>
                         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                             <Mail size={16} className="text-zinc-400 dark:text-zinc-500" />
-                            {userProfile.email}
+                            {user?.email}
                         </div>
                         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                             <LinkIcon size={16} className="text-zinc-400 dark:text-zinc-500" />
-                            <a href="#" className="text-emerald-600 dark:text-emerald-500 hover:underline">{userProfile.website}</a>
+                            <a href="#" className="text-emerald-600 dark:text-emerald-500 hover:underline">{user?.socials}</a>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                             <Calendar size={16} className="text-zinc-400 dark:text-zinc-500" />
@@ -186,16 +212,19 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Skills/Tags */}
+              {user?.skills && (
                 <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none">
-                    <h3 className="text-zinc-900 dark:text-zinc-100 font-semibold font-primary text-2xl mb-4">Skills</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {['Python', 'TensorFlow', 'PyTorch', 'React', 'Node.js', 'Docker', 'AWS', 'System Design'].map(skill => (
-                            <span key={skill} className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-full text-xs font-medium border border-zinc-200 dark:border-zinc-700">
-                                {skill}
-                            </span>
-                        ))}
-                    </div>
+                  <h3 className="text-zinc-900 dark:text-zinc-100 font-semibold font-primary text-2xl mb-4">Skills</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {user.skills.map((skill) => (
+                      <span key={skill} className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-full text-xs font-medium border border-zinc-200 dark:border-zinc-700">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+              )}
+
 
             </div>
 
@@ -223,19 +252,19 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Activity Feed */}
-                <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none min-h-[400px]">
+                
+                {/* <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none min-h-[400px]">
                     <div className="flex justify-between items-center mb-6">
                          <h3 className="text-zinc-900 dark:text-zinc-100 font-semibold font-primary text-2xl">Recent Activity</h3>
                          <button className="text-xs text-emerald-600 dark:text-emerald-500 font-medium hover:underline">View All</button>
                     </div>
 
                     <div className="space-y-0 relative">
-                        {/* Vertical Line */}
                         <div className="absolute left-[19px] top-2 bottom-4 w-px bg-zinc-200 dark:bg-zinc-800"></div>
 
                         {activityLog.map((activity) => (
                             <div key={activity.id} className="relative pl-12 pb-8 last:pb-0">
-                                {/* Icon Bubble */}
+                                
                                 <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center z-10">
                                     <activity.icon size={18} className={activity.color} />
                                 </div>
@@ -251,7 +280,7 @@ const ProfilePage = () => {
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
 
             </div>
           </div>

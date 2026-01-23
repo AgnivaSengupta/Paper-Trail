@@ -7,12 +7,12 @@ import { useParams } from "react-router-dom"; // Changed from useLocation
 import BlogLayout from "@/components/layouts/BlogLayout";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { User } from "lucide-react";
+import { MessageSquare, User } from "lucide-react";
 import Comment from "@/components/blogPage/Comment";
 import { buildTrees, type IComment } from "@/utils/treeBuilder";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
+import './blogpage.css'
 // Import styles...
 // import "@/styles/BlogPageStyles.css";
 
@@ -203,13 +203,6 @@ const BlogPage = () => {
     <BlogLayout>
       {/* Main Container - Changed fixed width to max-w */}
       <div className="dot-grid">
-        {/*<div className="pt-10">*/}
-        {/*<GridHeader
-            title={post.title}
-            authorName={post.author?.name}
-            authorImage={post.author?.profilePic}
-            date={post.updatedAt}
-          />*/}
 
         <div className="container mx-auto pt-28">
           <div
@@ -247,13 +240,13 @@ const BlogPage = () => {
 
           <div className="w-full flex flex-col items-center">
             {/* Cover Image - Fallback logic added */}
-            {/*<div className="w-full mb-10">
+            <div className="w-full mb-10">
               <img
                 src={post.coverImageUrl || "/stock-1.jpeg"}
                 alt="Cover"
                 className="w-full h-[400px] md:h-[700px] object-cover rounded-2xl shadow-sm"
               />
-            </div>*/}
+            </div>
 
             {/* Text Section Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-12 w-full mx-auto mt-5">
@@ -274,7 +267,7 @@ const BlogPage = () => {
               </aside>
 
               {/* Main Content */}
-              <div className="space-y-10 font-primary w-full max-w-[90vw] overflow-hidden">
+              <div className="space-y-10 font-content w-full max-w-[90vw] overflow-hidden">
                 <div
                   id="blog-content"
                   className="tiptap-content"
@@ -286,15 +279,18 @@ const BlogPage = () => {
             </div>
 
             <div className="w-full mx-auto py-8 mt-20">
-              <h3 className="text-2xl font-primary font-bold mb-4">
-                Comments ({comments.length})
-              </h3>
+              <div className="flex item-center gap-3">
+                <MessageSquare className="w-5 h-5"/>
+                <h3 className="text-2xl font-primary font-bold mb-4">
+                  Comments ({comments.length})
+                </h3>
+              </div>
 
               {/* Global Reply Input (Top level) */}
               <div className="mb-8 flex gap-4">
                 <Avatar className="w-10 h-10">
                   {/* Use current user's profile pic if available */}
-                  <AvatarFallback><User /></AvatarFallback>
+                  <AvatarFallback><User/></AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-grow">

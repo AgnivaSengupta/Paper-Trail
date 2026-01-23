@@ -153,7 +153,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         </button>
       </div>
 
-      <div className="space-y-1 flex-1">
+      <div className="space-y-0.5 flex-1">
         <SidebarItem
           icon={LayoutDashboard}
           label="Home"

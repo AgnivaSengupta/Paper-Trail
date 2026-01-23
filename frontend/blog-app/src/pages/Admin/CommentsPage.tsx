@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useThemeStore } from '@/store/themeStore';
 import axiosInstance from '@/utils/axiosInstance';
 import { API_PATHS } from '@/utils/apiPaths';
+import { useAuthStore } from '@/store/useAuthStore';
 
 
 type Author = {
@@ -21,7 +22,9 @@ type Author = {
 };
 
 type PostType = {
+  _id: string;
   title: string;
+  slug: string;
 }
 
 type Inbox = {
@@ -50,6 +53,8 @@ const CommentsPage = () => {
   
   const [currPage, setCurrPage] = useState(1);
 
+  const {user} = useAuthStore();
+
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
@@ -62,6 +67,18 @@ const CommentsPage = () => {
     }
   };
   
+  const handleSendReply = async (comment: Inbox, parentComment: string | null, content: string) => {
+    try {
+      const post = comment.post;
+      const response = await axiosInstance.post(API_PATHS.COMMENTS.ADD_COMMENT(comment.post._id), {
+        content, post , parentComment,
+      }, {
+        withCredentials: true,
+      });
+    } catch (error) {
+      alert("Failed to comment!");
+    }
+  }
   const getAllUnrepliedComments = async (pageNumber=1) => {
     try{
       setLoading(true);
@@ -112,6 +129,7 @@ const CommentsPage = () => {
     }
   }, [theme]);
 
+  console.log(inbox)
   
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
@@ -144,7 +162,7 @@ const CommentsPage = () => {
               </button>
               
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarImage src={user?.profilePic || "https://github.com/shadcn.png"} alt="@shadcn" className='object-cover'/>
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </div>
@@ -158,7 +176,7 @@ const CommentsPage = () => {
                   <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-1/4">Author</th>
                   <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-1/2">Comment</th>
                   {/*<th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 text-center">Status</th>*/}
-                  <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 text-right">Actions</th>
+                  <th className="py-4 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-1/4">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -172,11 +190,11 @@ const CommentsPage = () => {
                       {/* Author */}
                       <td className="py-4 px-6 align-top">
                         <div className="flex items-start gap-3">
-                           <img src={comment.author?.profilePic || "https://api.dicebear.com/7.x/avataaars/svg?seed=Unknown"} alt="avatar" className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-                           <div>
-                             <div className="font-medium font-primary text-xl text-zinc-900 dark:text-zinc-200">{comment.author?.name}</div>
-                             <div className="text-sm text-zinc-500 mt-0.5">{comment.updatedAt}</div>
-                           </div>
+                          <img src={comment.author?.profilePic || "https://api.dicebear.com/7.x/avataaars/svg?seed=Unknown"} alt="avatar" className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 object-cover" />
+                          <div>
+                            <div className="font-medium font-primary text-xl text-zinc-900 dark:text-zinc-200">{comment.author?.name}</div>
+                            <div className="text-sm text-zinc-500 mt-0.5">{comment.updatedAt}</div>
+                          </div>
                         </div>
                       </td>
 
@@ -199,33 +217,14 @@ const CommentsPage = () => {
                             {/* Context: Which Post? */}
                             <div className="mt-2 text-xs text-zinc-400 flex items-center gap-1">
                                 <span>on</span>
-                                <span className="text-zinc-500 dark:text-zinc-400 font-medium hover:underline cursor-pointer">{comment.post.title}</span>
+                                <span className="text-zinc-500 dark:text-zinc-400 font-medium hover:underline cursor-pointer">{comment.post?.title}</span>
                             </div>
                         </div>
                       </td>
 
-                      {/* Status */}
-                      {/*<td className="py-4 px-6 align-top text-center">
-                        {comment.status === 'approved' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
-                                <CheckCircle size={12} /> Approved
-                            </span>
-                        )}
-                        {comment.status === 'pending' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
-                                <Clock size={12} /> Pending
-                            </span>
-                        )}
-                        {comment.status === 'spam' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
-                                <AlertOctagon size={12} /> Spam
-                            </span>
-                        )}
-                      </td>*/}
-
                       {/* Actions */}
-                      <td className="py-4 px-6 align-top text-right">
-                        <div className="inline-flex items-center justify-end gap-2">
+                      <td className="py-4 px-6 align-center">
+                        <div className="flex items-center justify-start gap-2">
                           <button 
                             onClick={() => handleReplyClick(comment._id)}
                             className={`p-1.5 rounded transition-colors text-sm font-medium flex items-center gap-1.5 ${replyingTo === comment._id ? 'bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
@@ -249,9 +248,9 @@ const CommentsPage = () => {
                     {replyingTo === comment._id && (
                         <tr className="bg-zinc-50 dark:bg-zinc-800/30 animate-in fade-in slide-in-from-top-2 duration-200">
                             <td colSpan="4" className="p-4 pl-16 pr-6 border-b border-zinc-200 dark:border-zinc-800">
-                                <div className="flex gap-4">
+                                <div className="flex gap-4 my-2">
                                     <div className="h-full flex flex-col items-center">
-                                         <div className="w-0.5 h-full bg-zinc-200 dark:bg-zinc-700"></div>
+                                        <div className="w-0.5 h-full bg-zinc-200 dark:bg-zinc-700"></div>
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-center mb-2">
@@ -273,7 +272,8 @@ const CommentsPage = () => {
                                             >
                                                 Cancel
                                             </button>
-                                            <button className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+                                            <button onClick={() => handleSendReply(comment, comment._id, replyText)}
+                                              className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg shadow-sm flex items-center gap-2 transition-colors">
                                                 <Send size={14} /> Send Reply
                                             </button>
                                         </div>

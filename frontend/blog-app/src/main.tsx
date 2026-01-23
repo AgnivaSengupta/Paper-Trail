@@ -10,6 +10,6 @@ createRoot(document.getElementById('root')!).render(
   <GoogleOAuthProvider clientId={clientId} >  
     <StrictMode>
       <App />
-    </StrictMode>,
+    </StrictMode>
   </GoogleOAuthProvider>
 )

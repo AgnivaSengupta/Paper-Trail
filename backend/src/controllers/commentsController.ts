@@ -20,26 +20,44 @@ const createComment = async (req:Request, res:Response) => {
   try{
     const { _id: authorId } = req.user;
     // const author = { name, profilePic };
-    
     const { content, post, parentComment } = req.body;
+
+    console.log(authorId, content, post, parentComment)
     let ancestors: mongoose.Types.ObjectId[] = [];
     
+    const {postId} = req.params
+    const postDoc = await BlogPost.findById(postId);
+
+    if (!postDoc) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
     // If parent exists -> meaning its a reply to some comment
     if (parentComment){
       const parent = await Comment.findById(parentComment); // find the parent Comment
+      
       if (!parent) return res.status(400).json({ msg: "Parent not found" });
       
       // now we construct the new ancestor array -> parentId + parent's ancestor array
       ancestors = [...parent.ancestors, parent._id as mongoose.Types.ObjectId];
     }
-    // Else its a new root level comment
-    const newComment = await Comment.create({
-      post,
+
+    console.log({
+      post: postId,
       content,
       author: authorId,
       parentComment: parentComment || null,
       ancestors,
-      postAuthor: post.author._id,
+      postAuthor: postDoc.author._id,
+    })
+
+    // Else its a new root level comment
+    const newComment = await Comment.create({
+      post: postId,
+      content,
+      author: authorId,
+      parentComment: parentComment || null,
+      ancestors,
+      postAuthor: postDoc.author._id,
     });
     
     res.status(201).json(newComment);
@@ -168,17 +186,15 @@ const getAllComments = async (req: Request, res: Response) => {
     
     const filter : {
       postAuthor: string,
-      hasReplied: boolean,
       parentComment: null,
     } = {
       postAuthor: req.user._id,
-      hasReplied: false,
       parentComment: null,
     }
     
     const inbox = await Comment.find(filter)
       .populate("author", "name profilePic")
-      .populate("post", "title")
+      .populate("post", "_id title slug")
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);

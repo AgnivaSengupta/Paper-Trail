@@ -7,7 +7,7 @@ const CommentSchema = new mongoose.Schema({
     parentComment: {type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null},
     
     ancestors: [{type: mongoose.Schema.Types.ObjectId, ref:'Comment'}],
-    // hasReplied: {type: Boolean, default: false},
+    hasReplied: {type: Boolean, default: false},
     isDeleted: {type: Boolean, default: false},
     postAuthor: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
 }, {timestamps: true})

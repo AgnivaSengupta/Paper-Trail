@@ -255,6 +255,10 @@ const getUserProfile = async (req: Request, res: Response) => {
       email: user.email,
       profilePic: user.profilePic,
       bio: user.bio,
+      location: user.location,
+      tite: user.title,
+      website: user.socials,
+      skills: user.skills,
       //role: user.role,
     });
   } catch (error) {
@@ -280,29 +284,29 @@ const logOut = async (req: Request, res: Response) => {
 
 const updateProfile = async (req: Request, res: Response) => {
   try {
+    const userId = req.user._id;
     const {
-      user,
-      username,
+      name,
       title,
       bio,
       location,
       skills,
       website,
-      profileImage,
+      picture,
     } = req.body;
 
     const updatedData = {
-      name: username,
+      name: name,
       title: title,
       bio: bio,
       location: location,
       skills: skills,
       socials: website,
-      profilePic: profileImage,
+      profilePic: picture,
     };
 
-    const updatedUser = await User.findById(
-      user._id,
+    const updatedUser = await User.findByIdAndUpdate(
+      userId._id,
       { $set: updatedData },
       {
         new: true,
@@ -314,6 +318,7 @@ const updateProfile = async (req: Request, res: Response) => {
     return updatedUser;
   } catch (error) {
     console.error("Update failed: ", error);
+    res.status(500).json({ msg: "Update failed", error: error.message });
   }
 };
 export {

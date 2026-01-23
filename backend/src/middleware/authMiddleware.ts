@@ -49,7 +49,7 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
     // console.log("Cookie- ", req.cookies.token);
     next();
   } catch (error) {
-    console.error("Auth Middleware Error:",);
+    console.error("Auth Middleware Error:", error);
     return res.status(401).json({ msg: "Not authorized, invalid token" });
   }
 };
