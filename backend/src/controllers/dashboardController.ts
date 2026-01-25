@@ -8,11 +8,11 @@ import { AuthorStatsResponse } from "../proto/generated/analytics/AuthorStatsRes
 const fetchAnalytics = (authorId: string, timeRange: string): Promise<AuthorStatsResponse> => {
     return new Promise((resolve, reject) => {
 
-        const payload = {
+const payload = {
             authorId: authorId,
             timeRange: timeRange,
         }
-        analyticsClient.GetAuthorStats({ authorId: authorId }, (err, response) => {
+        analyticsClient.GetAuthorStats(payload, (err, response) => {
             if (err) {
                 console.error("grpc Error:", err);
                 resolve({

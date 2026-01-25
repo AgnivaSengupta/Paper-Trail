@@ -1,0 +1,110 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Development
+.next/
+.cache/
+.parcel-cache/
+
+# Go binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Go specific
+vendor/
+bin/
+*.prof
+
+# Package Management
+# Keep pnpm-lock.yaml for dependency tracking
+# npm (exclude since using pnpm)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# pnpm
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs & Runtime
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Test
+*.test.js
+*.test.ts
+test-results/
+
+# Docker & Infrastructure
+docker-compose.override.yml
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
+
+# Database (if local)
+*.sqlite
+*.db
+
+# Media uploads (if local storage)
+uploads/
+media/
+
+# Build caches
+.cache/
+.parcel-cache/

@@ -60,10 +60,9 @@ const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
       flex items-center
       ${collapsed ? "justify-center px-2" : "justify-between px-4"}
       py-3 mb-1 cursor-pointer rounded-lg transition-colors
-      ${
-        active
-          ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
+      ${active
+        ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
       }
     `}
     title={collapsed ? label : ""}
@@ -96,8 +95,8 @@ const formatTime = (seconds: number) => {
 // Helper to format large numbers (1500 -> 1.5k)
 const formatNumber = (num: number) => {
   return new Intl.NumberFormat('en-US', {
-      notation: "compact",
-      maximumFractionDigits: 1
+    notation: "compact",
+    maximumFractionDigits: 1
   }).format(num);
 };
 
@@ -118,22 +117,22 @@ const StatCard = ({
           {title}
         </h3>
         {loading ? (
-            <div className="h-8 w-24 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded" />
+          <div className="h-8 w-24 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded" />
         ) : (
-            <div className="text-3xl font-bold text-zinc-900 dark:text-white">
+          <div className="text-3xl font-bold text-zinc-900 dark:text-white">
             {value}
-            </div>
+          </div>
         )}
       </div>
       <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-zinc-500 dark:text-zinc-400">
         <Icon size={20} />
       </div>
     </div>
-    
+
     <div className="flex items-center gap-2 text-xs">
-        {/* Placeholder for trend - typically calculated vs previous period */}
+      {/* Placeholder for trend - typically calculated vs previous period */}
       <span className="text-emerald-500 flex items-center gap-0.5 font-medium">
-         {trend}
+        {trend}
       </span>
       <span className="text-zinc-500 dark:text-zinc-500">{subtext}</span>
     </div>
@@ -144,11 +143,11 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
 
   // ----------------------------------------------------------------------------------------------
-  const {data, loading, error, timeRange, setTimeRange} = useDashboard();
-  
+  const { data, loading, error, timeRange, setTimeRange } = useDashboard();
+
   if (error) {
     return <div className="p-8 text-red-500">Failed to load dashboard: {error}</div>;
   }
@@ -203,8 +202,8 @@ const Dashboard = () => {
           {/* ================================================================= */}
           {/* END OVERLAY                                 */}
           {/* ================================================================= */}
-          
-          
+
+
           {/* Header */}
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-primary text-zinc-900 dark:text-zinc-200">
@@ -363,61 +362,61 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div> */}
 
-<div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-zinc-50 dark:bg-zinc-800/30 text-zinc-500 dark:text-zinc-400 uppercase text-xs">
-                        <tr>
-                            <th className="px-6 py-4 font-medium">Rank</th>
-                            <th className="px-6 py-4 font-medium">Post Title</th>
-                            <th className="px-6 py-4 font-medium text-right">Views</th>
-                            <th className="px-6 py-4 font-medium text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                        {loading ? (
-                            // Skeleton Rows
-                            [1,2,3].map(i => (
-                                <tr key={i}>
-                                    <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse"/></td>
-                                    <td className="px-6 py-4"><div className="h-4 w-48 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse"/></td>
-                                    <td className="px-6 py-4"><div className="h-4 w-16 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto"/></td>
-                                    <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto"/></td>
-                                </tr>
-                            ))
-                        ) : (
-                            data?.topPosts.map((post, index) => (
-                                <tr key={post._id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
-                                    <td className="px-6 py-4 text-zinc-500 font-mono">#{index + 1}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            {post.coverImageUrl && (
-                                                <img src={post.coverImageUrl} alt="" className="w-10 h-10 rounded-md object-cover" />
-                                            )}
-                                            <span className="font-medium text-zinc-900 dark:text-zinc-200 line-clamp-1">
-                                                {post.title}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">
-                                        {formatNumber(post.views)}
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <a href={`/post/${post._id}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-block">
-                                            <ExternalLink size={16} />
-                                        </a>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                        {!loading && data?.topPosts.length === 0 && (
-                            <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
-                                    No posts found. Start writing to see analytics!
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-zinc-50 dark:bg-zinc-800/30 text-zinc-500 dark:text-zinc-400 uppercase text-xs">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Rank</th>
+                    <th className="px-6 py-4 font-medium">Post Title</th>
+                    <th className="px-6 py-4 font-medium text-right">Views</th>
+                    <th className="px-6 py-4 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                  {loading ? (
+                    // Skeleton Rows
+                    [1, 2, 3].map(i => (
+                      <tr key={i}>
+                        <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" /></td>
+                        <td className="px-6 py-4"><div className="h-4 w-48 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" /></td>
+                        <td className="px-6 py-4"><div className="h-4 w-16 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto" /></td>
+                        <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto" /></td>
+                      </tr>
+                    ))
+                  ) : (
+                    data?.topPosts.map((post, index) => (
+                      <tr key={post._id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-6 py-4 text-zinc-500 font-mono">#{index + 1}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {post.coverImageUrl && (
+                              <img src={post.coverImageUrl} alt="" className="w-10 h-10 rounded-md object-cover" />
+                            )}
+                            <span className="font-medium text-zinc-900 dark:text-zinc-200 line-clamp-1">
+                              {post.title}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">
+                          {formatNumber(post.views)}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <a href={`/post/${post._id}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-block">
+                            <ExternalLink size={16} />
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {!loading && data?.topPosts.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
+                        No posts found. Start writing to see analytics!
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
 
