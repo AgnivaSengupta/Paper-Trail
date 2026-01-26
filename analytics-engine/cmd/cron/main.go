@@ -40,15 +40,15 @@ func main() {
 	})
 
 	// 2. Daily/Monthly: Every 30 min (at minute 5 and 35)
-	// Reads RAW -> Writes DAILY
+	// Reads Hourly -> Writes DAILY (Rollup)
 	c.AddFunc("5,35 * * * *", func() {
-		log.Println("📅 Aggregating Daily & Monthly...")
+		log.Println("📅 Aggregating...")
 		updateDaily(dbPool)
-		updateMonthly(dbPool)
+		// updateMonthly(dbPool)
 	})
 	
 
-	// 3. Monthly: Once an hour (at minute 0)
+	// 3. Monthly & Yearly: Once an hour (at minute 0)
 	// Reads DAILY -> Writes MONTHLY
 	c.AddFunc("0 * * * *", func() {
 		log.Println("🗓️ Aggregating Monthly and Yearly...")
@@ -66,7 +66,7 @@ func main() {
 	// log.Println("Cron service started....")
 	// select {}
 
-	// --- B. CLEANUP JOB (The "Diamond" at bottom right) ---
+	// --- B. CLEANUP JOB  ---
 
 	// Runs every hour.
 	// Deletes raw events older than 24 hours.
@@ -90,6 +90,9 @@ func runAggregation(db *pgxpool.Pool) {
 
 func initSchema(db *pgxpool.Pool) {
 	queries := []string{
+		
+		`CREATE INDEX IF NOT EXISTS idx_analytics_events_time ON analytics_events (event_time);`,
+		
 		// 1. Hourly Stats Table
 		`CREATE TABLE IF NOT EXISTS hourly_stats (
 				time_bucket TIMESTAMPTZ NOT NULL,
@@ -172,7 +175,7 @@ func updateHourly(db *pgxpool.Pool) {
 			COUNT(DISTINCT user_id) as visitors,
 			COALESCE(SUM(time_spent_sec), 0) as time_spent_sec
 		FROM analytics_events
-		WHERE event_time >= DATE_TRUNC('hour', NOW() - INTERVAL '1 hour')
+		WHERE event_time >= DATE_TRUNC('hour', NOW() - INTERVAL '2 hour')
 		GROUP BY 1, 2, 3
 		ON CONFLICT (post_id, time_bucket)
 		DO UPDATE SET 
@@ -190,14 +193,14 @@ func updateDaily(db *pgxpool.Pool) {
 	sql := `
 		INSERT INTO daily_stats (day, post_id, author_id, views, visitors, time_spent_sec)
 		SELECT
-            DATE_TRUNC('day', event_time) as day,
+            DATE_TRUNC('day', time_bucket)::DATE as day,
             post_id,
 			author_id,
-            COUNT(*) FILTER (WHERE event_type = 'page_view') as views,
-            COUNT(DISTINCT user_id) as visitors,
-            COALESCE(SUM(time_spent_sec), 0) as time_spent_sec
-        FROM analytics_events
-        WHERE event_time >= CURRENT_DATE
+			SUM(views) as views,
+			SUM(visitors) as visitors,
+			SUM(time_spent_sec) as time_spent_sec
+        FROM hourly_stats
+        WHERE time_bucket >= DATE_TRUNC('day', NOW() - INTERVAL '1 day')
         GROUP BY 1, 2, 3
         ON CONFLICT (post_id, day)
         DO UPDATE SET 
@@ -221,7 +224,7 @@ func updateMonthly(db *pgxpool.Pool) {
 			SUM(visitors) as visitors,
 			SUM(time_spent_sec) as time_spent_sec
 		FROM daily_stats
-		WHERE day >= DATE_TRUNC('month', NOW())
+		WHERE day >= DATE_TRUNC('month', NOW() - INTERVAL '1 month')
 		GROUP BY 1, 2, 3
 		ON CONFLICT (post_id, month)
 		DO UPDATE SET 
@@ -245,7 +248,7 @@ func updateYearly(db *pgxpool.Pool) {
 			SUM(visitors) as visitors,
 			SUM(time_spent_sec) as time_spent_sec
 		FROM monthly_stats
-		WHERE month >= DATE_TRUNC('year', NOW())
+		WHERE month >= DATE_TRUNC('year', NOW() - INTERVAL '1 year')
 		GROUP BY 1, 2, 3
 		ON CONFLICT (post_id, year)
 		DO UPDATE SET views = EXCLUDED.views, visitors = EXCLUDED.visitors, time_spent_sec = EXCLUDED.time_spent_sec;

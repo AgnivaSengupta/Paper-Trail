@@ -30,6 +30,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useDashboard } from "@/hooks/useDashBoard";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Spinner } from "@/components/ui/spinner";
+import { useNavigate } from "react-router-dom";
 
 // --- Mock Data ---
 const performanceData = [
@@ -53,37 +56,6 @@ const gpuData = [
   { time: "6", gpu1: 23, gpu2: 38 },
   { time: "7", gpu1: 34, gpu2: 43 },
 ];
-
-const SidebarItem = ({ icon: Icon, label, active, badge, collapsed }) => (
-  <div
-    className={`
-      flex items-center
-      ${collapsed ? "justify-center px-2" : "justify-between px-4"}
-      py-3 mb-1 cursor-pointer rounded-lg transition-colors
-      ${active
-        ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
-      }
-    `}
-    title={collapsed ? label : ""}
-  >
-    <div className="flex items-center gap-3">
-      <Icon size={18} />
-      {!collapsed && (
-        <span className="text-sm font-medium whitespace-nowrap">{label}</span>
-      )}
-    </div>
-    {!collapsed && badge && (
-      <span className="bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300 text-xs px-2 py-0.5 rounded">
-        {badge}
-      </span>
-    )}
-    {collapsed && badge && (
-      <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full"></div>
-    )}
-  </div>
-);
-
 
 // Helper to format seconds into "2m 30s"
 const formatTime = (seconds: number) => {
@@ -113,13 +85,13 @@ const StatCard = ({
   <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
     <div className="flex justify-between items-start mb-4">
       <div>
-        <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-1">
+        <h3 className="text-zinc-500 dark:text-zinc-300 text-sm font-bold font-mono uppercase tracking-normal mb-1">
           {title}
         </h3>
         {loading ? (
           <div className="h-8 w-24 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded" />
         ) : (
-          <div className="text-3xl font-bold text-zinc-900 dark:text-white">
+          <div className="text-3xl font-primary font-bold text-zinc-900 dark:text-white mt-4 ml-2">
             {value}
           </div>
         )}
@@ -144,6 +116,8 @@ const Dashboard = () => {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const { user } = useAuthStore();
+  
+  const navigate = useNavigate();
 
   // ----------------------------------------------------------------------------------------------
   const { data, loading, error, timeRange, setTimeRange } = useDashboard();
@@ -153,14 +127,6 @@ const Dashboard = () => {
   }
   // ----------------------------------------------------------------------------------------------
 
-
-
-  // Helper for Chart Colors based on theme
-  const chartGridColor = theme === "dark" ? "#27272a" : "#e4e4e7";
-  const chartTextColor = theme === "dark" ? "#71717a" : "#a1a1aa";
-  const tooltipBg = theme === "dark" ? "#18181b" : "#ffffff";
-  const tooltipBorder = theme === "dark" ? "#27272a" : "#e4e4e7";
-  const tooltipText = theme === "dark" ? "#e4e4e7" : "#18181b";
 
   return (
     // The "dark" class wrapper allows Tailwind's dark mode to work within this component
@@ -211,17 +177,7 @@ const Dashboard = () => {
             </h1>
 
             <div className="flex items-center gap-3">
-              {/* <div className="relative h-18">
-                <Search
-                  className="absolute left-3 top-7 text-zinc-400 dark:text-zinc-500"
-                  size={16}
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 w-64 text-zinc-900 dark:text-zinc-300 shadow-sm dark:shadow-none"
-                />
-              </div> */}
+
               <button
                 onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
@@ -305,361 +261,108 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 mb-6 shadow-sm dark:shadow-none transition-colors">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-zinc-500 dark:text-zinc-400 text-sm font-content font-semibold uppercase tracking-wider">
-                Top Performing Content
+                Recent Activity
               </h3>
               <span className="text-xs text-zinc-500">Sorted by Views</span>
             </div>
-            {/* <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={performanceData}>
-                  <defs>
-                    <linearGradient
-                      id="colorAccuracy"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={chartGridColor}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="day"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: chartTextColor, fontSize: 10 }}
-                    dy={10}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: chartTextColor, fontSize: 10 }}
-                    domain={[90, 110]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: tooltipBg,
-                      borderColor: tooltipBorder,
-                      borderRadius: "8px",
-                    }}
-                    itemStyle={{ color: tooltipText }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="accuracy"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorAccuracy)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div> */}
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-zinc-50 dark:bg-zinc-800/30 text-zinc-500 dark:text-zinc-400 uppercase text-xs">
+            <table className="w-full text-left border-collapse -translate-y-2">
+              <thead>
+                <tr className="py-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+                  <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Rank
+                  </th>
+                  <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-[40%]">
+                    Post Details
+                  </th>
+                  <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Views
+                  </th>
+                  <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Link
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {loading ? (
                   <tr>
-                    <th className="px-6 py-4 font-medium">Rank</th>
-                    <th className="px-6 py-4 font-medium">Post Title</th>
-                    <th className="px-6 py-4 font-medium text-right">Views</th>
-                    <th className="px-6 py-4 font-medium text-right">Action</th>
+                    <td colSpan={5} className="py-12">
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <Spinner />
+                        <span className="mt-2 text-sm text-zinc-500">
+                          Loading your posts...
+                        </span>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                  {loading ? (
-                    // Skeleton Rows
-                    [1, 2, 3].map(i => (
-                      <tr key={i}>
-                        <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" /></td>
-                        <td className="px-6 py-4"><div className="h-4 w-48 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" /></td>
-                        <td className="px-6 py-4"><div className="h-4 w-16 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto" /></td>
-                        <td className="px-6 py-4"><div className="h-4 w-8 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse ml-auto" /></td>
-                      </tr>
-                    ))
-                  ) : (
-                    data?.topPosts.map((post, index) => (
-                      <tr key={post._id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
-                        <td className="px-6 py-4 text-zinc-500 font-mono">#{index + 1}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            {post.coverImageUrl && (
-                              <img src={post.coverImageUrl} alt="" className="w-10 h-10 rounded-md object-cover" />
-                            )}
-                            <span className="font-medium text-zinc-900 dark:text-zinc-200 line-clamp-1">
+                ) : (
+                  data?.topPosts.map((post, index) => (
+                    <tr
+                      key={post._id}
+                      className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
+                    >
+                      
+                    <td className="py-6 px-6">
+                      <div className="pl-5 pb-2 text-base text-zinc-500 dark:text-zinc-400">
+                        <span>{index+1}</span>
+                      </div>
+                    </td>
+                      
+                      {/* Title & Category */}
+                      <td className="py-6 px-6">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded text-zinc-400">
+                            <FileText size={20} />
+                          </div>   
+                            <div
+                              // onClick={() => navigate(`/${post.slug}`)}
+                              className="font-primary text-xl text-zinc-900 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer">
                               {post.title}
-                            </span>
+                            </div>
+                        </div>
+                      </td>
+
+                      {/* Engagement (Likes/Views) */}
+                      <td className="py-6 px-6">
+                        <div className="pl-3 text-lg text-zinc-600 dark:text-zinc-400">
+
+                          <div
+                            className="flex items-center gap-4"
+                            title="Views"
+                          >
+                            <Eye
+                              size={16}
+                              className={
+                                   "text-zinc-300 dark:text-zinc-700"
+                              }
+                            />
+                            <span>{post.views}</span>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">
-                          {formatNumber(post.views)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <a href={`/post/${post._id}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-block">
+                        </div>
+                      </td>
+
+
+                      {/* Actions */}
+                      <td className="py-6 px-6 text-center">
+                        <div className="flex items-center justify-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity pl-4">
+                          <button
+                            onClick={() => navigate(`/${post.slug}`)}
+                            className="p-1.5 cursor-pointer text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                             <ExternalLink size={16} />
-                          </a>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                  {!loading && data?.topPosts.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
-                        No posts found. Start writing to see analytics!
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+
+              </tbody>
+            </table>
+            
           </div>
 
           {/* Bottom Grid */}
-          <div className="grid grid-cols-3 gap-6">
-            {/* System Health */}
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">
-                  System Health
-                </h3>
-                <div className="flex items-center gap-1 text-[10px] text-emerald-500">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                  OPERATIONAL
-                </div>
-              </div>
 
-              <div className="space-y-6">
-                {[
-                  {
-                    label: "Api Endpoints",
-                    sub: "Response Time: 124ms",
-                    status: "99%",
-                  },
-                  {
-                    label: "Model Registry",
-                    sub: "24 Models Active",
-                    status: "Online",
-                  },
-                  {
-                    label: "GPU Cluster",
-                    sub: "4/4 GPUs Available",
-                    status: "Healthy",
-                  },
-                  {
-                    label: "Storage",
-                    sub: "4.2TB / 10TB Used",
-                    status: "Normal",
-                  },
-                  {
-                    label: "Database",
-                    sub: "Replication Lag: 2ms",
-                    status: "Normal",
-                  },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle2
-                      size={16}
-                      className="text-emerald-500 mt-0.5 shrink-0"
-                    />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-0.5">
-                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
-                          {item.label}
-                        </span>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-                          {item.status}
-                        </span>
-                      </div>
-                      <div className="text-xs text-zinc-500">{item.sub}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* GPU Utilization */}
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
-              <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-6">
-                GPU Utilization
-              </h3>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={gpuData}>
-                    <defs>
-                      <linearGradient
-                        id="colorGpu1"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#a855f7"
-                          stopOpacity={0.3}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#a855f7"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="colorGpu2"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#ec4899"
-                          stopOpacity={0.3}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#ec4899"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={chartGridColor}
-                      vertical={false}
-                    />
-                    <XAxis dataKey="time" hide />
-                    <YAxis hide domain={[0, 100]} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: tooltipBg,
-                        borderColor: tooltipBorder,
-                      }}
-                      itemStyle={{ color: tooltipText }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="gpu1"
-                      stackId="1"
-                      stroke="#a855f7"
-                      fill="url(#colorGpu1)"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="gpu2"
-                      stackId="1"
-                      stroke="#ec4899"
-                      fill="url(#colorGpu2)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex justify-center gap-4 mt-2">
-                <div className="flex items-center gap-2 text-xs text-zinc-500">
-                  <div className="w-2 h-2 rounded-full bg-purple-500"></div> GPU
-                  1
-                </div>
-                <div className="flex items-center gap-2 text-xs text-zinc-500">
-                  <div className="w-2 h-2 rounded-full bg-pink-500"></div> GPU 2
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Alerts */}
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">
-                  Recent Alerts [3]
-                </h3>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex gap-3">
-                  <AlertTriangle
-                    size={18}
-                    className="text-rose-500 shrink-0 mt-0.5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
-                        High Latency Detected
-                      </span>
-                      <span className="text-[10px] text-zinc-500">
-                        2 Min Ago
-                      </span>
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-1">
-                      Fraud-Detection-V4
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Info size={18} className="text-zinc-400 shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
-                        Training Complete
-                      </span>
-                      <span className="text-[10px] text-zinc-500">
-                        1 Hour Ago
-                      </span>
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-1">
-                      Experiment-Nlp-V8
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Info size={18} className="text-zinc-400 shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
-                        Training Complete
-                      </span>
-                      <span className="text-[10px] text-zinc-500">
-                        1 Hour Ago
-                      </span>
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-1">
-                      Experiment-Nlp-V8
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <AlertTriangle
-                    size={18}
-                    className="text-amber-500 shrink-0 mt-0.5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
-                        Drift Alert
-                      </span>
-                      <span className="text-[10px] text-zinc-500">
-                        15 Min Ago
-                      </span>
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-1">
-                      Sentiment-Analysis-V3
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button className="w-full mt-6 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 text-left uppercase tracking-wider">
-                [ View All Alerts → ]
-              </button>
-            </div>
-          </div>
         </main>
       </div>
     </div>
