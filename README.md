@@ -142,6 +142,5 @@ REDIS_DSN=redis://localhost:6379
 ├── analytics-engine/   # Go microservices for traffic tracking
 ├── backend/            # Node.js REST API & gRPC client
 ├── frontend/           # React SPA 
-├── proto/              # Shared Protocol Buffers definitions
-└── data.json           # Configuration and seed data
+└── proto/              # Shared Protocol Buffers definitions
 ```
