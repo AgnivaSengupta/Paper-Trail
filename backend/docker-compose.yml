@@ -7,6 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
+    volumes:
+      - ./.env:/app/.env:ro
     ports:
       - "8000:8000"
     environment:
@@ -18,8 +20,8 @@ services:
       # 2. JWT Secret for auth
       - JWT_SECRET=${JWT_SECRET}
       
-      - GOOGLE_CLIENT_ID=${OAUTH_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
       - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
       
       # 3. Connection to Go Analytics Engine

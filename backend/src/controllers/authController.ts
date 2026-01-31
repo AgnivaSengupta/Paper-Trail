@@ -14,6 +14,7 @@ import { OAuth2Client } from "google-auth-library";
 const secret = process.env.JWT_SECRET;
 const oAuthclientID = process.env.OAUTH_CLIENT_ID;
 const oAuthclientSecret = process.env.OAUTH_CLIENT_SECRET;
+const googleCallbackURL = process.env.GOOGLE_CALLBACK_URL;
 
 let googleClient: OAuth2Client | null = null;
 
@@ -22,7 +23,7 @@ const getGoogleClient = () => {
     googleClient = new OAuth2Client(
       oAuthclientID,
       oAuthclientSecret,
-      "postmessage",
+      googleCallbackURL || "postmessage", // Default to postmessage for local dev
     );
   }
   return googleClient;
