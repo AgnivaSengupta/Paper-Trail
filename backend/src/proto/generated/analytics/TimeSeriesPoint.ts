@@ -1,4 +1,4 @@
-// Original file: ../proto/analytics.proto
+// Original file: proto/analytics.proto
 
 import type { Long } from '@grpc/proto-loader';
 

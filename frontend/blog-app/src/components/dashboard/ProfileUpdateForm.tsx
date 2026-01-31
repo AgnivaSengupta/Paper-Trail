@@ -3,7 +3,6 @@ import {
   Field,
   FieldError,
   FieldGroup,
-  FieldLabel,
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
@@ -67,7 +66,7 @@ export function ProfileUpdateForm() {
         picture: finalPicUrl, 
       };
 
-      const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE, payload, {
+      await axiosInstance.put(API_PATHS.AUTH.UPDATE, payload, {
         withCredentials: true
       })
       // console.log([...formData])

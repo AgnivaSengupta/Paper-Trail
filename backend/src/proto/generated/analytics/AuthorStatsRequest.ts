@@ -1,10 +1,12 @@
-// Original file: ../proto/analytics.proto
+// Original file: proto/analytics.proto
 
 
 export interface AuthorStatsRequest {
-  'authorId'?: (string);
+  'author_id'?: (string);
+  'time_range'?: (string);
 }
 
 export interface AuthorStatsRequest__Output {
-  'authorId': (string);
+  'author_id': (string);
+  'time_range': (string);
 }

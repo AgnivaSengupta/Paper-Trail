@@ -31,6 +31,13 @@ connectDb();
 
 // Middleware
 app.use(express.json()) // --> automatically parses every incoming json payload -> avoids manual parsing
+app.use((req, res, next) => {
+    // Allows the "Opener" (Frontend) to talk to the "Popup" (Backend callback)
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    // Optional: Sometimes required for strict COOP modes
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp"); 
+    next();
+});
 
 // Different api routes ------------------------------------------------------------------------------|
     app.use("/api/auth", authRouter);
@@ -41,8 +48,17 @@ app.use(express.json()) // --> automatically parses every incoming json payload 
     
     app.use("/api/dashboard-summary", dashboardRouter);
 
-    app.use("/api", uploadRouter);
+app.use("/api", uploadRouter);
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        port: process.env.PORT || 8000
+    });
+});
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8000
 app.listen(PORT, ()=> console.log("Server running on Port: ", PORT));

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package analytics;
+
+option go_package = "./pb";
+
+service AnalyticsService {
+  // 1. Post Level: Detailed stats for a specific blog post
+  rpc GetPostStats (PostStatsRequest) returns (PostStatsResponse);
+
+  // 2. Author Level: Aggregate stats for the user's entire profile
+  rpc GetAuthorStats (AuthorStatsRequest) returns (AuthorStatsResponse);
+}
+
+// --- Post Level Messages ---
+
+message PostStatsRequest {
+  string post_id = 1;
+  string time_range = 2; // "24h", "7d", "30d", "all"
+}
+
+message PostStatsResponse {
+  int64 views = 1;
+  int64 unique_visitors = 2;
+  double avg_read_time_sec = 3;
+  repeated TimeSeriesPoint chart_data = 4;
+}
+
+// --- Author Level Messages ---
+
+message AuthorStatsRequest {
+  string author_id = 1;
+  string time_range = 2;
+}
+
+message AuthorStatsResponse {
+  int64 total_views = 1;
+  int64 total_visitors = 2;
+  double overall_avg_read_time = 3;
+  
+  // A list of the author's best performing content
+  repeated TopPost top_posts = 4;
+}
+
+message TopPost {
+  string post_id = 1;
+  string title = 2; // Optional: Fetch from main DB or store here
+  int64 views = 3;
+}
+
+// --- Shared Messages ---
+
+message TimeSeriesPoint {
+  string timestamp = 1;
+  int64 views = 2;
+}

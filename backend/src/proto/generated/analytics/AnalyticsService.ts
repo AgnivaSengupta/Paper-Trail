@@ -1,4 +1,4 @@
-// Original file: ../proto/analytics.proto
+// Original file: proto/analytics.proto
 
 import type * as grpc from '@grpc/grpc-js'
 import type { MethodDefinition } from '@grpc/proto-loader'

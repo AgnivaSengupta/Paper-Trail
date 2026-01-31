@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: blog_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      # 1. MongoDB Atlas Connection String (Replace with your actual URL)
+      - MONGO_URL=${MONGO_URL}
+      
+      # 2. JWT Secret for auth
+      - JWT_SECRET=${JWT_SECRET}
+      
+      - GOOGLE_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      
+      # 3. Connection to Go Analytics Engine
+      # Since we join the external network below, we can reach the container by name 'server'
+      # 'server' is the service name in your Analytics docker-compose file
+      - ANALYTICS_GRPC_HOST=server:50051 
+      
+    networks:
+      - analytics_net 
+
+# Connect to the EXISTING network created by your Analytics Engine
+networks:
+  analytics_net:
+    external: true
+    # CRITICAL: Run 'docker network ls' to get the exact name. 
+    # It is usually "folderName_analytics_net".
+    name: analytics-engine_analytics_net

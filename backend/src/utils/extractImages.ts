@@ -1,7 +1,7 @@
-const extractImages = (content) => {
+const extractImages = (content: any) => {
   const urls: string[] = [];
   
-  const traverse = (node) => {
+  const traverse = (node: any) => {
     if (node.type === 'image' && node.attrs && node.attrs.src){
       urls.push(node.attrs.src);
     }

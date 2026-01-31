@@ -27,7 +27,7 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
   return (
   <div className="flex flex-col mb-4">
         {/* 1. Comment Card */}
-        <div className="border border p-3 rounded-md bg-white">
+        <div className="border border p-3 rounded-md bg-white dark:bg-zinc-900">
           <div className="flex gap-5">
             <div>
               <Avatar>
@@ -42,13 +42,13 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
                 {comment.isDeleted ? "[deleted]" : comment.author.name}
               </div>
     
-              <div className="text-gray-800 text-sm mb-2 font-content">
+              <div className="text-gray-800 dark:text-slate-100 text-sm mb-2 font-content">
                 {comment.isDeleted ? <span className="italic text-gray-400">This comment was deleted.</span> : comment.content}
               </div>
     
               {/* Action Buttons */}
               {!comment.isDeleted && (
-                <div className="flex gap-3 text-xs text-gray-500">
+                <div className="flex gap-3 text-xs text-gray-500 dark:text-gray-300">
                    <button onClick={() => setIsReplying(!isReplying)} className="hover:underline">
                      Reply
                    </button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Sun,
   Moon,
@@ -8,7 +8,6 @@ import {
   ThumbsUp,
   Eye,
   Calendar,
-  Search,
 } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -178,17 +177,7 @@ const BlogPosts = () => {
 
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
-                <div className="relative h-18">
-                  <Search
-                    className="absolute left-3 top-7 text-zinc-400 dark:text-zinc-500"
-                    size={16}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 w-64 text-zinc-900 dark:text-zinc-300 shadow-sm dark:shadow-none"
-                  />
-                </div>
+
                 <button
                   onClick={() => toggleTheme()}
                   className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"

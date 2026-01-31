@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Pencil, ArrowRight } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 interface ShareCardProps {
     title: string;

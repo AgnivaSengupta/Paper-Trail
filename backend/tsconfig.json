@@ -28,3 +28,18 @@
   },
   "include": ["src/**/*", "types/**/*"]
 }
+
+
+// {
+//   "compilerOptions": {
+//     /* ... keep other settings ... */
+
+//     /* Output Options - OPTIMIZED */
+//     "sourceMap": false,       // Turn off unless you strictly need debugging in production
+//     "declaration": false,     // Turn off (Server doesn't need .d.ts files)
+//     "declarationMap": false,  // Turn off
+//     "removeComments": true,   // Optional: Makes files slightly smaller
+
+//     /* ... keep strict, lib, etc ... */
+//   }
+// }

@@ -19,10 +19,10 @@ analyticsClient.GetAuthorStats(payload, (err, response) => {
             if (err) {
                 console.error("❌ gRPC Error:", err);
                 resolve({
-                    totalViews: 0,
-                    totalVisitors: 0,
-                    overallAvgReadTime: 0,
-                    topPosts: []
+                    total_views: 0,
+                    total_visitors: 0,
+                    overall_avg_read_time: 0,
+                    top_posts: []
                 });
             } else {
                 console.log("✅ gRPC Response received:", response);
@@ -83,14 +83,14 @@ const getDashboardSummary = async (req: Request, res: Response) => {
         // 
         if (analyticsStats.top_posts && analyticsStats.top_posts.length > 0) {
                     
-                    // FIX 2: Use snake_case 'post_id'
+                    // FIX 2: Use camelCase 'postId'
                     const topPostsIds = analyticsStats.top_posts.map((p: any) => p.post_id);
         
                     const postDetails = await BlogPost.find({ _id: { $in: topPostsIds } })
                         .select('title coverImageUrl');
         
                     hydratedTopPosts = analyticsStats.top_posts.map((gPost: any) => {
-                        // FIX 3: Use snake_case 'post_id'
+                        // FIX 3: Use camelCase 'postId'
                         const details = postDetails.find(d => d._id.toString() === gPost.post_id);
                         return {
                             _id: gPost.post_id,

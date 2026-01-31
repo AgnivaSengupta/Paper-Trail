@@ -1,12 +1,12 @@
-// Original file: ../proto/analytics.proto
+// Original file: proto/analytics.proto
 
 
 export interface PostStatsRequest {
-  'postId'?: (string);
-  'timeRange'?: (string);
+  'post_id'?: (string);
+  'time_range'?: (string);
 }
 
 export interface PostStatsRequest__Output {
-  'postId': (string);
-  'timeRange': (string);
+  'post_id': (string);
+  'time_range': (string);
 }

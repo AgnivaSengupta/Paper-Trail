@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadImageToR2 } from "@/utils/r2-upload";
 import { Spinner } from "@/components/ui/spinner";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ImageUploadBox = ({ previewUrl, setPreviewUrl, setCoverFile }) => (
   <div className="relative group w-full aspect-video rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center mt-2 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600 overflow-hidden">
@@ -150,7 +151,8 @@ const EditorPage = () => {
   };
 
   const setContent = useEditorStore((state) => state.setContent);
-
+  const { user } = useAuthStore();
+  
   return (
     <div >
       <Toaster containerClassName="text-lg" />
@@ -200,8 +202,9 @@ const EditorPage = () => {
 
               <Avatar>
                 <AvatarImage
-                  src="https://github.com/shadcn.png"
+                  src={user?.profilePic || "https://github.com/shadcn.png"}
                   alt="@shadcn"
+                  className="object-cover"
                 />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>

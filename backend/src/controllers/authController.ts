@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import { generateOTP, hashOtp } from "../utils/otp_utils";
-// import { mailTrapClient, sender, sendTestEmail } from "../utils/resendClient";
+import { sendTestEmail } from "../utils/resendClient";
 import { otpEmail } from "../utils/email";
 import crypto from "crypto";
 
@@ -15,21 +15,25 @@ const secret = process.env.JWT_SECRET;
 const oAuthclientID = process.env.OAUTH_CLIENT_ID;
 const oAuthclientSecret = process.env.OAUTH_CLIENT_SECRET;
 
-if (!secret) {
-  throw new Error("JWT secrert not read from env file");
-}
+let googleClient: OAuth2Client | null = null;
 
-if (!oAuthclientID || !oAuthclientSecret) {
-  throw new Error("OAuth set up issue");
-}
-const googleClient = new OAuth2Client(
-  process.env.OAUTH_CLIENT_ID,
-  process.env.OAUTH_CLIENT_SECRET,
-  "postmessage",
-);
+const getGoogleClient = () => {
+  if (!googleClient && oAuthclientID && oAuthclientSecret) {
+    googleClient = new OAuth2Client(
+      oAuthclientID,
+      oAuthclientSecret,
+      "postmessage",
+    );
+  }
+  return googleClient;
+};
 
 const generateToken = (userId: Types.ObjectId) => {
-  return jwt.sign({ id: userId }, secret, { expiresIn: "7d" });
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET environment variable is not set");
+  }
+  return jwt.sign({ id: userId }, jwtSecret, { expiresIn: "7d" });
 };
 
 const registerUser = async (req: Request, res: Response) => {
@@ -144,10 +148,14 @@ const verifyEmail = async (req: Request, res: Response) => {
 const googleLogin = async (req: Request, res: Response) => {
   try {
     const { code } = req.body;
-    const { tokens } = await googleClient.getToken(code);
-    const ticket = await googleClient.verifyIdToken({
+    const client = getGoogleClient();
+    if (!client) {
+      return res.status(500).json({ msg: "OAuth not configured" });
+    }
+    const { tokens } = await client.getToken(code);
+    const ticket = await client.verifyIdToken({
       idToken: tokens.id_token!,
-      audience: oAuthclientID,
+      audience: oAuthclientID || "",
     });
 
     const payload = ticket.getPayload();
@@ -318,7 +326,10 @@ const updateProfile = async (req: Request, res: Response) => {
     return updatedUser;
   } catch (error) {
     console.error("Update failed: ", error);
-    res.status(500).json({ msg: "Update failed", error: error.message });
+    res.status(500).json({ 
+      msg: "Update failed", 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
   }
 };
 export {

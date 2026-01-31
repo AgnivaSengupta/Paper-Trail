@@ -85,7 +85,7 @@ const SidebarItem = React.forwardRef(
   },
 );
 
-const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: {isSidebarOpen: boolean, setIsSidebarOpen: (state: boolean) => void}) => {
   const navigate = useNavigate();
   const sidebaeItemRef = useRef(null);
 
@@ -108,7 +108,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   
   const handleLogOut = async () => {
     try{    
-      const response = await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
+      await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
         withCredentials: true,
       });
       clearUser();
@@ -177,7 +177,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <SidebarItem
           icon={Settings}
           label="Profile"
-          active
           collapsed={!isSidebarOpen}
           path="/admin/profile"
         />

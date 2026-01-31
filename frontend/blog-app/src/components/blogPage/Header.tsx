@@ -7,7 +7,7 @@ import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {motion} from 'framer-motion'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
@@ -15,7 +15,7 @@ const Header = () => {
   const [isDark, setIsDark] = useState(false);
   
   const { user, setUser } = useAuthStore();
-  const { authFormOpen, setAuthFormOpen } = useAuthStore();
+  const { setAuthFormOpen } = useAuthStore();
 
   useEffect(() => {
     // Check for saved preference or system preference
@@ -123,14 +123,14 @@ const Header = () => {
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar>
-                      <AvatarImage src={ user.profilePic } alt='User Image'/>
+                      <AvatarImage src={ user.profilePic } alt='User Image' className="cursor-pointer"/>
                       <AvatarFallback>
                         <User/>
                       </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 mt-3" align="start">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    {/*<DropdownMenuLabel>My Account</DropdownMenuLabel>*/}
                     <DropdownMenuGroup>
                       <DropdownMenuItem onClick={() => navigate('/admin/profile')}>
                         Profile

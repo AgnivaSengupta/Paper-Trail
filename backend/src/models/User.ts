@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema(
     title: { type: String, default: ""},
     socials: {type: String, default: ""},
     
-    skills: {type: [String], default: [], validate: {validator: function(v){return v.length <= 10}, message: 'Cannot have more than 10 skills.'}},
+    skills: {type: [String], default: [], validate: {validator: function(v: string[]){return v.length <= 10}, message: 'Cannot have more than 10 skills.'}},
     lastLogin: { type: Date, default: Date.now },
     isVerified: { type: Boolean, default: false },
 

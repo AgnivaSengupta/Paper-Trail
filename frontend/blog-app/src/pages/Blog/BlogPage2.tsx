@@ -1,33 +1,22 @@
 import BlogLayout from "@/components/layouts/BlogLayout";
 import TableOfContents from "@/components/blogPage/TableOfContents";
-import BlogContent from "@/components/blogPage/BlogContent";
 import { API_PATHS } from "@/utils/apiPaths";
 import axiosInstance from "@/utils/axiosInstance";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { MessageSquare, User } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import DOMPurify from "dompurify";
+// import DOMPurify from "dompurify";
 import TiptapRenderer from "@/components/blogPage/TiptapRenderer";
 import { buildTrees, type IComment } from "@/utils/treeBuilder";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import Comment from "@/components/blogPage/Comment";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { useActiveTimer } from "@/hooks/analytics/useActiveTimer";
 import { ScrollTracker } from "@/components/analytics/ScrollTracker";
 import { useAuthStore } from "@/store/useAuthStore";
-import ShareCard from "@/components/ShareCard";
+// import ShareCard from "@/components/ShareCard";
 import ShareButtons from "@/components/blogPage/ShareButtons";
-
-const tocItems = [
-  { id: "introduction", title: "Introduction", level: 2 },
-  { id: "cors-policy", title: 'CORS "Read" Policy', level: 2 },
-  { id: "implementation", title: "Implementation Details", level: 3 },
-  { id: "math-example", title: "Mathematical Notation", level: 2 },
-  { id: "best-practices", title: "Best Practices", level: 2 },
-  { id: "conclusion", title: "Conclusion", level: 2 },
-];
 
 const BlogPage2 = () => {
   const [post, setPost] = useState(null);
@@ -136,12 +125,12 @@ const BlogPage2 = () => {
       <main className="container mx-auto px-4 py-12 max-w-5xl">
         {/* Title section */}
         <div
-          className="h-[193px] my-12 py-6 px-12 flex flex-col gap-6"
-          style={{
-            backgroundImage: `linear-gradient(hsl(235 0% 40.2% / 0.8) 1px, transparent 1px),
-                linear-gradient(90deg, hsl(235 0% 40.2% / 0.8) 1px, transparent 1px)`,
-            backgroundSize: "22px 24px",
-          }}
+          className="h-[193px] mt-10 py-6 px-12 flex flex-col gap-6"
+          // style={{
+          //   backgroundImage: `linear-gradient(hsl(235 0% 40.2% / 0.8) 1px, transparent 1px),
+          //       linear-gradient(90deg, hsl(235 0% 40.2% / 0.8) 1px, transparent 1px)`,
+          //   backgroundSize: "22px 24px",
+          // }}
         >
           <h1 className="font-primary italic text-[clamp(1.5rem,4vw,7rem)]">
             {post.title}
@@ -168,16 +157,19 @@ const BlogPage2 = () => {
           </div>
         </div>
 
-        <div
-          className="mb-12 rounded-lg overflow-hidden border border-border animate-fade-in"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <img
-            src={post.coverImageUrl || "/stock-1.jpeg"}
-            alt="Blog hero"
-            className="w-full h-auto object-cover aspect-[21/9]"
-          />
-        </div>
+        {post.coverImageUrl && (
+          <div
+            className="mb-12 rounded-lg overflow-hidden border border-border animate-fade-in"
+            style={{ animationDelay: "0.2s" }}
+          >
+            <img
+              src={post.coverImageUrl || "/stock-1.jpeg"}
+              alt="Blog hero"
+              className="w-full h-auto object-cover aspect-[21/9]"
+            />
+          </div>
+        )}
+
 
         <div className="flex gap-8 lg:gap-16">
           {/* Table of Contents - Desktop */}
@@ -231,7 +223,7 @@ const BlogPage2 = () => {
               </h3>
             </div>
 
-            <div className="mb-8 p-6 rounded-lg border bg-white">
+            <div className="mb-8 p-6 rounded-lg border bg-white dark:bg-zinc-900">
               <h2 className="text-xl font-primary mb-5">Leave a comment</h2>
               <div className="flex item-center gap-4">
 
@@ -249,7 +241,7 @@ const BlogPage2 = () => {
                         handleReply(null, rootComment); // null parentId = root comment
                         setRootComment("");
                       }}
-                      className="px-4 py-2 cursor-pointer bg-black text-white text-sm font-bold rounded hover:bg-gray-800 disabled:opacity-50"
+                      className="px-4 py-2 cursor-pointer bg-black dark:bg-slate-100 text-white dark:text-black text-sm font-bold rounded hover:bg-gray-800 disabled:opacity-50"
                       disabled={!rootComment.trim()}
                     >
                       Post Comment

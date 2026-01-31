@@ -1,15 +1,32 @@
 import { Resend } from "resend";
 import { otpEmail } from "./email";
 
-const resend = new Resend(process.env.RESEND_API_KEY); // test key
+let resend: Resend | null = null;
+
+const getResendClient = () => {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+};
 
 export async function sendTestEmail(otpEmail: string) {
-  const response = await resend.emails.send({
-    from: "onboarding@resend.dev", // allowed in test mode
-    to: "delivered@resend.dev",      // any email, won't be delivered
-    subject: "Test Email - Verify your email",
-    html: otpEmail,
-  });
+  try {
+    const client = getResendClient();
+    const response = await client.emails.send({
+      from: "onboarding@resend.dev", // allowed in test mode
+      to: "delivered@resend.dev",      // any email, won't be delivered
+      subject: "Test Email - Verify your email",
+      html: otpEmail,
+    });
 
-  console.log(response);
+    console.log(response);
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    throw error;
+  }
 }
