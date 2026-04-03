@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/pagination";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
-// import { mockPosts } from "../data/mockPosts";
-import type { Post } from "../../pages/Admin/BlogPosts";
-
-const POSTS_PER_PAGE = 6;
+import type { Post } from "@/types/domain";
 
 // interface Post {
 //   id: string;
@@ -47,7 +44,7 @@ const LatestPosts = () => {
   };
   
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   
   const fetchPosts = async (pageNumber: number) => {
     try {

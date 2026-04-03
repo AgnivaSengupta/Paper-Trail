@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+**/node_modules/  # Catch modules in backend/ and frontend/
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+**/.env          # Catch .env inside subfolders
+**/.env.* # Catch .env.local, .env.dev, etc.
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime files
+*.pid
+*.pid.lock
+*.seed
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Caches
+.cache/
+.turbo/
+
+# Local uploads and temp files
+uploads/
+media/
+tmp/
+temp/
+
+# Editor / OS clutter
+.DS_Store
+Thumbs.db
+
+# pnpm specific
+.pnpm-debug.log*
+node_modules
+.pnpm-store
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Frontend specific (if using Vite/Next.js)
+.next/
+out/

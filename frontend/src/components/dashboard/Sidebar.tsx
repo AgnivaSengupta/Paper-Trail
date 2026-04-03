@@ -11,6 +11,7 @@ import {
   Send,
   Settings,
   Sun,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
@@ -32,38 +33,41 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
-const SidebarItem = React.forwardRef(
-  (
-    { icon: Icon, label, active, badge, collapsed, path, variant, ...props },
-    ref,
-  ) => {
+interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon: LucideIcon;
+  label: string;
+  active?: boolean;
+  badge?: string;
+  collapsed: boolean;
+  path?: string;
+}
+
+const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
+  ({ icon: Icon, label, active, badge, collapsed, path, onClick, ...props }, ref) => {
     const navigate = useNavigate();
 
-    const handleClick = (e) => {
-      if (path) {
-        navigate(path);
-      }
-    };
     return (
       <div
         ref={ref}
         {...props}
         className={`
-      flex items-center
-      ${collapsed ? "justify-center px-2" : "justify-between px-4"}
-      py-3 mb-1 cursor-pointer rounded-lg transition-colors
-      ${
-        active
-          ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
-      }
-    `}
+          flex items-center
+          ${collapsed ? "justify-center px-2" : "justify-between px-4"}
+          py-3 mb-1 cursor-pointer rounded-lg transition-colors relative
+          ${
+            active
+              ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+              : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
+          }
+        `}
         title={collapsed ? label : ""}
-        onClick={(e) => {
-          props.onClick?.(e);
-          handleClick(e);
+        onClick={(event) => {
+          onClick?.(event);
+          if (path) {
+            navigate(path);
+          }
         }}
       >
         <div className="flex items-center gap-3">
@@ -85,17 +89,25 @@ const SidebarItem = React.forwardRef(
   },
 );
 
-const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: {isSidebarOpen: boolean, setIsSidebarOpen: (state: boolean) => void}) => {
+SidebarItem.displayName = "SidebarItem";
+
+const Sidebar = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (state: boolean) => void;
+}) => {
   const navigate = useNavigate();
-  const sidebaeItemRef = useRef(null);
+  const sidebaeItemRef = useRef<HTMLDivElement | null>(null);
 
   const [supportText, setSupportText] = useState("");
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  
-  const user = useUserStore((state) => state.user);
-  const clearUser = useUserStore((state) => state.clearUser)
+
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -104,20 +116,18 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: {isSidebarOpen: boolean, s
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
-  
-  
+
   const handleLogOut = async () => {
-    try{    
-      await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
+    try {
+      await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {}, {
         withCredentials: true,
       });
-      clearUser();
+      logout();
     } catch (error) {
       console.log("Error while logging out.", error);
     }
-  }
-  
-  
+  };
+
   return (
     <aside
       className={`
@@ -206,7 +216,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: {isSidebarOpen: boolean, s
             <div className="font-primary font-bold text-2xl pb-2 ml-2 mt-2">
               <h4>Settings</h4>
             </div>
-            {/*<Separator/>*/}
             <div className="flex flex-col gap-1">
               <div className="group">
                 <div
@@ -218,7 +227,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: {isSidebarOpen: boolean, s
                 </div>
               </div>
               <Separator />
-              <div className="group" onClick={() => handleLogOut()}>
+              <div className="group" onClick={() => void handleLogOut()}>
                 <div className="p-2 flex gap-3 item-center rounded-sm  group-hover:bg-red-200/30 cursor-pointer">
                   <Avatar className="size-6">
                     <AvatarImage

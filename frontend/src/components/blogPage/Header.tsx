@@ -14,7 +14,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, refreshUser } = useAuthStore();
   const { setAuthFormOpen } = useAuthStore();
 
   useEffect(() => {
@@ -29,20 +29,8 @@ const Header = () => {
   }, []);
   
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
-          withCredentials: true,
-        });
-
-        setUser(response.data);
-      } catch (error) {
-        setUser(null);
-        console.log(error);
-      }
-    };
-    fetchProfile();
-  }, [setUser]);
+    void refreshUser();
+  }, [refreshUser]);
 
   const toggleDarkMode = () => {
     setIsDark(!isDark);
@@ -68,6 +56,7 @@ const Header = () => {
         withCredentials: true,
       })
       console.log(response);
+      setUser(null);
     } catch (error) {
       console.log("Error while logging out..")
     }
@@ -84,7 +73,7 @@ const Header = () => {
             damping: 20, 
             delay: 0.2,
             // Width animation usually looks better with a slightly longer duration
-            width: { duration: 1.0, ease: "easeOut" } 
+            width: { duration: 1.0, ease: "easeOut" as const } 
           }}
         className="container max-w-6xl mx-auto flex h-14 items-center justify-between px-6 rounded-full border border-border/50 bg-gradient-to-b from-background/80 to-background/60 backdrop-blur-xl shadow-lg">
         {/* Logo */}
@@ -123,7 +112,7 @@ const Header = () => {
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar>
-                      <AvatarImage src={ user.profilePic } alt='User Image' className="cursor-pointer"/>
+                      <AvatarImage src={ user.profilePic ?? undefined } alt='User Image' className="cursor-pointer"/>
                       <AvatarFallback>
                         <User/>
                       </AvatarFallback>

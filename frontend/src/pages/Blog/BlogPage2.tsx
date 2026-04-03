@@ -2,9 +2,9 @@ import BlogLayout from "@/components/layouts/BlogLayout";
 import TableOfContents from "@/components/blogPage/TableOfContents";
 import { API_PATHS } from "@/utils/apiPaths";
 import axiosInstance from "@/utils/axiosInstance";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, User } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 // import DOMPurify from "dompurify";
 import TiptapRenderer from "@/components/blogPage/TiptapRenderer";
@@ -17,22 +17,22 @@ import { ScrollTracker } from "@/components/analytics/ScrollTracker";
 import { useAuthStore } from "@/store/useAuthStore";
 // import ShareCard from "@/components/ShareCard";
 import ShareButtons from "@/components/blogPage/ShareButtons";
+import type { Post } from "@/types/domain";
+import formatDate from "@/utils/dateFormatter";
 
 const BlogPage2 = () => {
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [blogLoading, setBlogLoading] = useState<boolean>(true);
   const [blogError, setBlogError] = useState<null | string>(null);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [comments, setComments] = useState<IComment[]>([]);
   const [rootComment, setRootComment] = useState("");
   const { slug } = useParams();
-  const navRef = useRef(null);
-
   const {user} = useAuthStore();
 
   // const { json } = useEditorStore();
 
-  const { trackEvents } = useAnalytics(post?._id, user?._id, post?.author._id);
+  const { trackEvents } = useAnalytics(post?._id, user?._id, post?.author?._id);
   // useActiveTimer(trackEvents, post?._id);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const BlogPage2 = () => {
         // title: post?.title
       });
     }
-  }, [post?._id]);
+  }, [post?._id, trackEvents]);
 
 
   //Post Content Fetching ....
@@ -64,10 +64,10 @@ const BlogPage2 = () => {
         setBlogLoading(false);
       }
     };
-    // console.log(post.content?.html);
     fetchBlog();
-  }, []);
+  }, [slug]);
 
+  // fetching comments ....
   useEffect(() => {
     if (!post?._id) return;
 
@@ -90,6 +90,7 @@ const BlogPage2 = () => {
   const commentTree = useMemo(() => buildTrees(comments), [comments]);
 
   const handleReply = async (parentComment: string | null, content: string) => {
+    if (!post) return;
     try {
       const response = await axiosInstance.post(API_PATHS.COMMENTS.ADD_COMMENT(post._id),
       {
@@ -103,6 +104,7 @@ const BlogPage2 = () => {
 
     setComments((prev) => [...prev, response.data]);
     } catch (error) {
+      console.log("Error: ", error);
       alert("Failed to add comment");
     }
   }
@@ -123,52 +125,55 @@ const BlogPage2 = () => {
   return (
     <BlogLayout>
       <main className="container mx-auto px-4 py-12 max-w-5xl">
-        {/* Title section */}
-        <div
-          className="h-[193px] mt-10 py-6 px-12 flex flex-col gap-6"
-          // style={{
-          //   backgroundImage: `linear-gradient(hsl(235 0% 40.2% / 0.8) 1px, transparent 1px),
-          //       linear-gradient(90deg, hsl(235 0% 40.2% / 0.8) 1px, transparent 1px)`,
-          //   backgroundSize: "22px 24px",
-          // }}
-        >
-          <h1 className="font-primary italic text-[clamp(1.5rem,4vw,7rem)]">
-            {post.title}
-          </h1>
-
-          <div className="flex gap-5 items-center">
-            <div className="flex gap-3 py-[8px] px-[9px] w-fit bg-background border-1">
-              <Avatar className="bg-zinc-400">
-                <AvatarImage src="" />
-                <AvatarFallback>
-                  <User />
-                </AvatarFallback>
-              </Avatar>
-              <h2 className="text-xl font-primary tracking-wider">
-                {post.author.name}
-              </h2>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-primary tracking-wider">
-                {"Date: " + post.updatedAt}
-              </h2>
+        
+        <div className="flex flex-col gap-4">
+          {/* Title section */}
+          <div className="min-h-[193px] mt-10 py-6 px-12 flex flex-col gap-6">
+            <h1 className="font-primary italic text-[clamp(1.5rem,3vw,4rem)]">
+              {post.title}
+            </h1>
+  
+            <div className="flex gap-5 items-center justify-between">
+              
+              <div className="flex gap-2 items-center">
+                <span className="text-base font-primary tracking-wider">by: </span>
+                
+                <div className="flex gap-3 py-[3px] px-[4px] w-fit bg-background border-1 items-center">
+                  <Avatar className="">
+                    <AvatarImage src={post.author?.profilePic || ""} className="rounded-full object-cover" />
+                    <AvatarFallback>
+                      <User />
+                    </AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-lg font-primary tracking-wider">
+                    {post.author.name}
+                  </h2>
+                </div>
+              </div>
+  
+              <div>
+                <h2 className="text-lg font-primary tracking-wider">
+                  {"Date: " + formatDate(post.updatedAt)}
+                </h2>
+              </div>
             </div>
           </div>
+  
+          {post.coverImageUrl && (
+            <div
+              className="mb-12 rounded-lg overflow-hidden border border-border animate-fade-in"
+              style={{ animationDelay: "0.2s" }}
+            >
+              <img
+                src={post.coverImageUrl || "/stock-1.jpeg"}
+                alt="Blog hero"
+                className="w-full h-auto object-cover aspect-[21/9]"
+              />
+            </div>
+          )}
         </div>
+        
 
-        {post.coverImageUrl && (
-          <div
-            className="mb-12 rounded-lg overflow-hidden border border-border animate-fade-in"
-            style={{ animationDelay: "0.2s" }}
-          >
-            <img
-              src={post.coverImageUrl || "/stock-1.jpeg"}
-              alt="Blog hero"
-              className="w-full h-auto object-cover aspect-[21/9]"
-            />
-          </div>
-        )}
 
 
         <div className="flex gap-8 lg:gap-16">
@@ -185,14 +190,6 @@ const BlogPage2 = () => {
             className="flex-1 min-w-0 animate-fade-in"
             style={{ animationDelay: "0.4s" }}
           >
-            {/* <BlogContent /> */}
-            {/*<div
-              id="blog-content"
-              className="prose-doc"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(post.content?.html || ""),
-              }}
-            />*/}
 
             <div className="relative">
 
@@ -209,10 +206,9 @@ const BlogPage2 = () => {
               title={post.title}
               description="A comprehensive guide to setting up cross-origin resource sharing for secure API communication."
               author={post.author.name}
-              authorImage={post.author.profilePic}
+              authorImage={post.author.profilePic ?? undefined}
               publishDate={post.updatedAt}
               readTime="15 min read"
-              category="Web Development"
             />
             <div className="h-0.25 w-full bg-black/20"></div>
             {/* Comments section */}

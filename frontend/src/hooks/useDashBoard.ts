@@ -1,23 +1,8 @@
 import { API_PATHS } from "@/utils/apiPaths";
 import axiosInstance from "@/utils/axiosInstance";
+import axios from "axios";
 import { useEffect, useState } from "react";
-
-export interface DashboardData {
-  stats: {
-    totalPosts: number;
-    drafts: number;
-    published: number;
-    totalViews: number;
-    totalVisitors: number;
-    avgReadTime: number;
-  };
-  topPosts: {
-    _id: string;
-    title: string;
-    coverImageUrl: string;
-    views: number;
-  }[];
-}
+import type { DashboardData } from "@/types/domain";
 
 export const useDashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -36,12 +21,17 @@ export const useDashboard = () => {
             withCredentials: true,
           },
         );
-        setData(response.data);
+        setData(response.data as DashboardData);
       } catch (error) {
         console.error("Failed to fetch dashboard: ", error);
-        setError(
-          error.response?.data?.message || "Failed to fetch dashboard data",
-        );
+        if (axios.isAxiosError(error)) {
+          setError(
+            (error.response?.data as { message?: string } | undefined)?.message ||
+              "Failed to fetch dashboard data",
+          );
+        } else {
+          setError("Failed to fetch dashboard data");
+        }
       } finally {
         setLoading(false);
       }

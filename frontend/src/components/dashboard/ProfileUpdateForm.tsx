@@ -24,7 +24,7 @@ import { uploadImageToR2 } from "@/utils/r2-upload";
 
 export function ProfileUpdateForm() {
   const [previewUrl, setPreviewUrl] = useState("");
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(ProfileSchema),

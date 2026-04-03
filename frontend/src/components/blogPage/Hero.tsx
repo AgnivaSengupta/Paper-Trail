@@ -2,7 +2,7 @@ import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,14 +13,13 @@ const Hero = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const { user, setUser } = useAuthStore();
-  const { authFormOpen, setAuthFormOpen } = useAuthStore();
+  const { user, setAuthFormOpen } = useAuthStore();
 
-  const containerVariants = {
-    hidden: { opacity: 0, blur: 20 },
+  const containerVariants: Variants = {
+    hidden: { opacity: 0, filter: "blur(20px)" },
     visible: {
       opacity: 1,
-      blur: 0,
+      filter: "blur(0px)",
       transition: {
         staggerChildren: 0.2, // Time between each child's animation
         delayChildren: 0, // Initial delay before the first child starts
@@ -28,13 +27,13 @@ const Hero = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
     visible: {
       filter: "blur(0px)",
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: "easeOut" },
+      transition: { duration: 0.7, ease: [0, 0, 0.2, 1] },
     },
   };
 

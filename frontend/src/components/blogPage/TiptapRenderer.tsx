@@ -3,17 +3,10 @@ import Callout from "./Callout";
 import CodeBlock from "./CodeBlock";
 // import MathBlock from "./MathBlock";
 import slugify from "slugify";
-
-type TipTapNode = {
-    type: string;
-    attrs?: Record<string, any>;
-    content?: TipTapNode[];
-    marks?: { type: string, attrs?: Record<string, any> }[];
-    text?: string;
-}
+import type { PostContent, TipTapNode } from "@/types/domain";
 
 interface RenderProps {
-    content: { type: string; content: TipTapNode[] } | null;
+    content: PostContent["json"];
 }
 
 const TiptapRenderer = ({ content }: RenderProps) => {
@@ -22,6 +15,18 @@ const TiptapRenderer = ({ content }: RenderProps) => {
     return <div className="prose-docs">{content.content.map((node, index) => renderNode(node, index))}</div>
 }
 
+const getStringAttr = (node: TipTapNode, key: string): string | undefined => {
+    const value = node.attrs?.[key];
+    return typeof value === "string" ? value : undefined;
+};
+
+const getCalloutType = (node: TipTapNode): "info" | "warning" | "tip" | "note" | undefined => {
+    const value = getStringAttr(node, "type");
+    if (value === "info" || value === "warning" || value === "tip" || value === "note") {
+        return value;
+    }
+    return undefined;
+};
 
 const renderNode = (node: TipTapNode, index: number) => {
     if (node.type === 'text') {
@@ -46,9 +51,9 @@ const renderNode = (node: TipTapNode, index: number) => {
         return (
             <img 
                 key={index} // Don't forget the key!
-                src={node.attrs?.src} 
-                alt={node.attrs?.alt || ''} 
-                title={node.attrs?.title}
+                src={getStringAttr(node, "src")}
+                alt={getStringAttr(node, "alt") || ''}
+                title={getStringAttr(node, "title")}
                 className="my-6 rounded-lg max-w-full h-auto" // meaningful styles
             />
         );
@@ -78,15 +83,15 @@ const renderNode = (node: TipTapNode, index: number) => {
             return (
                 <CodeBlock
                     key={index}
-                    language={node.attrs?.language || "text"}
-                    filename={node.attrs?.filename} // You must add a filename attr to your Tiptap extension to support this
+                    language={getStringAttr(node, "language") || "text"}
+                    filename={getStringAttr(node, "filename")} // You must add a filename attr to your Tiptap extension to support this
                     code={node.content?.[0]?.text || ""}
                 />
             );
 
         case "callout": // Assumes you created a custom Node in Tiptap named 'callout'
             return (
-                <Callout key={index} type={node.attrs?.type || "info"} title={node.attrs?.title}>
+                <Callout key={index} type={getCalloutType(node) || "info"} title={getStringAttr(node, "title")}>
                     {node.content?.map((child, i) => renderNode(child, i))}
                 </Callout>
             );
@@ -121,7 +126,7 @@ const renderNode = (node: TipTapNode, index: number) => {
 
         case "image":
             return (
-                <img src={node.attrs?.scr} alt="" />
+                <img src={getStringAttr(node, "src")} alt="" />
             )
 
         default:

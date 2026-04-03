@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "./apiPaths";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -30,18 +30,14 @@ axiosInstance.interceptors.response.use(
   },
 
   (error) => {
-    if (error.response.status === 401) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
       // token not found
-      // Redirect to login Page
-      // window.location.href= "/";
-
-      const { clearUser, setOpenAuthForm } = useUserStore.getState();
-
-      clearUser();
-      setOpenAuthForm(true);
-    } else if (error.response.status === 500) {
+      const { logout, setAuthFormOpen } = useAuthStore.getState();
+      logout();
+      setAuthFormOpen(true);
+    } else if (axios.isAxiosError(error) && error.response?.status === 500) {
       console.error("Server error. Please try again later");
-    } else if (error.code === "ECONNABORTED") {
+    } else if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
       console.error("Request timeout. Please try again.");
     }
     return Promise.reject(error);

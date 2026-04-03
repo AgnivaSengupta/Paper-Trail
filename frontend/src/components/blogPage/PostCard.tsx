@@ -1,5 +1,4 @@
-// import type { Post } from "../data/mockPosts";
-import type { Post } from "../../pages/Admin/BlogPosts";
+import type { Post } from "@/types/domain";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";

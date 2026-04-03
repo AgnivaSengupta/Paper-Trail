@@ -1,10 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Hash, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 
-const TagInput = ({ tags, onAddTag, onRemoveTag, className }) => {
+interface TagInputProps {
+  tags: string[];
+  onAddTag: (tag: string) => void;
+  onRemoveTag: (tag: string) => void;
+  className?: string;
+}
+
+const TagInput = ({ tags, onAddTag, onRemoveTag, className = "" }: TagInputProps) => {
   const [input, setInput] = useState<string>("");
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && input.trim()) {
       e.preventDefault();
       onAddTag(input.trim());

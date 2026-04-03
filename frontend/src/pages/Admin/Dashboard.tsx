@@ -1,61 +1,21 @@
-import React, { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
-  Search,
   RefreshCcw,
-  ChevronDown,
-  CheckCircle2,
-  AlertTriangle,
-  Info,
-  X,
   Sun,
   Moon,
-  Rocket,
   Clock,
   FileText,
   Users,
   Eye,
   ExternalLink,
 } from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useDashboard } from "@/hooks/useDashBoard";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
-
-// --- Mock Data ---
-const performanceData = [
-  { day: "Dec 1", accuracy: 93 },
-  { day: "Dec 3", accuracy: 94 },
-  { day: "Dec 6", accuracy: 96 },
-  { day: "Dec 9", accuracy: 98 },
-  { day: "Dec 11", accuracy: 96 },
-  { day: "Dec 14", accuracy: 99 },
-  { day: "Dec 18", accuracy: 102 },
-  { day: "Dec 20", accuracy: 104 },
-  { day: "Dec 22", accuracy: 105 },
-];
-
-const gpuData = [
-  { time: "1", gpu1: 40, gpu2: 24 },
-  { time: "2", gpu1: 30, gpu2: 13 },
-  { time: "3", gpu1: 20, gpu2: 38 },
-  { time: "4", gpu1: 27, gpu2: 39 },
-  { time: "5", gpu1: 18, gpu2: 48 },
-  { time: "6", gpu1: 23, gpu2: 38 },
-  { time: "7", gpu1: 34, gpu2: 43 },
-];
 
 // Helper to format seconds into "2m 30s"
 const formatTime = (seconds: number) => {
@@ -72,6 +32,15 @@ const formatNumber = (num: number) => {
   }).format(num);
 };
 
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  subtext: string;
+  trend: ReactNode;
+  icon: typeof Eye;
+  loading: boolean;
+}
+
 const StatCard = ({
   title,
   value,
@@ -79,9 +48,7 @@ const StatCard = ({
   trend,
   icon: Icon,
   loading,
-  // trendValue,
-  // trendPositive,
-}) => (
+}: StatCardProps) => (
   <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800/50 shadow-sm dark:shadow-none transition-colors">
     <div className="flex justify-between items-start mb-4">
       <div>
@@ -182,7 +149,7 @@ const Dashboard = () => {
                 onClick={() => toggleTheme()}
                 className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
               >
-                {theme ? <Sun size={18} /> : <Moon size={18} />}
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
               </button>
 
               {/* <button className="flex items-center gap-2 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 transition-colors shadow-sm dark:shadow-none text-zinc-700 dark:text-zinc-200">

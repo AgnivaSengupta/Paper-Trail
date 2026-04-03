@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import slugify from "slugify";
+import type { PostContent } from "@/types/domain";
 
 // interface TOCItem {
 //   id: string;
@@ -8,15 +9,7 @@ import slugify from "slugify";
 // }
 
 interface TableOfContentsProps {
-  content: { type: string; content: TipTapNode[] } | null;
-}
-
-type TipTapNode = {
-  type: string;
-  attrs?: Record<string, any>;
-  content?: TipTapNode[];
-  marks?: { type: string, attrs?: Record<string, any> }[];
-  text?: string;
+  content: PostContent["json"];
 }
 
 

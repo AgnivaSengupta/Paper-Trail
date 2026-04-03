@@ -1,24 +1,6 @@
-interface IPost {
-  title: string;
-  coverImageUrl: string | null;
-}
+import type { CommentNode } from "@/types/domain";
 
-interface IAuthor {
-  name: string;
-  profilePic: string | null;
-}
-
-export interface IComment {
-  _id: string;
-  content: string;
-  post: IPost;
-  author: IAuthor;
-  parentComment: string | null;
-  ancestors: string[];
-  createdAt: string;
-  
-  replies?: IComment[];
-}
+export interface IComment extends CommentNode {}
 
 // export interface IComment extends Document {
 //   post: Types.ObjectId | { title: string; coverImageUrl?: string }; // populated post
@@ -33,8 +15,10 @@ export interface IComment {
 // }
 
 
+type TreeComment = IComment & { replies: IComment[] };
+
 export const buildTrees = (comments: IComment[])=> {
-  const map = new Map<string, IComment>();
+  const map = new Map<string, TreeComment>();
   const roots: IComment[] = [];
   
   // Initialization

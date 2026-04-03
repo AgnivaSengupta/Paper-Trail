@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 
 interface props {
   comment: IComment;
-  onReply: (parentComment: string, content: string) => void;
+  onReply: (parentComment: string | null, content: string) => void;
 }
 
 const Comment: React.FC<props> = ({comment, onReply}) => {
@@ -31,7 +31,7 @@ const Comment: React.FC<props> = ({comment, onReply}) => {
           <div className="flex gap-5">
             <div>
               <Avatar>
-                <AvatarImage src={comment.author.profilePic}  className="object-cover"/>
+                <AvatarImage src={comment.author.profilePic ?? undefined}  className="object-cover"/>
                 <AvatarFallback>
                   <User2/>
                 </AvatarFallback>

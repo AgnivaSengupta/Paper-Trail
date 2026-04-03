@@ -14,7 +14,6 @@ interface ShareButtonsProps {
     authorImage?: string;
     publishDate?: string;
     readTime?: string;
-    category?: string;
 }
 
 const ShareButtons = ({
@@ -25,7 +24,6 @@ const ShareButtons = ({
     authorImage = "",
     publishDate = "2025",
     readTime = "5 min read",
-    category = "development",
 }: ShareButtonsProps) => {
     const [copied, setCopied] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false);
@@ -294,7 +292,7 @@ const ShareButtons = ({
                                 Download PNG
                             </Button>
 
-                            {typeof navigator !== "undefined" && navigator.share && (
+                            {typeof navigator !== "undefined" && "share" in navigator && (
                                 <Button
                                 variant="default"
                                 size="sm"

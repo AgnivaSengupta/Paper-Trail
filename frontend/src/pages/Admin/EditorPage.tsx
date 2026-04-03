@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { Sun, Moon, Eye, Save, Send, UploadCloud, X, Pen } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +15,13 @@ import { uploadImageToR2 } from "@/utils/r2-upload";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "@/store/useAuthStore";
 
-const ImageUploadBox = ({ previewUrl, setPreviewUrl, setCoverFile }) => (
+interface ImageUploadBoxProps {
+  previewUrl: string;
+  setPreviewUrl: Dispatch<SetStateAction<string>>;
+  setCoverFile: Dispatch<SetStateAction<File | null>>;
+}
+
+const ImageUploadBox = ({ previewUrl, setPreviewUrl, setCoverFile }: ImageUploadBoxProps) => (
   <div className="relative group w-full aspect-video rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center mt-2 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600 overflow-hidden">
     {previewUrl ? (
       <>
@@ -45,9 +51,10 @@ const ImageUploadBox = ({ previewUrl, setPreviewUrl, setCoverFile }) => (
       accept="image/png, image/jpeg, image/webp"
       onChange={(e) => {
         const file = e.target.files?.[0];
-        if (file)
+        if (file) {
           setPreviewUrl(URL.createObjectURL(file));
           setCoverFile(file);
+        }
       }}
     />
   </div>
@@ -58,7 +65,7 @@ const EditorPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAiTabOpen, setIsAiTabOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
-  const [coverFile, setCoverFile] = useState(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
@@ -66,7 +73,7 @@ const EditorPage = () => {
   const [meta, setMeta] = useState({
     title: "",
     slug: "",
-    coverImageUrl: null,
+    coverImageUrl: "" as string | null,
     tags: ["Technology"],
     excerpt: "",
   });
@@ -231,7 +238,7 @@ const EditorPage = () => {
                   </button>
                   <button
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium cursor-pointer text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                    onClick={(e) => handleSubmit("draft")}
+                    onClick={() => handleSubmit("draft")}
                   >
                     {isSubmitting ? 
                       (<>
@@ -244,7 +251,7 @@ const EditorPage = () => {
                   </button>
                   <button
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium cursor-pointer text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-lg shadow-emerald-900/20 transition-colors"
-                    onClick={(e) => handleSubmit("publish")}
+                    onClick={() => handleSubmit("publish")}
                   >
                     {isSubmitting ? 
                       (<>
@@ -314,15 +321,16 @@ const EditorPage = () => {
                       </label>
                       <TagInput
                         tags={meta.tags}
-                        onAddTag={(t) =>
+                        onAddTag={(t: string) =>
                           setMeta({ ...meta, tags: [...meta.tags, t] })
                         }
-                        onRemoveTag={(t) =>
+                        onRemoveTag={(t: string) =>
                           setMeta({
                             ...meta,
                             tags: meta.tags.filter((tag) => tag !== t),
                           })
                         }
+                        className=""
                       />
                     </div>
                   </div>

@@ -23,8 +23,6 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useThemeStore } from '@/store/themeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import axiosInstance from '@/utils/axiosInstance';
-import { API_PATHS } from '@/utils/apiPaths';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -61,30 +59,14 @@ const Profile2 = () => {
     // const [isDarkMode, setIsDarkMode] = useState(true);
     // const [profile, setProfile] = useState();
 
-    const { user, setUser } = useAuthStore();
+    const { user, refreshUser } = useAuthStore();
 
     const theme = useThemeStore((state) => state.theme);
     const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
-    const fetchProfile = async () => {
-        try {
-            const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
-                withCredentials: true,
-            });
-
-            await setUser();
-            console.log(response.data);
-        } catch (error) {
-            // await setUser();
-            console.log("Error fetching user details.");
-        } finally {
-            console.log(user);
-        }
-    };
-
     useEffect(() => {
-        fetchProfile();
-    }, []);
+        void refreshUser();
+    }, [refreshUser]);
 
     useEffect(() => {
         if (theme === "dark") {
@@ -94,8 +76,6 @@ const Profile2 = () => {
         }
     }, [theme]);
 
-    console.log(user?.skills[0])
-    console.log(typeof (user?.skills[0]))
     return (
         <div className={theme === 'dark' ? 'dark' : ''}>
             <div className="flex min-h-screen bg-background">
@@ -120,7 +100,7 @@ const Profile2 = () => {
                                 </button>
 
                                 <Avatar>
-                                    <AvatarImage src={user?.profilePic || "https://github.com/shadcn.png"} alt="@shadcn" className='object-cover' />
+                                        <AvatarImage src={user?.profilePic || "https://github.com/shadcn.png"} alt="@shadcn" className='object-cover' />
                                     <AvatarFallback>CN</AvatarFallback>
                                 </Avatar>
                             </div>
@@ -132,7 +112,7 @@ const Profile2 = () => {
                                 <div className="relative group">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-accent/50 to-accent/30 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <Avatar className="w-24 h-24 ring-4 ring-background shadow-lg relative transition-transform duration-300 group-hover:scale-105">
-                                        <AvatarImage src={user?.profilePic} alt="Agniva Sengupta" className='object-cover' />
+                                        <AvatarImage src={user?.profilePic ?? undefined} alt={user?.name ?? "Avatar"} className='object-cover' />
                                         <AvatarFallback className="text-2xl font-serif bg-muted">AS</AvatarFallback>
                                     </Avatar>
                                 </div>
@@ -140,7 +120,7 @@ const Profile2 = () => {
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <h1 className="font-serif text-3xl font-semibold text-foreground">
-                                            Agniva Sengupta
+                                            {user?.name ?? "Anonymous"}
                                         </h1>
                                         <Tooltip>
                                             <TooltipTrigger>

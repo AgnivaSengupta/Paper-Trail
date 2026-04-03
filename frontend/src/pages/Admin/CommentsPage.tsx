@@ -14,40 +14,18 @@ import { useThemeStore } from '@/store/themeStore';
 import axiosInstance from '@/utils/axiosInstance';
 import { API_PATHS } from '@/utils/apiPaths';
 import { useAuthStore } from '@/store/useAuthStore';
+import type { InboxComment } from '@/types/domain';
+import formatDate from '@/utils/dateFormatter';
 
-
-type Author = {
-  name: string;
-  profilePic: string | 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex';
-};
-
-type PostType = {
-  _id: string;
-  title: string;
-  slug: string;
-}
-
-type Inbox = {
-  _id: string;
-  post: PostType;
-  author: Author;
-  content: string;
-  parentComment: string | null;
-  hasReplied: boolean;
-  postAuthor: Author;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const CommentsPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'pending', 'approved', 'spam'
-  const [replyingTo, setReplyingTo] = useState(null); // ID of comment being replied to
+  const [replyingTo, setReplyingTo] = useState<string | null>(null); // ID of comment being replied to
   const [replyText, setReplyText] = useState('');
   
   const [loading, setLoading] = useState(false);
   
-  const [inbox, setInbox] = useState<Inbox[]>([]);
+  const [inbox, setInbox] = useState<InboxComment[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   
@@ -58,7 +36,7 @@ const CommentsPage = () => {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
-  const handleReplyClick = (id) => {
+  const handleReplyClick = (id: string) => {
     if (replyingTo === id) {
       setReplyingTo(null); // Close if already open
     } else {
@@ -67,14 +45,16 @@ const CommentsPage = () => {
     }
   };
   
-  const handleSendReply = async (comment: Inbox, parentComment: string | null, content: string) => {
+  const handleSendReply = async (comment: InboxComment, parentComment: string | null, content: string) => {
     try {
       const post = comment.post;
-      const response = await axiosInstance.post(API_PATHS.COMMENTS.ADD_COMMENT(comment.post._id), {
+      await axiosInstance.post(API_PATHS.COMMENTS.ADD_COMMENT(comment.post._id), {
         content, post , parentComment,
       }, {
         withCredentials: true,
       });
+      setReplyingTo(null);
+      setReplyText("");
     } catch (error) {
       alert("Failed to comment!");
     }
@@ -96,7 +76,7 @@ const CommentsPage = () => {
     } catch (error){
       console.log("Error fetching the comments: ", error);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   }
 
@@ -193,7 +173,7 @@ const CommentsPage = () => {
                           <img src={comment.author?.profilePic || "https://api.dicebear.com/7.x/avataaars/svg?seed=Unknown"} alt="avatar" className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 object-cover" />
                           <div>
                             <div className="font-medium font-primary text-xl text-zinc-900 dark:text-zinc-200">{comment.author?.name}</div>
-                            <div className="text-sm text-zinc-500 mt-0.5">{comment.updatedAt}</div>
+                            <div className="text-sm text-zinc-500 mt-0.5">{formatDate(comment.updatedAt)}</div>
                           </div>
                         </div>
                       </td>
@@ -247,7 +227,7 @@ const CommentsPage = () => {
                     {/* Inline Reply Box */}
                     {replyingTo === comment._id && (
                         <tr className="bg-zinc-50 dark:bg-zinc-800/30 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <td colSpan="4" className="p-4 pl-16 pr-6 border-b border-zinc-200 dark:border-zinc-800">
+                            <td colSpan={4} className="p-4 pl-16 pr-6 border-b border-zinc-200 dark:border-zinc-800">
                                 <div className="flex gap-4 my-2">
                                     <div className="h-full flex flex-col items-center">
                                         <div className="w-0.5 h-full bg-zinc-200 dark:bg-zinc-700"></div>
@@ -288,7 +268,7 @@ const CommentsPage = () => {
                 {/* Empty State */}
                 {inbox.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="py-12 text-xl font-primary text-center text-zinc-500 dark:text-zinc-400">
+                    <td colSpan={4} className="py-12 text-xl font-primary text-center text-zinc-500 dark:text-zinc-400">
                         <MessageSquare size={32} className="mx-auto mb-3 opacity-20" />
                         No unreplied comments.
                     </td>

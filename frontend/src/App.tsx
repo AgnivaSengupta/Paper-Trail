@@ -20,10 +20,10 @@ function App() {
     root.classList.add(theme);
   }, [theme]);
 
-  const { setUser } = useAuthStore();
+  const { refreshUser } = useAuthStore();
   useEffect(() => {
-    setUser()
-  }, [setUser]);
+    void refreshUser()
+  }, [refreshUser]);
   
   return (
     <div className="text-5xl t">

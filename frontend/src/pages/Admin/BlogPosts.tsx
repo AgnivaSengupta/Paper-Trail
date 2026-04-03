@@ -27,26 +27,12 @@ import {
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import formatDate from "@/utils/dateFormatter";
+import type { Post } from "@/types/domain";
 
 export type Author = {
   name: string;
   profilePic: string;
-};
-
-export type Post = {
-  _id: string;
-  title: string;
-  slug: string;
-  content: string;
-  coverImageUrl?: string | null;
-  tags: string[];
-  author: Author;
-  isDraft: boolean;
-  views: number;
-  likes: number;
-  generatedByAi: boolean;
-  createdAt: string;
-  updatedAt: string;
 };
 
 const BlogPosts = () => {
@@ -191,7 +177,7 @@ const BlogPosts = () => {
                     alt="@shadcn"
                     className='object-cover'
                   />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback>{user?.name[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
               </div>
             </div>
@@ -218,9 +204,6 @@ const BlogPosts = () => {
               ))}
             </div>
 
-            {/*<button className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 px-3 py-2 rounded-lg border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 transition-colors">
-              <Filter size={14} /> Filter View
-            </button>*/}
           </div>
 
           {/* Table Container */}
@@ -342,7 +325,7 @@ const BlogPosts = () => {
                         <td className="py-6 px-6">
                           <div className="flex items-center gap-2 text-base text-zinc-500 dark:text-zinc-400">
                             <Calendar size={14} />
-                            <span>{post.updatedAt}</span>
+                            <span>{formatDate(post.updatedAt)}</span>
                           </div>
                         </td>
 

@@ -15,7 +15,7 @@ export const uploadImageToR2 = async (
       signal,
     });
 
-    const { uploadUrl, key, publicUrl } = data;
+    const { uploadUrl, publicUrl } = data;
 
     console.log("Public URL: ", publicUrl);
     
