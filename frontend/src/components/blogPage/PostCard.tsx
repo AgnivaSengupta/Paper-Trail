@@ -2,6 +2,7 @@ import type { Post } from "@/types/domain";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import formatDate from "@/utils/dateFormatter";
 
 interface PostCardProps {
   post: Post;
@@ -52,7 +53,7 @@ const PostCard = ({ post, index = 0 }: PostCardProps) => {
             <div className="font-mono text-xs text-muted-foreground">
               <span className="font-sketch text-base text-foreground">{post.author.name}</span>
               <span className="mx-2">•</span>
-              <span>{post.updatedAt}</span>
+              <span>{formatDate(post.updatedAt) }</span>
             </div>
             <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
           </div>

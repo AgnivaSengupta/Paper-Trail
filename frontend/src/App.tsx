@@ -8,8 +8,9 @@ import ProtectedRoute from './components/layouts/ProtectedRoute';
 import LandingPage from './pages/Blog/LandingPage';
 import EditorPage from './pages/Admin/EditorPage';
 import CommentsPage from './pages/Admin/CommentsPage';
-import BlogPage2 from './pages/Blog/BlogPage2';
+import BlogPage from './pages/Blog/BlogPage';
 import Profile2 from './pages/Admin/Profile2';
+
 
 function App() {
 
@@ -32,7 +33,7 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<LandingPage/>}/>
-          <Route path='/:slug' element={<BlogPage2/>}/>
+          <Route path='/:slug' element={<BlogPage/>}/>
           
           {/* Admin routes */}
           <Route element={<ProtectedRoute/>}>

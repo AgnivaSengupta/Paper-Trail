@@ -8,8 +8,23 @@ import MediaAsset from "../models/MediaAsset";
 // admin only
 const createPost = async (req: Request, res: Response) => {
   try {
+    // console.log(req.body);
     const { title, content, coverImageUrl, tags, isDraft } = req.body;
     const user = req.user;
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const monthlyPostCount = await BlogPost.countDocuments({
+      author: user?.id,
+      createdAt: { $gte: startOfMonth },
+    });
+
+    if (monthlyPostCount >= 10) {
+      return res.status(403).json({
+        msg: "You have reached your monthly limit of 10 blog posts",
+      });
+    }
     const slug = title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "") // remove non-word except spaces & hyphens
@@ -22,21 +37,22 @@ const createPost = async (req: Request, res: Response) => {
       content,
       coverImageUrl,
       tags,
-      author: user._id,
+      author: user?.id,
       isDraft,
     });
-    
+
     await newPost.save();
 
     const usedImageUrls = extractImages(content.json);
-    
-    if (usedImageUrls.length > 0){
+    usedImageUrls.push(coverImageUrl);
+
+    if (usedImageUrls.length > 0) {
       await MediaAsset.updateMany(
         { url: { $in: usedImageUrls } },
-        { $set: { status: 'active' } },
+        { $set: { status: "active" } },
       );
-    };
-    
+    }
+
     res.status(201).json(newPost);
   } catch (error) {
     console.log(error);
@@ -53,10 +69,7 @@ const updatePost = async (req: Request, res: Response) => {
     if (!post) {
       return res.status(404).json({ msg: "Post not found" });
     }
-    if (
-      post.author.toString() !== req.user._id.toString() &&
-      req.user.role != "admin"
-    ) {
+    if (post.author.toString() !== req.user?.id && req.user.role != "admin") {
       return res.status(403).json({ msg: "Not authorized to update the post" });
     }
 
@@ -74,6 +87,20 @@ const updatePost = async (req: Request, res: Response) => {
       updatedData,
       { new: true },
     );
+
+    if (updatedData.content?.json) {
+      const usedImageUrls = extractImages(updatedData.content.json);
+      if (updatedData.coverImageUrl) {
+        usedImageUrls.push(updatedData.coverImageUrl);
+      }
+      
+      if (usedImageUrls.length > 0) {
+        await MediaAsset.updateMany(
+          { url: { $in: usedImageUrls } },
+          { $set: { status: "active" } },
+        );
+      }
+    }
 
     res.json(updatedData);
   } catch (error) {
@@ -108,7 +135,7 @@ const getAllPosts = async (req: Request, res: Response) => {
   try {
     // console.log("1. Controller hit");
     // console.log("2. User is:", req.user);
-        
+
     const status = req.query.status || "published";
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 8;
@@ -127,8 +154,8 @@ const getAllPosts = async (req: Request, res: Response) => {
       .populate("author", "name profilePic")
       .sort({ updatedAt: -1 })
       .skip(skip)
-      .limit(limit)
-      // .lean();
+      .limit(limit);
+    // .lean();
 
     // Count totals for pagination and tab counts
     const [totalCount, allCount, publishedCount, draftCount] =
@@ -159,31 +186,31 @@ const getAllPosts = async (req: Request, res: Response) => {
 // get posts written by user
 // @route GET/api/post
 // private
-const getAllPostsByUser = async (req:Request, res:Response) => {
-  try{
+const getAllPostsByUser = async (req: Request, res: Response) => {
+  try {
     const user = req.user;
-    
-    const status = req.query.status || 'published';
+
+    const status = req.query.status || "published";
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 8;
     const skip = (page - 1) * limit;
-    
-    let filter: {author: string, isDraft?: boolean} = {
-      author: user._id
-    }
-    
-    if (status === 'published'){
+
+    let filter: { author: string; isDraft?: boolean } = {
+      author: user.id,
+    };
+
+    if (status === "published") {
       filter.isDraft = false;
-    } else if (status === 'draft'){
+    } else if (status === "draft") {
       filter.isDraft = true;
     }
-    
+
     const posts = await BlogPost.find(filter)
       .populate("author", "name profilePic")
-      .sort({updatedAt: -1})
+      .sort({ updatedAt: -1 })
       .skip(skip)
-      .limit(limit)
-    
+      .limit(limit);
+
     // Count totals for pagination and tab counts
     const [totalCount, allCount, publishedCount, draftCount] =
       await Promise.all([
@@ -205,11 +232,12 @@ const getAllPostsByUser = async (req:Request, res:Response) => {
         draft: draftCount,
       },
     });
-    
-  } catch (error){
-    res.status(500).json({ msg: "Server error while fetching the posts.", error });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: "Server error while fetching the posts.", error });
   }
-}
+};
 
 // get posts by slug
 // @route GET/api/posts/slugs/:slug
@@ -293,7 +321,7 @@ const getLatestPosts = async (req: Request, res: Response) => {
       .sort({ updatedAt: -1 })
       .limit(8);
 
-    res.json({posts});
+    res.json({ posts });
   } catch (error) {
     res.status(500).json({ msg: "server error", error });
   }

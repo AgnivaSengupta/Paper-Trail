@@ -34,6 +34,7 @@ import { Label } from "../ui/label";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import { useAuthStore } from "@/store/useAuthStore";
+import UsageBar from "./Usagebar";
 
 interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
   icon: LucideIcon;
@@ -102,6 +103,8 @@ const Sidebar = ({
   const sidebaeItemRef = useRef<HTMLDivElement | null>(null);
 
   const [supportText, setSupportText] = useState("");
+  const [postUsed, setPostUsed] = useState(0);
+  const [postLimit, setPostLimit] = useState(10);
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
@@ -116,13 +119,30 @@ const Sidebar = ({
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
+  
+  useEffect(() => {
+    const fetchUsage = async () => {
+      const response = await axiosInstance.get(API_PATHS.AUTH.GET_USAGE, {
+        withCredentials: true,
+      });
+      
+      const postUsed = response.data.postUsed;
+      const postLimit = response.data.postLimit;
+      
+      setPostUsed(postUsed);
+      setPostLimit(postLimit);
+    };
+    
+    fetchUsage();
+  }, []);
 
   const handleLogOut = async () => {
     try {
-      await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {}, {
-        withCredentials: true,
-      });
+      // await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {}, {
+      //   withCredentials: true,
+      // });
       logout();
+      navigate('/');
     } catch (error) {
       console.log("Error while logging out.", error);
     }
@@ -217,6 +237,15 @@ const Sidebar = ({
               <h4>Settings</h4>
             </div>
             <div className="flex flex-col gap-1">
+              
+              <div className="p-2 text-sm">
+                <p className="mb-1">Your Usage</p>
+                <div className="px-2">
+                  <UsageBar postUsed={postUsed} postLimit={postLimit}/>
+                </div>
+              </div>
+              <Separator className="my-1"/>
+              
               <div className="group">
                 <div
                   onClick={() => toggleTheme()}
@@ -226,7 +255,7 @@ const Sidebar = ({
                   <p className="text-sm tracking-wider">Change Theme</p>
                 </div>
               </div>
-              <Separator />
+              {/*<Separator />*/}
               <div className="group" onClick={() => void handleLogOut()}>
                 <div className="p-2 flex gap-3 item-center rounded-sm  group-hover:bg-red-200/30 cursor-pointer">
                   <Avatar className="size-6">

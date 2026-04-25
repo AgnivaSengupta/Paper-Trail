@@ -6,21 +6,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, User } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-// import DOMPurify from "dompurify";
 import TiptapRenderer from "@/components/blogPage/TiptapRenderer";
 import { buildTrees, type IComment } from "@/utils/treeBuilder";
 import { Textarea } from "@/components/ui/textarea";
-// import { Button } from "@/components/ui/button";
 import Comment from "@/components/blogPage/Comment";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { ScrollTracker } from "@/components/analytics/ScrollTracker";
 import { useAuthStore } from "@/store/useAuthStore";
-// import ShareCard from "@/components/ShareCard";
 import ShareButtons from "@/components/blogPage/ShareButtons";
 import type { Post } from "@/types/domain";
 import formatDate from "@/utils/dateFormatter";
+import SkeletonLoader from "@/components/blogPage/SkeletonLoader";
 
-const BlogPage2 = () => {
+const BlogPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [blogLoading, setBlogLoading] = useState<boolean>(true);
   const [blogError, setBlogError] = useState<null | string>(null);
@@ -28,12 +26,9 @@ const BlogPage2 = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [rootComment, setRootComment] = useState("");
   const { slug } = useParams();
-  const {user} = useAuthStore();
-
-  // const { json } = useEditorStore();
+  const {user, setAuthFormOpen} = useAuthStore();
 
   const { trackEvents } = useAnalytics(post?._id, user?._id, post?.author?._id);
-  // useActiveTimer(trackEvents, post?._id);
 
   useEffect(() => {
     if (post?._id) {
@@ -104,15 +99,17 @@ const BlogPage2 = () => {
 
     setComments((prev) => [...prev, response.data]);
     } catch (error) {
-      console.log("Error: ", error);
-      alert("Failed to add comment");
+      // console.log("Error: ", error);
+      // alert("Failed to add comment");
+      setAuthFormOpen(true);
     }
   }
 
   if (blogLoading)
     return (
       <div className="min-h-screen flex items-center justify-center">
-        Loading...
+        {/*Loading...*/}
+        <SkeletonLoader/>
       </div>
     );
   if (blogError)
@@ -273,4 +270,4 @@ const BlogPage2 = () => {
   );
 };
 
-export default BlogPage2;
+export default BlogPage;

@@ -84,7 +84,7 @@ const addComment = async (req: Request, res: Response) => {
 
     const comment = await Comment.create({
       post: postId,
-      author: req.user._id,
+      author: req.user?.id,
       content,
       parentComment: parentComment || null,
     });
@@ -188,7 +188,7 @@ const getAllComments = async (req: Request, res: Response) => {
       postAuthor: string,
       parentComment: null,
     } = {
-      postAuthor: req.user._id,
+      postAuthor: req.user?.id,
       parentComment: null,
     }
     

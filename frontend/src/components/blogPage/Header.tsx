@@ -14,7 +14,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   
-  const { user, setUser, refreshUser } = useAuthStore();
+  const { user, setUser, refreshUser, logout } = useAuthStore();
   const { setAuthFormOpen } = useAuthStore();
 
   useEffect(() => {
@@ -52,11 +52,7 @@ const Header = () => {
 
   const handleLogOut = async () => {
     try {
-      const response = await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {
-        withCredentials: true,
-      })
-      console.log(response);
-      setUser(null);
+      logout();
     } catch (error) {
       console.log("Error while logging out..")
     }
@@ -111,7 +107,7 @@ const Header = () => {
           {user ? (
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Avatar>
+                    <Avatar className="cursor-pointer">
                       <AvatarImage src={ user.profilePic ?? undefined } alt='User Image' className="cursor-pointer"/>
                       <AvatarFallback>
                         <User/>

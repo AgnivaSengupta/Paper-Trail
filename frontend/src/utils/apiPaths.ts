@@ -1,14 +1,12 @@
-export const BASE_URL = "http://localhost:8000"
+// In local dev, use "" so requests go to the same origin (Vite proxies /api → localhost:8000).
+// In production, set VITE_API_BASE_URL to your deployed backend URL.
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/"
 
 export const API_PATHS = {
     AUTH: {
-        REGISTER: "api/auth/register",
-        LOGIN: "api/auth/login",
-        GOOGLE_LOGIN: "api/auth/google",
-        GET_PROFILE: "api/auth/profile",
-        LOGOUT: "api/auth/logout",
-        VERIFY: "api/auth/verify",
-        UPDATE: "api/auth/profile"
+        GET_USAGE: "api/user/get-usage",
+        GET_PROFILE: "api/user/profile",
+        UPDATE: "api/user/profile"
     },
     POST: {
         CREATE_POST: "api/post", // post req
@@ -33,6 +31,6 @@ export const API_PATHS = {
         DELETE_COMMENT: (commentId: string) => `api/comments/${commentId}`
     },
     UPLOAD: {
-      GET_URL: "api/get-upload-url",
+        GET_URL: "api/get-upload-url",
     }
 }

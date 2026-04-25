@@ -9,6 +9,8 @@ import { otpEmail } from "../utils/email";
 import crypto from "crypto";
 
 import { OAuth2Client } from "google-auth-library";
+import MediaAsset from "../models/MediaAsset";
+import BlogPost from "../models/BlogPost";
 // import crypto from crypto;
 
 const secret = process.env.JWT_SECRET;
@@ -148,7 +150,22 @@ const verifyEmail = async (req: Request, res: Response) => {
 
 const googleLogin = async (req: Request, res: Response) => {
   try {
-    const { code } = req.body;
+    console.log("google route hit", {
+      method: req.method,
+      contentType: req.headers["content-type"],
+      body: req.body,
+      rawBodyType: typeof req.body,
+      origin: req.headers.origin,
+      referer: req.headers.referer,
+    });
+    const code = req.body?.code;
+    if (!code) {
+      console.error("Google Auth Error: missing auth code", {
+        contentType: req.headers["content-type"],
+        origin: req.headers.origin,
+      });
+      return res.status(400).json({ msg: "Google auth code is required" });
+    }
     const client = getGoogleClient();
     if (!client) {
       return res.status(500).json({ msg: "OAuth not configured" });
@@ -253,7 +270,7 @@ const loginUser = async (req: Request, res: Response) => {
 
 const getUserProfile = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user?.id).select("-password");
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
@@ -293,7 +310,8 @@ const logOut = async (req: Request, res: Response) => {
 
 const updateProfile = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user?.id;
+    // console.log(req.body);
     const {
       name,
       title,
@@ -315,13 +333,18 @@ const updateProfile = async (req: Request, res: Response) => {
     };
 
     const updatedUser = await User.findByIdAndUpdate(
-      userId._id,
+      userId,
       { $set: updatedData },
       {
         new: true,
         runValidators: true,
       },
     );
+    
+    await MediaAsset.updateOne(
+      { url: picture },
+      { $set: {status: "active"} }
+    )
 
     res.status(200).json({ msg: "User Updated" });
     return updatedUser;
@@ -333,6 +356,26 @@ const updateProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
+const getUsage = async (req: Request, res: Response) => {
+  try {
+    const userId = req?.user.id;
+    console.log(req.user);
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const maxPost = 10;
+    const monthlyPostCount = await BlogPost.countDocuments({
+      author: userId,
+      createdAt: { $gte: startOfMonth },
+    });
+    
+    return res.status(200).json({ msg: "OK", postUsed: monthlyPostCount, postLimit: maxPost });
+  } catch (error) {
+    return res.status(500).json({
+      msg: "Failed to get usage",
+    })
+  }
+}
 export {
   registerUser,
   verifyEmail,
@@ -341,4 +384,5 @@ export {
   logOut,
   updateProfile,
   googleLogin,
+  getUsage,
 };

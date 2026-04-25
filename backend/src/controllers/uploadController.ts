@@ -27,7 +27,7 @@ const upload = async (req: Request, res: Response) => {
     await MediaAsset.create({
       url: publicUrl,
       key: key,
-      userId: req.user._id,
+      userId: req.user?.id,
       status: 'pending',
     })
 

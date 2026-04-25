@@ -77,7 +77,7 @@ const Hero = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="font-primary text-5xl sm:text-6xl md:text-7xl lg:text-9xl  leading-tight  mb-8"
+          className="font-primary text-5xl sm:text-6xl md:text-7xl lg:text-8xl  leading-tight mb-8"
         >
           <motion.span variants={itemVariants}
             className={`block `}

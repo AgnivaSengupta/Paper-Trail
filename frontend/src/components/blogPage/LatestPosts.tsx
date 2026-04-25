@@ -13,6 +13,7 @@ import {
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import type { Post } from "@/types/domain";
+import { Loader, Loader2 } from "lucide-react";
 
 // interface Post {
 //   id: string;
@@ -27,14 +28,8 @@ import type { Post } from "@/types/domain";
 
 const LatestPosts = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  //const [currPage, setCurrPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
-  //const totalPages = Math.ceil(mockPosts.length / POSTS_PER_PAGE);
-  // const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  // const endIndex = startIndex + POSTS_PER_PAGE;
-  // const currentPosts = mockPosts.slice(startIndex, endIndex);
-
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -44,7 +39,7 @@ const LatestPosts = () => {
   };
   
   const [posts, setPosts] = useState<Post[]>([]);
-  const [, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const fetchPosts = async (pageNumber: number) => {
     try {
@@ -53,7 +48,7 @@ const LatestPosts = () => {
         params: {
           status: 'published',
           page: pageNumber,
-          limit: 5,
+          limit: 6,
         },
       });
       
@@ -102,11 +97,18 @@ const LatestPosts = () => {
         </AnimatedSection>
 
         {/* Posts grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {posts.map((post, index) => (
-            <PostCard key={post._id} post={post} index={index}/>
-          ))}
-        </div>
+        {loading ? (
+          <div className="w-full h-80 flex justify-center items-center">
+            <Loader2 className="animate-spin"/>
+          </div>
+        ): (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {posts.map((post, index) => (
+              <PostCard key={post._id} post={post} index={index}/>
+            ))}
+          </div>
+        )}
+
 
         {/* Pagination */}
         <AnimatedSection className="flex flex-col items-center gap-4">

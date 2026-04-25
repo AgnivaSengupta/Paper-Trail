@@ -35,8 +35,8 @@ analyticsClient.GetAuthorStats(payload, (err, response) => {
 // @route POST/api/dashboard-summary
 const getDashboardSummary = async (req: Request, res: Response) => {
     try {
-        console.log('🔍 Dashboard request - User ID:', req.user?._id, 'Range:', req.query.range);
-        const userId = req.user._id;
+        console.log('🔍 Dashboard request - User ID:', req.user?.id, 'Range:', req.query.range);
+        const userId = req.user?.id;
         const range = (req.query.range as string) || '24h';
         console.log('📊 Fetching analytics for user:', userId, 'range:', range);
         const [
@@ -53,9 +53,9 @@ const getDashboardSummary = async (req: Request, res: Response) => {
         ])
         // const [totalPosts, drafts, published] = 
         //     await Promise.all([
-        //         BlogPost.countDocuments({author: req.user._id}),
-        //         BlogPost.countDocuments({author: req.user._id, isDraft: true}),
-        //         BlogPost.countDocuments({ author: req.user._id, isDraft: false}),
+        //         BlogPost.countDocuments({author: req.user?.id}),
+        //         BlogPost.countDocuments({author: req.user?.id, isDraft: true}),
+        //         BlogPost.countDocuments({ author: req.user?.id, isDraft: false}),
         //         // Comment.countDocuments(),
         //     ]);
 

@@ -1,57 +1,32 @@
-import jwt from "jsonwebtoken";
-import User from "../models/User";
 import type { Request, Response, NextFunction } from "express";
-import { Document, Types } from "mongoose";
+import { auth, getSession } from "../lib/auth";
 
-interface JwtPayload {
-  id: string;
-//  iat?: number; // issued at timestamp
-  // exp?: number; // expiration timestamp
-}
-
-interface IUser extends Document {
-  _id: Types.ObjectId;
-  name: string;
-  email: string;
-  profilePic?: string | null;
-  bio?: string;
-  location?: string;
-  title?: string;
-  socials?: string;
-  skills: string[];
-  isVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+declare global {
+  namespace Express {
+    interface Request{
+      user?: typeof auth.$Infer.Session.user; 
+      session?: typeof auth.$Infer.Session.session;
+    }
+  }
 }
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let token = req.cookies.token;
-
-    if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized, invalid token format" });
+    const sessionContext = await getSession(req);
+    
+    if (!sessionContext) {
+      return res.status(401).json({message: "Not authorized"})
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    // req.user = ...: The entire result of the database query—the user document (without the password)—is assigned to a new property on the request object called user.
-    // This makes the user's information accessible in all subsequent middleware and route handlers in the request-response cycle.
-    const user = (await User.findById(decoded.id).select("-password")) as IUser;
-    //console.log(req.user)
-
-    if (!user) {
-      return res.status(401).json({ msg: "User not found" });
-    }
-
-    req.user = user;
-    // console.log("token", token);
-    // console.log("Cookie- ", req.cookies.token);
-    next();
+    
+    req.user = sessionContext.user;
+    req.session = sessionContext.session;
+    next(); // ← was missing — without this, the request hangs
   } catch (error) {
-    console.error("Auth Middleware Error:", error);
-    return res.status(401).json({ msg: "Not authorized, invalid token" });
+      console.error("Auth Middleware Error:", error);
+      // Better Auth handles standard auth failures by returning null above. 
+      // If it hits this catch block, it's likely a DB connection issue or server error.
+      return res.status(500).json({ message: "Internal server error during authentication" });
   }
-};
+}
 
 export default protect;
