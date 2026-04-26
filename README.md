@@ -2,17 +2,7 @@
 
 A full-stack blogging platform with a rich text editor, author dashboard, comments, and cloud media management.
 
-## Screenshots
-
-_Include your application screenshots here to demonstrate the UI/UX._
-
-| Feature   | Preview                                                                     |
-| --------- | --------------------------------------------------------------------------- |
-| Dashboard | ![Dashboard](https://via.placeholder.com/800x450?text=Dashboard+Screenshot) |
-| Editor    | ![Editor](https://via.placeholder.com/800x450?text=Editor+Screenshot)       |
-| Blog Page | ![Blog](https://via.placeholder.com/800x450?text=Blog+Screenshot)           |
-
----
+![Mockup](assets/mockup.png)
 
 ## Architecture
 
