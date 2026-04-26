@@ -263,7 +263,7 @@ const Dashboard = () => {
                     </td>
                   </tr>
                 ) : (
-                  data?.topPosts.map((post, index) => (
+                  data?.topPosts?.map((post, index) => (
                     <tr
                       key={post._id}
                       className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"

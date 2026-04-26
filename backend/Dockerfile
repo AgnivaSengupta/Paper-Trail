@@ -1,8 +1,7 @@
 # ==========================================
-# Stage 1: Base Builder
+# Stage 1: Base
 # ==========================================
 FROM node:20-alpine AS base
-# 1. OPTIMIZATION: Use Corepack instead of 'npm install -g' (Faster)
 RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 WORKDIR /app
 
@@ -11,24 +10,16 @@ WORKDIR /app
 # ==========================================
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
-
-# 2. OPTIMIZATION: Cache the pnpm store
-# This prevents re-downloading packages you've used before
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
 # ==========================================
-# Stage 3: Build Stage
+# Stage 3: Build
 # ==========================================
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# 3. OPTIMIZATION: Disable Telemetry & Update Notifiers during build
-ENV NEXT_TELEMETRY_DISABLED=1
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false
-
-# Run the build
 RUN pnpm run build
 
 # ==========================================
@@ -43,8 +34,6 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nodejs:nodejs /app/src/proto ./src/proto
-COPY --from=builder --chown=nodejs:nodejs /app/proto ./proto
 
 USER nodejs
 EXPOSE 8000

@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import {
   createPost,
   updatePost,
@@ -32,7 +32,7 @@ const adminOnly = (req: Request, res: Response, next: NextFunction) => {
 const viewLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 1,
-  keyGenerator: (req) => `view:${req.params.id}:${req.ip}`,
+  keyGenerator: (req) => `view:${req.params.id}:${ipKeyGenerator(req.ip ?? "")}`,
   message: { msg: "You already viewed this post recently" },
   standardHeaders: true,
   legacyHeaders: false,
@@ -42,7 +42,7 @@ const viewLimiter = rateLimit({
 const likeLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
   max: 1,
-  keyGenerator: (req) => `like:${req.params.id}:${req.ip}`,
+  keyGenerator: (req) => `like:${req.params.id}:${ipKeyGenerator(req.ip ?? "")}`,
   message: { msg: "You already liked this post recently" },
   standardHeaders: true,
   legacyHeaders: false,

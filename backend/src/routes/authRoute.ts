@@ -1,5 +1,5 @@
 import express, { Router} from 'express'
-import { getUserProfile, loginUser, registerUser, logOut, verifyEmail, updateProfile, googleLogin, getUsage } from '../controllers/authController'
+import { getUserProfile, updateProfile, getUsage } from '../controllers/authController'
 import protect from '../middleware/authMiddleware';
 
 const router: Router = express.Router();

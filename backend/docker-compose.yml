@@ -14,28 +14,21 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=8000
-      # 1. MongoDB Atlas Connection String (Replace with your actual URL)
       - MONGO_URL=${MONGO_URL}
-      
-      # 2. JWT Secret for auth
-      - JWT_SECRET=${JWT_SECRET}
-      
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL}
       - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
       - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
-      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
-      
-      # 3. Connection to Go Analytics Engine
-      # Since we join the external network below, we can reach the container by name 'server'
-      # 'server' is the service name in your Analytics docker-compose file
-      - ANALYTICS_GRPC_HOST=server:50051 
-      
+      - FRONTEND_URL=${FRONTEND_URL}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_DEVURL=${R2_DEVURL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     networks:
-      - analytics_net 
+      - app_network
 
-# Connect to the EXISTING network created by your Analytics Engine
 networks:
-  analytics_net:
-    external: true
-    # CRITICAL: Run 'docker network ls' to get the exact name. 
-    # It is usually "folderName_analytics_net".
-    name: analytics-engine_analytics_net
+  app_network:
+    driver: bridge
