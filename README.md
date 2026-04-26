@@ -4,13 +4,13 @@ A full-stack blogging platform with a rich text editor, author dashboard, commen
 
 ## Screenshots
 
-*Include your application screenshots here to demonstrate the UI/UX.*
+_Include your application screenshots here to demonstrate the UI/UX._
 
-| Feature | Preview |
-|---------|---------|
+| Feature   | Preview                                                                     |
+| --------- | --------------------------------------------------------------------------- |
 | Dashboard | ![Dashboard](https://via.placeholder.com/800x450?text=Dashboard+Screenshot) |
-| Editor | ![Editor](https://via.placeholder.com/800x450?text=Editor+Screenshot) |
-| Blog Page | ![Blog](https://via.placeholder.com/800x450?text=Blog+Screenshot) |
+| Editor    | ![Editor](https://via.placeholder.com/800x450?text=Editor+Screenshot)       |
+| Blog Page | ![Blog](https://via.placeholder.com/800x450?text=Blog+Screenshot)           |
 
 ---
 
@@ -26,12 +26,12 @@ The system is composed of two main services:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Frontend (React)                    │
-│     Vite · Tailwind CSS 4 · TipTap · Zustand · Axios   │
-└──────────────────────┬──────────────────────────────────┘
-                       │ REST
-┌──────────────────────▼──────────────────────────────────┐
-│                  Backend (Node.js / Express)             │
-│   Better Auth · Mongoose · node-cron · express-rate-limit│
+│     Vite · Tailwind CSS 4 · TipTap · Zustand · Axios    │
+└───────────────────────────┬─────────────────────────────┘
+                            │ REST
+┌───────────────────────────▼─────────────────────────────┐
+│                 Backend (Node.js / Express)             │
+│  Better Auth · Mongoose · node-cron · express-rate-limit│
 ├────────────────┬───────────────────┬────────────────────┤
 │   MongoDB      │  Cloudflare R2    │  (Analytics Engine │
 │  (Content &    │  (Media storage   │   — coming soon)   │
@@ -44,30 +44,32 @@ The system is composed of two main services:
 ## Tech Stack
 
 ### Frontend
-| Category | Technology |
-|----------|-----------|
-| Framework | React 19 + Vite |
-| Styling | Tailwind CSS 4, Framer Motion |
-| State Management | Zustand |
-| Rich Text Editor | TipTap 3 (headings, lists, code blocks, images, links, highlights) |
-| Forms & Validation | React Hook Form + Zod |
-| HTTP Client | Axios |
-| Auth (client) | Better Auth client + `@react-oauth/google` |
-| Charts | Recharts |
-| Notifications | React Hot Toast |
-| UI Primitives | Radix UI |
+
+| Category           | Technology                                                         |
+| ------------------ | ------------------------------------------------------------------ |
+| Framework          | React 19 + Vite                                                    |
+| Styling            | Tailwind CSS 4, Framer Motion                                      |
+| State Management   | Zustand                                                            |
+| Rich Text Editor   | TipTap 3 (headings, lists, code blocks, images, links, highlights) |
+| Forms & Validation | React Hook Form + Zod                                              |
+| HTTP Client        | Axios                                                              |
+| Auth (client)      | Better Auth client + `@react-oauth/google`                         |
+| Charts             | Recharts                                                           |
+| Notifications      | React Hot Toast                                                    |
+| UI Primitives      | Radix UI                                                           |
 
 ### Backend
-| Category | Technology |
-|----------|-----------|
-| Runtime | Node.js + Express 5 |
-| Language | TypeScript |
-| Database | MongoDB via Mongoose |
-| Authentication | Better Auth (email/password + Google OAuth) |
-| Media Storage | Cloudflare R2 (AWS S3 SDK compatible) |
-| Rate Limiting | `express-rate-limit` |
+
+| Category       | Technology                                   |
+| -------------- | -------------------------------------------- |
+| Runtime        | Node.js + Express 5                          |
+| Language       | TypeScript                                   |
+| Database       | MongoDB via Mongoose                         |
+| Authentication | Better Auth (email/password + Google OAuth)  |
+| Media Storage  | Cloudflare R2 (AWS S3 SDK compatible)        |
+| Rate Limiting  | `express-rate-limit`                         |
 | Scheduled Jobs | `node-cron` (nightly orphaned media cleanup) |
-| Email | Resend |
+| Email          | Resend                                       |
 
 ---
 
@@ -116,40 +118,45 @@ The system is composed of two main services:
 ## API Endpoints
 
 ### Posts — `/api/post`
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/` | Public | List posts (supports `?status=published\|draft\|all&page=&limit=`) |
-| `GET` | `/slugs/:slug` | Public | Get a single post by slug |
-| `GET` | `/tag/:tag` | Public | Get posts by tag |
-| `GET` | `/search?q=` | Public | Search posts (title + content) |
-| `GET` | `/latest` | Public | Get the 8 most recent published posts |
-| `GET` | `/byuser` | 🔒 | Get posts by the authenticated user |
-| `POST` | `/` | 🔒 | Create a new post |
-| `PUT` | `/:id` | 🔒 | Update a post (whitelisted fields only) |
-| `DELETE` | `/:id` | 🔒 | Delete a post (cascades to comments) |
-| `POST` | `/:id/view` | Public (rate-limited) | Increment view count (1/hr per IP) |
-| `POST` | `/:id/like` | Public (rate-limited) | Increment like count (1/day per IP) |
+
+| Method   | Path           | Auth                  | Description                                                        |
+| -------- | -------------- | --------------------- | ------------------------------------------------------------------ |
+| `GET`    | `/`            | Public                | List posts (supports `?status=published\|draft\|all&page=&limit=`) |
+| `GET`    | `/slugs/:slug` | Public                | Get a single post by slug                                          |
+| `GET`    | `/tag/:tag`    | Public                | Get posts by tag                                                   |
+| `GET`    | `/search?q=`   | Public                | Search posts (title + content)                                     |
+| `GET`    | `/latest`      | Public                | Get the 8 most recent published posts                              |
+| `GET`    | `/byuser`      | 🔒                    | Get posts by the authenticated user                                |
+| `POST`   | `/`            | 🔒                    | Create a new post                                                  |
+| `PUT`    | `/:id`         | 🔒                    | Update a post (whitelisted fields only)                            |
+| `DELETE` | `/:id`         | 🔒                    | Delete a post (cascades to comments)                               |
+| `POST`   | `/:id/view`    | Public (rate-limited) | Increment view count (1/hr per IP)                                 |
+| `POST`   | `/:id/like`    | Public (rate-limited) | Increment like count (1/day per IP)                                |
 
 ### Comments — `/api/comments`
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/:postId` | Public | Get threaded comments for a post |
-| `POST` | `/:postId` | 🔒 | Add a comment or reply to a post |
-| `DELETE` | `/:commentId` | 🔒 | Delete a comment and all its descendants |
-| `GET` | `/` | 🔒 | Get paginated author inbox (top-level comments on own posts) |
+
+| Method   | Path          | Auth   | Description                                                  |
+| -------- | ------------- | ------ | ------------------------------------------------------------ |
+| `GET`    | `/:postId`    | Public | Get threaded comments for a post                             |
+| `POST`   | `/:postId`    | 🔒     | Add a comment or reply to a post                             |
+| `DELETE` | `/:commentId` | 🔒     | Delete a comment and all its descendants                     |
+| `GET`    | `/`           | 🔒     | Get paginated author inbox (top-level comments on own posts) |
 
 ### Dashboard — `/api/dashboard-summary`
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/` | 🔒 | Aggregate stats (post counts, recent posts) |
+
+| Method | Path | Auth | Description                                 |
+| ------ | ---- | ---- | ------------------------------------------- |
+| `GET`  | `/`  | 🔒   | Aggregate stats (post counts, recent posts) |
 
 ### Auth — `/api/auth/*`
+
 Handled entirely by **Better Auth** — provides email/password and Google OAuth flows, session management, and token refresh.
 
 ### Media — `/api`
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/upload` | 🔒 | Get a presigned R2 upload URL |
+
+| Method | Path      | Auth | Description                   |
+| ------ | --------- | ---- | ----------------------------- |
+| `POST` | `/upload` | 🔒   | Get a presigned R2 upload URL |
 
 ---
 
