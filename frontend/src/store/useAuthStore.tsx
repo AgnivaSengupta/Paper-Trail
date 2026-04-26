@@ -3,7 +3,7 @@ import {create} from 'zustand'
 // import { API_PATHS } from '@/utils/apiPaths';
 import type { AuthStoreState } from '@/types/auth';
 import type { User } from '@/types/domain';
-import { authClient, signOut, useSession } from '@/lib/auth-client';
+import { authClient, signOut } from '@/lib/auth-client';
 
 const normalizeUser = (user: any): User => ({
   _id: user.id ?? user._id ?? "",

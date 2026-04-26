@@ -46,7 +46,6 @@ const BlogPosts = () => {
   //const [status, setStatus] = useState<"all" | "published" | "draft">("all");
   const [totalPages, setTotalPages] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const [allPosts, setAllPosts] = useState(0);
   const [currPage, setCurrPage] = useState(1);
 
   const theme = useThemeStore((state) => state.theme);
@@ -76,7 +75,7 @@ const BlogPosts = () => {
       setPosts(posts);
       setTotalPages(totalPages);
       setTotalCount(totalCount);
-      setAllPosts(allCount);
+      void allCount;
     } catch (error) {
       console.log("Error fetching the posts:--> ", error);
       setPosts([]);

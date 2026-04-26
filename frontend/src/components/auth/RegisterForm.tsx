@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signUp } from "@/lib/auth-client";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface RegisterDialogProps {
@@ -25,7 +24,6 @@ const RegisterForm = ({
   onOpenChange,
   onSwitchToLogin,
 }: RegisterDialogProps) => {
-  const navigate = useNavigate();
   const { refreshUser } = useAuthStore();
   const [loading, setloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,8 +51,8 @@ const RegisterForm = ({
 
       await refreshUser();
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Something went wrong.");
       setloading(false);
       return;
     } finally {

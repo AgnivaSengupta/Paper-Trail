@@ -13,7 +13,7 @@ import {
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 import type { Post } from "@/types/domain";
-import { Loader, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 // interface Post {
 //   id: string;

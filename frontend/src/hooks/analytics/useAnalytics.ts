@@ -1,10 +1,7 @@
-// import { timeStamp } from 'console';
 import {useEffect, useRef, useCallback } from 'react';
 
 const FLUSH_INTERVAL = 5000;
 const HEARTBEAT_INTERVEL = 5000;
-// const endpoint = "http://localhost:8080/api/ingest"
-const endpoint = 'http://127.0.0.1:8080/api/ingest'
 
 export const useAnalytics = (postId: string | undefined, userId: string | undefined, authorId: string | undefined) => {
     const eventQueue = useRef<any[]>([]);
@@ -30,21 +27,8 @@ export const useAnalytics = (postId: string | undefined, userId: string | undefi
     const flushQueue = useCallback(() => {
         if (eventQueue.current.length === 0) return;
 
-        const dataToSend = [...eventQueue.current];
-        eventQueue.current = []
-        const body = JSON.stringify({events: dataToSend});
-
-        if (document.visibilityState === 'hidden'){
-            const blob = new Blob([body], {type: "application/json"});
-            navigator.sendBeacon(endpoint, blob);
-        } else {
-            fetch(endpoint, {
-                method: "POST",
-                headers: {'Content-Type': 'application/json'},
-                body: body,
-                keepalive: true,
-            }).catch(err => console.log('Analytics Flush error', err));
-        }
+        // Analytics transport is intentionally disabled until the engine is integrated.
+        eventQueue.current = [];
     }, []);
 
     // lifecycle management

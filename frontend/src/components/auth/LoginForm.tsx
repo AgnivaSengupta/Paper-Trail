@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface LoginDialogProps {
@@ -26,7 +25,6 @@ const LoginForm = ({
   onOpenChange,
   onSwitchToSignup,
 }: LoginDialogProps) => {
-  const navigate = useNavigate();
   const { refreshUser } = useAuthStore();
 
   const [loading, setloading] = useState(false);
@@ -63,7 +61,7 @@ const LoginForm = ({
       await refreshUser();
       // If no error thrown:
       onOpenChange(false);
-    } catch (err: any) {
+    } catch {
       setError("Invalid email or password");
     } finally {
       setloading(false);

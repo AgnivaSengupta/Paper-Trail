@@ -272,7 +272,6 @@ export function SimpleEditor({
         upload: uploadImageToR2,
         onError: (error) => console.error("Upload failed:", error),
       }),
-      // @ts-expect-error - version mismatch bypass
       BubbleMenuExtension,
       CustomCodeBlock,
     ],
@@ -300,9 +299,8 @@ export function SimpleEditor({
           <BubbleMenu
             editor={editor}
             shouldShow={({ editor }) => editor.isActive("codeBlock")}
-            tippyOptions={{
-              duration: 100,
-              offset: [0, 10],
+            options={{
+              offset: { mainAxis: 10 },
               placement: "top-start",
             }}
           >

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,14 +16,8 @@ import PostSettingsSidebar from "@/components/dashboard/PostSettingsSidebar";
 import { type JSONContent } from "@tiptap/react";
 import EditorHeader from "@/components/dashboard/EditorHeader";
 
-interface EditorContent {
-  html: string;
-  json: JSONContent | null;
-}
-
 const EditorPage = () => {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const setContent = useEditorStore((state) => state.setContent);
   const [postId, setPostId] = useState<string | null>(null);
   const [initialContent, setInitialContent] = useState<JSONContent | string | undefined>(undefined);
