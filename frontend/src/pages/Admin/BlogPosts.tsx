@@ -216,9 +216,9 @@ const BlogPosts = () => {
                     <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Status
                     </th>
-                    {/*<th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Engagement
-                    </th>*/}
+                    </th>
                     <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Date
                     </th>
@@ -287,7 +287,7 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Engagement (Likes/Views) */}
-                        {/*<td className="py-6 px-6">
+                        <td className="py-6 px-6">
                           <div className="flex items-center gap-4 text-base text-zinc-600 dark:text-zinc-400">
                             <div
                               className="flex items-center gap-1.5 min-w-[60px]"
@@ -318,7 +318,7 @@ const BlogPosts = () => {
                               <span>{post.views}</span>
                             </div>
                           </div>
-                        </td>*/}
+                        </td>
 
                         {/* Date */}
                         <td className="py-6 px-6">

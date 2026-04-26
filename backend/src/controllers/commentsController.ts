@@ -107,7 +107,8 @@ const getCommentsByPost = async (req: Request, res: Response) => {
 
     res.json(comments);
   } catch (error) {
-    res.status(500).json({ msg: "Failed to get comment for the post", error });
+    console.error("[getCommentsByPost] Error:", error);
+    res.status(500).json({ msg: "Failed to get comment for the post" });
   }
 };
 
@@ -126,11 +127,13 @@ const deleteComment = async (req: Request, res: Response) => {
 
     await Comment.deleteOne({ _id: commentId });
 
-    await Comment.deleteMany({ parentComment: commentId });
+    // Recursively delete ALL descendants that have this comment in their ancestors array
+    await Comment.deleteMany({ ancestors: commentId });
 
     res.json({ msg: "Comment deleted" });
   } catch (err) {
-    res.status(500).json({ msg: "Failed to delete comment", error: err });
+    console.error("[deleteComment] Error:", err);
+    res.status(500).json({ msg: "Failed to delete comment" });
   }
 };
 
@@ -166,7 +169,8 @@ const getAllComments = async (req: Request, res: Response) => {
     })
     
   } catch (error) {
-    res.status(500).json({ msg: "Failed to get all comments", error });
+    console.error("[getAllComments] Error:", error);
+    res.status(500).json({ msg: "Failed to get all comments" });
   }
 };
 

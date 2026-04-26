@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 import {
   createPost,
   updatePost,
@@ -27,6 +28,26 @@ const adminOnly = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// 1 view per IP per hour per post
+const viewLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 1,
+  keyGenerator: (req) => `view:${req.params.id}:${req.ip}`,
+  message: { msg: "You already viewed this post recently" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// 1 like per IP per day per post
+const likeLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
+  max: 1,
+  keyGenerator: (req) => `like:${req.params.id}:${req.ip}`,
+  message: { msg: "You already liked this post recently" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 router.post("/", protect, createPost);
 // router.post('/', createPost);
 router.get("/", getAllPosts);
@@ -36,8 +57,8 @@ router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.get("/tag/:tag", getPostByTag);
 router.get("/search", searchPosts);
-router.post("/:id/view", incrementView);
-router.post("/:id/like", likePost);
+router.post("/:id/view", viewLimiter, incrementView);
+router.post("/:id/like", likeLimiter, likePost);
 router.get("/latest", getLatestPosts);
 
 const blogPostRouter = router;

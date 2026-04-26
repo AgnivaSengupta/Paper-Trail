@@ -29,7 +29,22 @@ const Header = () => {
   }, []);
   
   useEffect(() => {
-    void refreshUser();
+    const fetchProfile = async () => {
+      try {
+        void refreshUser();
+
+        const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
+          withCredentials: true,
+        });
+
+        setUser(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        // Handle error (e.g., redirect to login)
+      }
+    };
+    
+    fetchProfile();
   }, [refreshUser]);
 
   const toggleDarkMode = () => {
@@ -108,7 +123,7 @@ const Header = () => {
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar className="cursor-pointer">
-                      <AvatarImage src={ user.profilePic ?? undefined } alt='User Image' className="cursor-pointer"/>
+                      <AvatarImage src={ user.profilePic ?? undefined } alt='User Image' className="cursor-pointer object-cover"/>
                       <AvatarFallback>
                         <User/>
                       </AvatarFallback>

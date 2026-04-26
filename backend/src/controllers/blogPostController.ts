@@ -1,8 +1,13 @@
 import BlogPost from "../models/BlogPost";
+import Comment from "../models/Comment";
 import type { Request, Response } from "express";
 import extractImages from "../utils/extractImages";
 import MediaAsset from "../models/MediaAsset";
 import { generateUniqueSlug } from "../utils/generateUniqueSlug";
+
+// Whitelist of fields that a user is allowed to update on a post
+const ALLOWED_UPDATE_FIELDS = ["title", "content", "coverImageUrl", "tags", "isDraft"] as const;
+type AllowedUpdateField = typeof ALLOWED_UPDATE_FIELDS[number];
 
 // create a new blog post
 // @route POST/api/post
@@ -52,8 +57,8 @@ const createPost = async (req: Request, res: Response) => {
 
     res.status(201).json(newPost);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Failed to create post", error });
+    console.error("[createPost] Error:", error);
+    res.status(500).json({ msg: "Failed to create post" });
   }
 };
 
@@ -78,23 +83,32 @@ const updatePost = async (req: Request, res: Response) => {
       }
     }
 
-    const updatedData = req.body;
+    // Only pick explicitly allowed fields to prevent mass assignment
+    const sanitizedData: Partial<Record<AllowedUpdateField, unknown>> = {};
+    for (const field of ALLOWED_UPDATE_FIELDS) {
+      if (field in req.body) {
+        sanitizedData[field] = req.body[field];
+      }
+    }
 
-    if (updatedData.title) {
-      updatedData.slug = await generateUniqueSlug(updatedData.title, req.params.id);
+    if (sanitizedData.title) {
+      (sanitizedData as Record<string, unknown>).slug = await generateUniqueSlug(
+        sanitizedData.title as string,
+        req.params.id,
+      );
     }
 
     const updatedPost = await BlogPost.findByIdAndUpdate(
       req.params.id,
-      updatedData,
+      sanitizedData,
       { new: true },
     );
 
     let usedImageUrls: string[] = [];
-    if (updatedData.content?.json) {
-      usedImageUrls = extractImages(updatedData.content.json);
-      if (updatedData.coverImageUrl) {
-        usedImageUrls.push(updatedData.coverImageUrl);
+    if ((sanitizedData.content as { json?: unknown })?.json) {
+      usedImageUrls = extractImages((sanitizedData.content as { json: unknown }).json);
+      if (sanitizedData.coverImageUrl) {
+        usedImageUrls.push(sanitizedData.coverImageUrl as string);
       }
 
       if (usedImageUrls.length > 0) {
@@ -114,9 +128,10 @@ const updatePost = async (req: Request, res: Response) => {
         { $set: { status: "pending" } },
       );
     }
-    
-    res.json(updatedData);
+
+    res.json(updatedPost);
   } catch (error) {
+    console.error("[updatePost] Error:", error);
     res.status(500).json({ msg: "Failed to update post" });
   }
 };
@@ -147,12 +162,14 @@ const deletePost = async (req: Request, res: Response) => {
       );
     }
 
+    // Cascade-delete all comments associated with this post
+    await Comment.deleteMany({ post: post._id });
+
     await post.deleteOne();
     res.status(200).json({ msg: "Post deleted" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Failed to delete post. Server error: ", error });
+    console.error("[deletePost] Error:", error);
+    res.status(500).json({ msg: "Failed to delete post" });
   }
 };
 
@@ -207,7 +224,8 @@ const getAllPosts = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ msg: "server error", error });
+    console.error("[getAllPosts] Error:", error);
+    res.status(500).json({ msg: "server error" });
   }
 };
 
@@ -261,9 +279,8 @@ const getAllPostsByUser = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Server error while fetching the posts.", error });
+    console.error("[getAllPostsByUser] Error:", error);
+    res.status(500).json({ msg: "Server error while fetching the posts." });
   }
 };
 
@@ -303,17 +320,25 @@ const getPostByTag = async (req: Request, res: Response) => {
 const searchPosts = async (req: Request, res: Response) => {
   try {
     const q = req.query.q;
+    if (!q || typeof q !== "string" || q.trim() === "") {
+      return res.status(400).json({ msg: "Search query is required" });
+    }
+
+    // Escape special regex characters to prevent ReDoS attacks
+    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const post = await BlogPost.find({
       isDraft: false,
       $or: [
-        { title: { $regex: q, $options: "i" } },
-        { content: { $regex: q, $options: "i" } },
+        { title: { $regex: escapedQ, $options: "i" } },
+        { "content.html": { $regex: escapedQ, $options: "i" } },
       ],
     }).populate("author", "name profilePic");
 
     res.json(post);
   } catch (error) {
-    res.status(500).json({ msg: "server error", error });
+    console.error("[searchPosts] Error:", error);
+    res.status(500).json({ msg: "server error" });
   }
 };
 
@@ -324,7 +349,8 @@ const incrementView = async (req: Request, res: Response) => {
     await BlogPost.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
     res.json({ msg: "View incremented" });
   } catch (error) {
-    res.status(500).json({ msg: "server error", error });
+    console.error("[controller] Error:", error);
+    res.status(500).json({ msg: "server error" });
   }
 };
 
@@ -335,7 +361,8 @@ const likePost = async (req: Request, res: Response) => {
     await BlogPost.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } });
     res.json({ msg: "Likes incremented" });
   } catch (error) {
-    res.status(500).json({ msg: "server error", error });
+    console.error("[controller] Error:", error);
+    res.status(500).json({ msg: "server error" });
   }
 };
 
@@ -351,7 +378,8 @@ const getLatestPosts = async (req: Request, res: Response) => {
 
     res.json({ posts });
   } catch (error) {
-    res.status(500).json({ msg: "server error", error });
+    console.error("[controller] Error:", error);
+    res.status(500).json({ msg: "server error" });
   }
 };
 

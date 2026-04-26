@@ -53,21 +53,6 @@ const Profile2 = () => {
       }
     };
     
-    // const fetchPosts = async () => {
-    //   try {
-    //     const response = await axiosInstance.get(
-    //       API_PATHS.POST.GET_ALL_POSTS_BY_USER,
-    //       {
-    //         params: {
-    //           status: "pubished",
-    //           page: pageNumber,
-    //           limit: 8,
-    //         },
-    //       },
-    //     );
-    //   }
-    // }
-
     // 2. Execute the function
     fetchProfile();
   }, [refreshUser]);
