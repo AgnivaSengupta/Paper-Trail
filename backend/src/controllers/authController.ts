@@ -39,234 +39,234 @@ const generateToken = (userId: Types.ObjectId) => {
   return jwt.sign({ id: userId }, jwtSecret, { expiresIn: "7d" });
 };
 
-const registerUser = async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body;
+// const registerUser = async (req: Request, res: Response) => {
+//   try {
+//     const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+//     const userExists = await User.findOne({ email });
 
-    if (userExists) {
-      return res.status(400).json({ msg: "User already exists" });
-    }
+//     if (userExists) {
+//       return res.status(400).json({ msg: "User already exists" });
+//     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // creating the user
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      isVerified: false,
-    });
+//     // creating the user
+//     const newUser = await User.create({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       isVerified: false,
+//     });
 
-    const otp = generateOTP();
-    newUser.verificationToken = hashOtp(otp);
-    newUser.verificationTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+//     const otp = generateOTP();
+//     newUser.verificationToken = hashOtp(otp);
+//     newUser.verificationTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    await newUser.save();
+//     await newUser.save();
 
-    // email verification
-    try {
-      // await mailTrapClient.send({
-      //   from: sender,
-      //   to: newUser.email,
-      //   subject: "Verify your email",
-      //   html: otpEmail.replace("{{OTP_CODE}}", otp),
-      //   category: "Email verification",
-      // });
+//     // email verification
+//     try {
+//       // await mailTrapClient.send({
+//       //   from: sender,
+//       //   to: newUser.email,
+//       //   subject: "Verify your email",
+//       //   html: otpEmail.replace("{{OTP_CODE}}", otp),
+//       //   category: "Email verification",
+//       // });
 
-      await sendTestEmail(otpEmail.replace("{{OTP_CODE}}", otp));
-    } catch (emailError) {
-      console.error("Email send failed:", emailError);
+//       await sendTestEmail(otpEmail.replace("{{OTP_CODE}}", otp));
+//     } catch (emailError) {
+//       console.error("Email send failed:", emailError);
 
-      return res.status(500).json({
-        msg: "Account created, but failed to send verification email. Please try again.",
-        userId: newUser._id,
-      });
-    }
+//       return res.status(500).json({
+//         msg: "Account created, but failed to send verification email. Please try again.",
+//         userId: newUser._id,
+//       });
+//     }
 
-    res.status(201).json({
-      msg: "Registration Successfull. Please verify your email.",
-      userId: newUser._id,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: "Server error" });
-  }
-};
+//     res.status(201).json({
+//       msg: "Registration Successfull. Please verify your email.",
+//       userId: newUser._id,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ msg: "Server error" });
+//   }
+// };
 
-const verifyEmail = async (req: Request, res: Response) => {
-  try {
-    const { userId, otp } = req.body;
+// const verifyEmail = async (req: Request, res: Response) => {
+//   try {
+//     const { userId, otp } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({ msg: "Invalid user" });
-    }
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(400).json({ msg: "Invalid user" });
+//     }
 
-    if (user.isVerified) {
-      return res.status(400).json({ msg: "Email already verified" });
-    }
+//     if (user.isVerified) {
+//       return res.status(400).json({ msg: "Email already verified" });
+//     }
 
-    if (!user.verificationToken || !user.verificationTokenExpiresAt) {
-      return res.status(400).json({ msg: "No verification in progress" });
-    }
+//     if (!user.verificationToken || !user.verificationTokenExpiresAt) {
+//       return res.status(400).json({ msg: "No verification in progress" });
+//     }
 
-    if (Date.now() > user.verificationTokenExpiresAt.getTime()) {
-      return res.status(400).json({ msg: "OTP expired" });
-    }
+//     if (Date.now() > user.verificationTokenExpiresAt.getTime()) {
+//       return res.status(400).json({ msg: "OTP expired" });
+//     }
 
-    if (hashOtp(otp) != user.verificationToken) {
-      return res.status(400).json({ msg: "Invalid OTP" });
-    }
+//     if (hashOtp(otp) != user.verificationToken) {
+//       return res.status(400).json({ msg: "Invalid OTP" });
+//     }
 
-    user.isVerified = true;
-    user.verificationToken = null;
-    user.verificationTokenExpiresAt = null;
-    user.lastLogin = new Date();
-    await user.save();
+//     user.isVerified = true;
+//     user.verificationToken = null;
+//     user.verificationTokenExpiresAt = null;
+//     user.lastLogin = new Date();
+//     await user.save();
 
-    const token = generateToken(user._id);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+//     const token = generateToken(user._id);
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//     });
 
-    res.status(200).json({
-      msg: "Email verified successfully",
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ msg: "Server Error" });
-  }
-};
+//     res.status(200).json({
+//       msg: "Email verified successfully",
+//       user: {
+//         _id: user._id,
+//         name: user.name,
+//         email: user.email,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({ msg: "Server Error" });
+//   }
+// };
 
-const googleLogin = async (req: Request, res: Response) => {
-  try {
-    console.log("google route hit", {
-      method: req.method,
-      contentType: req.headers["content-type"],
-      body: req.body,
-      rawBodyType: typeof req.body,
-      origin: req.headers.origin,
-      referer: req.headers.referer,
-    });
-    const code = req.body?.code;
-    if (!code) {
-      console.error("Google Auth Error: missing auth code", {
-        contentType: req.headers["content-type"],
-        origin: req.headers.origin,
-      });
-      return res.status(400).json({ msg: "Google auth code is required" });
-    }
-    const client = getGoogleClient();
-    if (!client) {
-      return res.status(500).json({ msg: "OAuth not configured" });
-    }
-    const { tokens } = await client.getToken(code);
-    const ticket = await client.verifyIdToken({
-      idToken: tokens.id_token!,
-      audience: oAuthclientID || "",
-    });
+// const googleLogin = async (req: Request, res: Response) => {
+//   try {
+//     console.log("google route hit", {
+//       method: req.method,
+//       contentType: req.headers["content-type"],
+//       body: req.body,
+//       rawBodyType: typeof req.body,
+//       origin: req.headers.origin,
+//       referer: req.headers.referer,
+//     });
+//     const code = req.body?.code;
+//     if (!code) {
+//       console.error("Google Auth Error: missing auth code", {
+//         contentType: req.headers["content-type"],
+//         origin: req.headers.origin,
+//       });
+//       return res.status(400).json({ msg: "Google auth code is required" });
+//     }
+//     const client = getGoogleClient();
+//     if (!client) {
+//       return res.status(500).json({ msg: "OAuth not configured" });
+//     }
+//     const { tokens } = await client.getToken(code);
+//     const ticket = await client.verifyIdToken({
+//       idToken: tokens.id_token!,
+//       audience: oAuthclientID || "",
+//     });
 
-    const payload = ticket.getPayload();
-    // console.log(payload);
-    if (!payload) return res.status(400).json({ msg: "Invalid google token" });
+//     const payload = ticket.getPayload();
+//     // console.log(payload);
+//     if (!payload) return res.status(400).json({ msg: "Invalid google token" });
 
-    const { email, name, picture, sub: googleId } = payload;
-    if (!email)
-      return res.status(400).json({ msg: "Email not provided by Google" });
+//     const { email, name, picture, sub: googleId } = payload;
+//     if (!email)
+//       return res.status(400).json({ msg: "Email not provided by Google" });
 
-    let user = await User.findOne({ email });
+//     let user = await User.findOne({ email });
 
-    if (user) {
-      if (!user.googleId) {
-        user.googleId = googleId;
-        await user.save();
-      }
-    } else {
-      // New user
-      const randomPassword = crypto.randomBytes(16).toString("hex");
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+//     if (user) {
+//       if (!user.googleId) {
+//         user.googleId = googleId;
+//         await user.save();
+//       }
+//     } else {
+//       // New user
+//       const randomPassword = crypto.randomBytes(16).toString("hex");
+//       const salt = await bcrypt.genSalt(10);
+//       const hashedPassword = await bcrypt.hash(randomPassword, salt);
 
-      user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
-        profilePic: picture,
-        googleId: googleId,
-        isVerified: true,
-      });
-    }
+//       user = await User.create({
+//         name,
+//         email,
+//         password: hashedPassword,
+//         profilePic: picture,
+//         googleId: googleId,
+//         isVerified: true,
+//       });
+//     }
     
     
-    // Token and cookie
-    const token = generateToken(user._id);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+//     // Token and cookie
+//     const token = generateToken(user._id);
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//     });
     
-    res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      profilePic: user.profilePic,
-      bio: user.bio,
-      msg: "Google Login successful",
-    });
-  } catch (error) {
-    console.error("Google Auth Error:", error);
-    res.status(500).json({ msg: "Google authentication failed" });
-  }
-};
+//     res.status(200).json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       profilePic: user.profilePic,
+//       bio: user.bio,
+//       msg: "Google Login successful",
+//     });
+//   } catch (error) {
+//     console.error("Google Auth Error:", error);
+//     res.status(500).json({ msg: "Google authentication failed" });
+//   }
+// };
 
-const loginUser = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+// const loginUser = async (req: Request, res: Response) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(500).json({ msg: "Invalid email or password" });
-    }
+//     if (!user) {
+//       return res.status(500).json({ msg: "Invalid email or password" });
+//     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+//     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
-      return res.status(500).json({ msg: "Invalid email or password" });
-    }
+//     if (!isMatch) {
+//       return res.status(500).json({ msg: "Invalid email or password" });
+//     }
 
-    const token = generateToken(user._id);
+//     const token = generateToken(user._id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//     });
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      profilePic: user.profilePic,
-      bio: user.bio,
-      msg: "Login successfull",
-    });
-  } catch (error) {
-    return res.status(500).json({ msg: "Server error" });
-  }
-};
+//     res.json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       profilePic: user.profilePic,
+//       bio: user.bio,
+//       msg: "Login successfull",
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ msg: "Server error" });
+//   }
+// };
 
 const getUserProfile = async (req: Request, res: Response) => {
   try {
@@ -377,12 +377,12 @@ const getUsage = async (req: Request, res: Response) => {
   }
 }
 export {
-  registerUser,
-  verifyEmail,
-  loginUser,
+  // registerUser,
+  // verifyEmail,
+  // loginUser,
   getUserProfile,
   logOut,
   updateProfile,
-  googleLogin,
+  // googleLogin,
   getUsage,
 };

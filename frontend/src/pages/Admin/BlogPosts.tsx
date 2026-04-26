@@ -55,7 +55,7 @@ const BlogPosts = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
   const getAllPosts = async (pageNumber = 1, filterStatus: string) => {
@@ -157,13 +157,12 @@ const BlogPosts = () => {
                 Posts
               </h1>
               <span className="text-zinc-400 text-sm border-l border-zinc-700 pl-4">
-                {allPosts} Total Posts
+                {totalCount} Total Posts
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-3">
-
                 <button
                   onClick={() => toggleTheme()}
                   className="p-2 cursor-pointer bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors shadow-sm dark:shadow-none"
@@ -175,7 +174,7 @@ const BlogPosts = () => {
                   <AvatarImage
                     src={user?.profilePic || "https://github.com/shadcn.png"}
                     alt="@shadcn"
-                    className='object-cover'
+                    className="object-cover"
                   />
                   <AvatarFallback>{user?.name[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
@@ -203,7 +202,6 @@ const BlogPosts = () => {
                 </button>
               ))}
             </div>
-
           </div>
 
           {/* Table Container */}
@@ -218,9 +216,9 @@ const BlogPosts = () => {
                     <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Status
                     </th>
-                    <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    {/*<th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Engagement
-                    </th>
+                    </th>*/}
                     <th className="py-6 px-6 text-base font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Date
                     </th>
@@ -256,7 +254,8 @@ const BlogPosts = () => {
                             <div>
                               <div
                                 onClick={() => navigate(`/${post.slug}`)}
-                                className="font-primary text-xl text-zinc-900 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer">
+                                className="font-primary text-xl text-zinc-900 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer"
+                              >
                                 {post.title}
                               </div>
                               <div className="text-sm text-zinc-500 mt-1 flex items-center gap-2">
@@ -288,7 +287,7 @@ const BlogPosts = () => {
                         </td>
 
                         {/* Engagement (Likes/Views) */}
-                        <td className="py-6 px-6">
+                        {/*<td className="py-6 px-6">
                           <div className="flex items-center gap-4 text-base text-zinc-600 dark:text-zinc-400">
                             <div
                               className="flex items-center gap-1.5 min-w-[60px]"
@@ -319,7 +318,7 @@ const BlogPosts = () => {
                               <span>{post.views}</span>
                             </div>
                           </div>
-                        </td>
+                        </td>*/}
 
                         {/* Date */}
                         <td className="py-6 px-6">
@@ -332,7 +331,12 @@ const BlogPosts = () => {
                         {/* Actions */}
                         <td className="py-6 px-6 text-center">
                           <div className="flex items-center justify-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity pl-4">
-                            <button className="p-1.5 cursor-pointer text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                            <button
+                              onClick={() =>
+                                navigate(`/admin/edit/${post.slug}`)
+                              }
+                              className="p-1.5 cursor-pointer text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                            >
                               <Edit3 size={16} />
                             </button>
                             <Dialog

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +22,43 @@ interface EditorContent {
 }
 
 const EditorPage = () => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const setContent = useEditorStore((state) => state.setContent);
+  const [postId, setPostId] = useState<string | null>(null);
+  const [initialContent, setInitialContent] = useState<JSONContent | string | undefined>(undefined);
+  // const [isFetchingPost, setIsFetchingPost] = useState(false);
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [previewUrl, setPreviewUrl] = useState("");
+  // const [coverFile, setCoverFile] = useState<File | null>(null);
+
+  // const theme = useThemeStore((state) => state.theme);
+  // const toggleTheme = useThemeStore((state) => state.toggleTheme);
+
+  // const [meta, setMeta] = useState({
+  //   title: "",
+  //   slug: "",
+  //   coverImageUrl: "" as string | null,
+  //   tags: ["Technology"],
+  //   excerpt: "",
+  // });
+
+  // const notify = (type: string) => {
+  //   switch (type) {
+  //     case "titleMissing":
+  //       toast.error("Please enter a post title!");
+  //       break;
+  //     case "emptyContent":
+  //       toast.error("Empty post cannot be published");
+  //       break;
+  //     case "publish":
+  //       toast.success("Post published successfully!");
+  //       break;
+
+  //   }
+
+  const [isFetchingPost, setIsFetchingPost] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -58,6 +96,54 @@ const EditorPage = () => {
         break;
     }
   };
+
+  useEffect(() => {
+    if (slug) {
+      const fetchPost = async () => {
+        setIsFetchingPost(true);
+        try {
+          const response = await axiosInstance.get(API_PATHS.POST.GET_POST_BY_SLUG(slug));
+          const post = response.data;
+
+          setPostId(post._id);
+          setMeta({
+            title: post.title,
+            slug: post.slug,
+            coverImageUrl: post.coverImageUrl || "",
+            tags: post.tags || [],
+            excerpt: post.excerpt || "",
+          });
+
+          if (post.coverImageUrl) {
+            setPreviewUrl(post.coverImageUrl);
+          }
+
+          setInitialContent(post.content?.json || post.content?.html || "");
+          setContent(post.content?.html || "", post.content?.json || null);
+
+        } catch (error) {
+          console.error("Failed to fetch post", error);
+          toast.error("Failed to load post for editing");
+        } finally {
+          setIsFetchingPost(false);
+        }
+      };
+
+      fetchPost();
+    } else {
+        setPostId(null);
+        setInitialContent(undefined);
+        setContent("", null);
+        setMeta({
+          title: "",
+          slug: "",
+          coverImageUrl: "",
+          tags: ["Technology"],
+          excerpt: "",
+        });
+        setPreviewUrl("");
+    }
+  }, [slug, setContent]);
 
   const json = useEditorStore((state) => state.json);
   const html = useEditorStore((state) => state.html);
@@ -103,10 +189,17 @@ const EditorPage = () => {
         isDraft: status === "draft" ? true : false,
       };
 
-      await axiosInstance.post(
-        API_PATHS.POST.CREATE_POST,
-        payload,
-      );
+      if (postId) {
+        await axiosInstance.put(
+          API_PATHS.POST.UPDATE_POST(postId),
+          payload,
+        );
+      } else {
+        await axiosInstance.post(
+          API_PATHS.POST.CREATE_POST,
+          payload,
+        );
+      }
 
       notify(status);
     } catch (error) {
@@ -116,9 +209,8 @@ const EditorPage = () => {
     }
   };
 
-  const setContent = useEditorStore((state) => state.setContent);
   const { user } = useAuthStore();
-  
+
   return (
     <div >
       <Toaster containerClassName="text-lg" />
@@ -175,11 +267,16 @@ const EditorPage = () => {
 
               {/* Editor Area */}
               <div className="flex-1 overflow-hidden bg-white dark:bg-zinc-900 scroll-smooth">
-                <SimpleEditor
-                  onChange={(json, html) => {
-                    setContent(html, json);
-                  }}
-                />
+                {isFetchingPost ? (
+                  <div className="flex items-center justify-center h-full text-zinc-500 font-primary">Loading post...</div>
+                ) : (
+                  <SimpleEditor
+                    initialContent={initialContent}
+                    onChange={(json, html) => {
+                      setContent(html, json);
+                    }}
+                  />
+                )}
               </div>
             </div>
 

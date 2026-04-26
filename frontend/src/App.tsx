@@ -40,6 +40,7 @@ function App() {
             <Route path='/admin/overview' element={<Dashboard/>}/>
             <Route path='/admin/posts' element={<BlogPosts/>}/>
             <Route path='/admin/create' element={<EditorPage/>}/>
+            <Route path='/admin/edit/:slug' element={<EditorPage/>}/>
             <Route path='/admin/profile' element={<Profile2/>}/>
             <Route path='/admin/comments' element={<CommentsPage/>}/>
           </Route>

@@ -51,7 +51,7 @@ const BlogPage = () => {
           API_PATHS.POST.GET_POST_BY_SLUG(slug),
         );
         setPost(response.data);
-        console.log(response.data.content);
+        // console.log(response.data.content);
       } catch (err) {
         console.error("Blog Fetching failed", err);
         setBlogError("Could not load blog post.");

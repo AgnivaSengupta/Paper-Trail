@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Sun,
   Moon,
-  FileText,
-  MessageSquare,
   MapPin,
   Mail,
   Link as LinkIcon,
@@ -13,8 +11,6 @@ import {
   Calendar,
   Edit,
   Share2,
-  Heart,
-  Star,
   CheckCircle,
 } from "lucide-react";
 import {
@@ -34,45 +30,12 @@ import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm";
 import axiosInstance from "@/utils/axiosInstance";
 import { API_PATHS } from "@/utils/apiPaths";
 
-interface StatCardProps {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-}
-
-const StatCard = ({ icon, value, label }: StatCardProps) => (
-  <Card className="group transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-default">
-    <CardContent className="p-5 text-center">
-      <div className="flex justify-center mb-2 text-muted-foreground group-hover:text-accent transition-colors">
-        {icon}
-      </div>
-      <div className={`font-serif text-2xl font-semibold `}>{value}</div>
-      <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
-        {label}
-      </div>
-    </CardContent>
-  </Card>
-);
-
 const Profile2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  // const [isDarkMode, setIsDarkMode] = useState(true);
-  // const [profile, setProfile] = useState();
-
   const { user, refreshUser, setUser } = useAuthStore();
 
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-
-  // useEffect(() => {
-  //   void refreshUser();
-  //   const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, {
-  //     withCredentials: true,
-  //   });
-
-  //   setUser(response.data)
-
-  // }, [refreshUser]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -89,6 +52,21 @@ const Profile2 = () => {
         // Handle error (e.g., redirect to login)
       }
     };
+    
+    // const fetchPosts = async () => {
+    //   try {
+    //     const response = await axiosInstance.get(
+    //       API_PATHS.POST.GET_ALL_POSTS_BY_USER,
+    //       {
+    //         params: {
+    //           status: "pubished",
+    //           page: pageNumber,
+    //           limit: 8,
+    //         },
+    //       },
+    //     );
+    //   }
+    // }
 
     // 2. Execute the function
     fetchProfile();
@@ -168,9 +146,7 @@ const Profile2 = () => {
                       <TooltipContent>Verified member</TooltipContent>
                     </Tooltip>
                   </div>
-                  <p className="text-white mt-1 text-base">
-                    {user?.title}
-                  </p>
+                  <p className="text-white mt-1 text-base">{user?.title}</p>
                 </div>
               </div>
 
@@ -203,34 +179,23 @@ const Profile2 = () => {
             </div>
 
             {/* Stats and About Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="gap-6 mb-8">
               {/* About Section */}
               <Card
-                className="lg:col-span-2 animate-fade-in"
+                className="lg:col-span-2 animate-fade-in gap-0 px-1 py-4 rounded-md"
                 style={{ animationDelay: "0.1s" }}
               >
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-0">
                   <CardTitle className="font-serif text-lg">About</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
+                <CardContent className="space-y-4 py-2">
+                  <div className="mb-4">
                     <p className="text-muted-foreground text-lg font-content leading-relaxed">
-                      {/* {bioExpanded ? fullBio : shortBio} */}
                       {user?.bio}
                     </p>
-                    {/* <button
-                                            onClick={() => setBioExpanded(!bioExpanded)}
-                                            className="text-accent text-sm font-medium mt-2 flex items-center gap-1 hover:underline"
-                                        >
-                                            {bioExpanded ? (
-                                                <>Show less <ChevronUp className="w-4 h-4" /></>
-                                            ) : (
-                                                <>Read more <ChevronDown className="w-4 h-4" /></>
-                                            )}
-                                        </button> */}
                   </div>
 
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="w-4 h-4" />
                       <span>{user?.location}</span>
@@ -304,40 +269,14 @@ const Profile2 = () => {
                 </CardContent>
               </Card>
 
-              {/* Stats Cards */}
-              <div
-                className="grid grid-cols-2 gap-4 animate-fade-in"
-                style={{ animationDelay: "0.2s" }}
-              >
-                <StatCard
-                  icon={<FileText className="w-5 h-5" />}
-                  value={42}
-                  label="Posts"
-                />
-                <StatCard
-                  icon={<MessageSquare className="w-5 h-5" />}
-                  value={185}
-                  label="Comments"
-                />
-                <StatCard
-                  icon={<Heart className="w-5 h-5" />}
-                  value={1000}
-                  label="Likes"
-                />
-                <StatCard
-                  icon={<Star className="w-5 h-5" />}
-                  value={980}
-                  label="Reputation"
-                />
-              </div>
             </div>
 
             {/* Skills Section */}
             <Card
-              className="mb-8 animate-fade-in"
+              className="mb-8 animate-fade-in gap-0 px-1 py-4 rounded-md"
               style={{ animationDelay: "0.3s" }}
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-1">
                 <CardTitle className="font-serif text-lg">Skills</CardTitle>
               </CardHeader>
               <CardContent>
@@ -346,7 +285,7 @@ const Profile2 = () => {
                     <Badge
                       key={skill}
                       variant="secondary"
-                      className="px-3 py-1.5 text-sm font-medium bg-muted hover:bg-accent/10 hover:text-accent transition-colors cursor-default"
+                      className="px-3 py-1 text-sm font-medium text-foreground/60 border-foreground border-dashed bg-muted transition-colors cursor-default rounded-sm"
                     >
                       {skill}
                     </Badge>
@@ -354,42 +293,7 @@ const Profile2 = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Activity Timeline */}
-            {/* <Card className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="font-serif text-lg">Recent Activity</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {activityData.map((activity, index) => (
-                                        <div
-                                            key={activity.id}
-                                            className="flex gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
-                                        >
-                                            <div className={`flex items-center justify-center w-9 h-9 rounded-full border shrink-0 ${getActivityColor(activity.type)}`}>
-                                                {getActivityIcon(activity.type)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <h4 className="font-medium text-foreground truncate">
-                                                        {activity.title}
-                                                    </h4>
-                                                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                                        {activity.date}
-                                                    </span>
-                                                </div>
-                                                {activity.description && (
-                                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                                                        {activity.description}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card> */}
+            
           </div>
         </main>
       </div>

@@ -18,7 +18,7 @@ export interface IComment extends Document {
 // =================================================================================================================================================
 const createComment = async (req:Request, res:Response) => {
   try{
-    const { _id: authorId } = req.user;
+    const authorId = req.user?.id;
     // const author = { name, profilePic };
     const { content, post, parentComment } = req.body;
 
@@ -47,7 +47,7 @@ const createComment = async (req:Request, res:Response) => {
       author: authorId,
       parentComment: parentComment || null,
       ancestors,
-      postAuthor: postDoc.author._id,
+      postAuthor: postDoc.author,
     })
 
     // Else its a new root level comment
@@ -57,7 +57,7 @@ const createComment = async (req:Request, res:Response) => {
       author: authorId,
       parentComment: parentComment || null,
       ancestors,
-      postAuthor: postDoc.author._id,
+      postAuthor: postDoc.author,
     });
     
     res.status(201).json(newComment);
@@ -105,26 +105,6 @@ const getCommentsByPost = async (req: Request, res: Response) => {
       .populate("post", "title coverImageUrl")
       .sort({ createdAt: -1 });
 
-    // const commentMap: Record<string, any> = {};
-
-    // comments.forEach((comment) => {
-    //   const c: any = comment.toObject(); // ignore TS
-    //   c.replies = [];
-    //   commentMap[c._id.toString()] = c;
-    // });
-
-    // const nestedComments: any[] = [];
-    // comments.forEach((comment) => {
-    //   const c: any = commentMap[comment._id.toString()];
-    //   if (c.parentComment) {
-    //     const parent: any = commentMap[c.parentComment];
-    //     if (parent) parent.replies.push(c);
-    //     else nestedComments.push(c);
-    //   } else {
-    //     nestedComments.push(c);
-    //   }
-    // });
-
     res.json(comments);
   } catch (error) {
     res.status(500).json({ msg: "Failed to get comment for the post", error });
@@ -140,6 +120,10 @@ const deleteComment = async (req: Request, res: Response) => {
       return res.status(404).json({ msg: "Comment not found" });
     }
 
+    if (comment.author.toString() !== req.user?.id && req.user?.role !== "admin") {
+      return res.status(403).json({ msg: "Not authorized to delete this comment" });
+    }
+
     await Comment.deleteOne({ _id: commentId });
 
     await Comment.deleteMany({ parentComment: commentId });
@@ -153,33 +137,6 @@ const deleteComment = async (req: Request, res: Response) => {
 // get all direct comments for a user --> to be shown in the user inbox
 const getAllComments = async (req: Request, res: Response) => {
   try {
-    // fetch all comments with author populated
-    // const comments = await Comment.find()
-    //     .populate("author", "name profilePic")
-    //     .populate("post", "title coverImageUrl")
-    //     .sort({ createdAt: 1 }) // replies come in order
-
-    //     const commentMap: Record<string, any> = {}; // cast to any
-    //     comments.forEach(comment => {
-    //         const c: any = comment.toObject(); // ignore TS
-    //         c.replies = [];
-    //         commentMap[c._id] = c;
-    //     });
-
-    //     const nestedComments: any[] = [];
-    //     comments.forEach(comment => {
-    //         const c: any = commentMap[comment._id.toString()];
-    //         if (c.parentComment) {
-    //             const parent: any = commentMap[c.parentComment.toString()];
-    //             if (parent) parent.replies.push(c);
-    //             else nestedComments.push(c);
-    //         } else {
-    //             nestedComments.push(c);
-    //         }
-    //     })
-
-    // res.json(nestedComments);
-
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 5;
     const skip = (page - 1) * limit;

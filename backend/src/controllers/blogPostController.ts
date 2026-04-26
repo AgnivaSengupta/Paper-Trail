@@ -2,6 +2,7 @@ import BlogPost from "../models/BlogPost";
 import type { Request, Response } from "express";
 import extractImages from "../utils/extractImages";
 import MediaAsset from "../models/MediaAsset";
+import { generateUniqueSlug } from "../utils/generateUniqueSlug";
 
 // create a new blog post
 // @route POST/api/post
@@ -25,11 +26,7 @@ const createPost = async (req: Request, res: Response) => {
         msg: "You have reached your monthly limit of 10 blog posts",
       });
     }
-    const slug = title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "") // remove non-word except spaces & hyphens
-      .trim() // remove leading/trailing spaces
-      .replace(/\s+/g, "-"); // replace spaces with hyphens
+    const slug = await generateUniqueSlug(title);
 
     const newPost = new BlogPost({
       title,
@@ -73,13 +70,18 @@ const updatePost = async (req: Request, res: Response) => {
       return res.status(403).json({ msg: "Not authorized to update the post" });
     }
 
+    let oldUsedImageUrls: string[] = [];
+    if (post.content?.json) {
+      oldUsedImageUrls = extractImages(post.content.json);
+      if (post.coverImageUrl) {
+        oldUsedImageUrls.push(post.coverImageUrl);
+      }
+    }
+
     const updatedData = req.body;
 
     if (updatedData.title) {
-      updatedData.slug = updatedData.title
-        .tolowercase()
-        .replace(/ /g, "-")
-        .replace(/[^\w-]+/g, "");
+      updatedData.slug = await generateUniqueSlug(updatedData.title, req.params.id);
     }
 
     const updatedPost = await BlogPost.findByIdAndUpdate(
@@ -88,12 +90,13 @@ const updatePost = async (req: Request, res: Response) => {
       { new: true },
     );
 
+    let usedImageUrls: string[] = [];
     if (updatedData.content?.json) {
-      const usedImageUrls = extractImages(updatedData.content.json);
+      usedImageUrls = extractImages(updatedData.content.json);
       if (updatedData.coverImageUrl) {
         usedImageUrls.push(updatedData.coverImageUrl);
       }
-      
+
       if (usedImageUrls.length > 0) {
         await MediaAsset.updateMany(
           { url: { $in: usedImageUrls } },
@@ -102,6 +105,16 @@ const updatePost = async (req: Request, res: Response) => {
       }
     }
 
+    const updatedSet = new Set(usedImageUrls);
+    const removedImageUrls = oldUsedImageUrls.filter(item => !updatedSet.has(item));
+
+    if (removedImageUrls.length > 0) {
+      await MediaAsset.updateMany(
+        { url: { $in: removedImageUrls } },
+        { $set: { status: "pending" } },
+      );
+    }
+    
     res.json(updatedData);
   } catch (error) {
     res.status(500).json({ msg: "Failed to update post" });
@@ -117,6 +130,21 @@ const deletePost = async (req: Request, res: Response) => {
 
     if (!post) {
       return res.status(404).json({ msg: "Post not found" });
+    }
+
+    let oldUsedImageUrls: string[] = [];
+    if (post.content?.json) {
+      oldUsedImageUrls = extractImages(post.content.json);
+      if (post.coverImageUrl) {
+        oldUsedImageUrls.push(post.coverImageUrl);
+      }
+    }
+
+    if (oldUsedImageUrls.length > 0) {
+      await MediaAsset.updateMany(
+        { url: { $in: oldUsedImageUrls } },
+        { $set: { status: "pending" } },
+      );
     }
 
     await post.deleteOne();

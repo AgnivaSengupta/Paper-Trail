@@ -1,23 +1,6 @@
 version: '3.8'
 
 services:
-  # 1. The Analytics Engine (Go)
-  analytics-engine:
-    build: 
-      context: ./analytics-engine
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"   # HTTP Ingest
-      - "50051:50051" # gRPC Server
-    environment:
-      - DB_DSN=${NEON_URL}
-      - REDIS_DSN=redis:6379
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - app_network
-
   # 2. The Core Backend (Node.js)
   backend:
     build: 
@@ -29,30 +12,15 @@ services:
       - NODE_ENV=production
       - PORT=8000
       - MONGO_URL=mongodb://mongo:27017/blog_db
-      - ANALYTICS_GRPC_HOST=analytics-engine:50051
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}         # Will read from your .env
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} # Will read from your .env
       - GOOGLE_CALLBACK_URL=http://localhost:5173   # Match frontend
     depends_on:
       - mongo
-      - analytics-engine
     networks:
       - app_network
 
   # 3. Infrastructure (Databases)
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: analytics
-    networks:
-      - app_network
-
-  redis:
-    image: redis:alpine
-    networks:
-      - app_network
 
   mongo:
     image: mongo:latest

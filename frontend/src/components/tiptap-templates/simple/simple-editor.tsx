@@ -213,8 +213,10 @@ const MobileToolbarContent = ({
 );
 
 export function SimpleEditor({
+  initialContent,
   onChange,
 }: {
+  initialContent?: JSONContent | string;
   onChange: (json: JSONContent, html: string) => void;
 }) {
   const isMobile = useIsMobile();
@@ -274,7 +276,7 @@ export function SimpleEditor({
       BubbleMenuExtension,
       CustomCodeBlock,
     ],
-    content: "",
+    content: initialContent || "",
     onUpdate: ({ editor }) => {
       onChange(editor.getJSON(), editor.getHTML());
     },
