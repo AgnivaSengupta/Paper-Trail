@@ -17,11 +17,69 @@ import authRouter from "./routes/authRoute";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
+const normalizeOrigin = (value?: string | null) => {
+    if (!value) return null;
+
+    try {
+        return new URL(value).origin;
+    } catch {
+        return null;
+    }
+}
+
+const configuredFrontendOrigin = normalizeOrigin(process.env.FRONTEND_URL);
+const configuredFrontendHost = configuredFrontendOrigin ? new URL(configuredFrontendOrigin).hostname : null;
+const vercelProjectPrefix = configuredFrontendHost?.endsWith(".vercel.app")
+    ? configuredFrontendHost.replace(".vercel.app", "")
+    : null;
+
+const allowedOrigins = new Set(
+    [
+        "http://localhost:5173",
+        configuredFrontendOrigin,
+        "https://papertrails.agniva.dev",
+        ...(
+            process.env.CORS_ALLOWED_ORIGINS
+                ?.split(",")
+                .map((origin) => normalizeOrigin(origin))
+                .filter((origin): origin is string => Boolean(origin)) ?? []
+        ),
+    ].filter((origin): origin is string => Boolean(origin))
+);
+
+const isAllowedOrigin = (origin?: string | null) => {
+    if (!origin) return true;
+    if (allowedOrigins.has(origin)) return true;
+
+    if (vercelProjectPrefix) {
+        const previewPattern = new RegExp(
+            `^https://${vercelProjectPrefix}(?:-[a-z0-9-]+)?\\.vercel\\.app$`,
+            "i",
+        );
+        return previewPattern.test(origin);
+    }
+
+    return false;
+};
+
 // global middleware
+const corsOriginDelegate = (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+) => {
+    if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`), false);
+};
 
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        origin: corsOriginDelegate,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
         credentials: true,
