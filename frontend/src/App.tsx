@@ -10,6 +10,7 @@ import EditorPage from './pages/Admin/EditorPage';
 import CommentsPage from './pages/Admin/CommentsPage';
 import BlogPage from './pages/Blog/BlogPage';
 import Profile2 from './pages/Admin/Profile2';
+import { Analytics } from '@vercel/analytics/react';
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
 
         </Routes>
       </Router>
+      <Analytics />
     </div>
   )
 }
